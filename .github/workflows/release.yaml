@@ -18,7 +18,7 @@ jobs:
         with:
           continue-after-seconds: 180
         env:
-          GITHUB_TOKEN: ${{ secrets.CR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
       - name: Fetch history
         run: git fetch --prune --unshallow
@@ -41,4 +41,4 @@ jobs:
         with:
           charts_repo_url: https://nextcloud.github.io/helm
         env:
-          CR_TOKEN: "${{ secrets.CR_TOKEN }}"
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
