@@ -1,0 +1,6 @@
+helm-extra-args: --timeout 600s
+chart-dirs:
+  - charts
+chart-repos:
+  - nextcloud=https://nextcloud.github.io/helm
+  - bitnami=https://charts.bitnami.com/bitnami
