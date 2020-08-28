@@ -1,6 +1,47 @@
 apiVersion: v1
 entries:
   nextcloud:
+  - apiVersion: v2
+    appVersion: 17.0.0
+    created: "2020-08-28T18:12:54.060771748Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.1.2
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 7.7.1
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 10.7.17
+    description: A file sharing server that puts the control and security of your
+      own data back into your hands.
+    digest: ef7b6835e9c0acbe0c6378360bf77852d9253ba78006592416358ee098c04f0c
+    home: https://nextcloud.com/
+    icon: https://cdn.rawgit.com/docker-library/docs/defa5ffc7123177acd60ddef6e16bddf694cc35f/nextcloud/logo.svg
+    keywords:
+    - nextcloud
+    - storage
+    - http
+    - web
+    - php
+    maintainers:
+    - email: skjnldsv@protonmail.com
+      name: skjnldsv
+    - email: christian.ingenhaag@googlemail.com
+      name: chrisingenhaag
+    - email: jeff@billimek.com
+      name: billimek
+    name: nextcloud
+    sources:
+    - https://github.com/nextcloud/helm
+    - https://github.com/nextcloud/docker
+    urls:
+    - https://github.com/nextcloud/helm/releases/download/nextcloud-2.1.0/nextcloud-2.1.0.tgz
+    version: 2.1.0
   - apiVersion: v1
     appVersion: 17.0.0
     created: "2020-08-26T16:22:56.792373862Z"
