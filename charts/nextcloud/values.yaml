@@ -216,13 +216,29 @@ mariadb:
     user: nextcloud
     password: changeme
 
+  replication:
+    enabled: false
+
   ## Enable persistence using Persistent Volume Claims
   ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
+  master:
+    persistence:
+      enabled: false
+      # storageClass: ""
+      accessMode: ReadWriteOnce
+      size: 8Gi
+
+postgresql:
+  enabled: false
+  global:
+    postgresql:
+      postgresqlUsername: nextcloud
+      postgresqlPassword: changeme
+      postgresqlDatabase: nextcloud
   persistence:
     enabled: false
-    accessMode: ReadWriteOnce
-    size: 8Gi
+    # storageClass: ""
 
 redis:
   enabled: false
