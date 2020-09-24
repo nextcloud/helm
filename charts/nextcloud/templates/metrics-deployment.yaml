@@ -15,6 +15,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "nextcloud.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: metrics
   template:
     metadata:
       annotations: {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
