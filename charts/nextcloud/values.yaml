@@ -3,7 +3,7 @@
 ##
 image:
   repository: nextcloud
-  tag: 17.0.0-apache
+  tag: 19.0.3-apache
   pullPolicy: IfNotPresent
   # pullSecrets:
   #   - myRegistrKeySecretName
@@ -245,7 +245,7 @@ redis:
   usePassword: false
 
 ## Cronjob to execute Nextcloud background tasks
-## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron-jobs
+## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#webcron
 ##
 cronjob:
   enabled: false
@@ -256,11 +256,13 @@ cronjob:
     # pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName
-  # Every 15 minutes
-  # Note: Setting this to any any other value than 15 minutes might
+  # Every 5 minutes
+  # Note: Setting this to any any other value than 5 minutes might
   #  cause issues with how nextcloud background jobs are executed
-  schedule: "*/15 * * * *"
+  schedule: "*/5 * * * *"
   annotations: {}
+  # Set curl's insecure option if you use e.g. self-signed certificates
+  curlInsecure: false
   failedJobsHistoryLimit: 5
   successfulJobsHistoryLimit: 2
   # If not set, nextcloud deployment one will be set
