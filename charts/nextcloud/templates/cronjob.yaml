@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ template "nextcloud.fullname" . }}
+  name: {{ template "nextcloud.fullname" . }}-cron
   labels:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     helm.sh/chart: {{ include "nextcloud.chart" . }}
@@ -44,9 +44,20 @@ spec:
               imagePullPolicy: {{ default .Values.image.pullPolicy .Values.cronjob.image.pullPolicy }}
               command: [ "curl" ]
               args:
+              {{- if .Values.ingress.enabled }}
+              {{- if .Values.cronjob.curlInsecure }}
+                - "-k"
+              {{- end }}
                 - "--fail"
                 - "-L"
+              {{- if .Values.ingress.tls }}
+                - "https://{{ .Values.nextcloud.host }}/cron.php"
+              {{- else }}
+                - "http://{{ .Values.nextcloud.host }}/cron.php"
+              {{- end }}
+              {{- else }}
                 - "http://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}/cron.php"
+              {{- end }}
               resources:
 {{ toYaml (default .Values.resources .Values.cronjob.resources) | indent 16 }}
     {{- with (default .Values.nodeSelector .Values.cronjob.nodeSelector) }}
