@@ -135,17 +135,23 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.size`                                           | PVC Storage Request for nextcloud volume                | `8Gi`                                       |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
 | `livenessProbe.enabled`                                      | Turn on and off liveness probe                          | `true`                                      |
-| `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `30`                                        |
-| `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `15`                                        |
+| `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `10`                                        |
+| `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `10`                                        |
 | `livenessProbe.timeoutSeconds`                               | When the probe times out                                | `5`                                         |
 | `livenessProbe.failureThreshold`                             | Minimum consecutive failures for the probe              | `3`                                         |
 | `livenessProbe.successThreshold`                             | Minimum consecutive successes for the probe             | `1`                                         |
 | `readinessProbe.enabled`                                     | Turn on and off readiness probe                         | `true`                                      |
-| `readinessProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated               | `30`                                        |
-| `readinessProbe.periodSeconds`                               | How often to perform the probe                          | `15`                                        |
+| `readinessProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated               | `10`                                        |
+| `readinessProbe.periodSeconds`                               | How often to perform the probe                          | `10`                                        |
 | `readinessProbe.timeoutSeconds`                              | When the probe times out                                | `5`                                         |
 | `readinessProbe.failureThreshold`                            | Minimum consecutive failures for the probe              | `3`                                         |
 | `readinessProbe.successThreshold`                            | Minimum consecutive successes for the probe             | `1`                                         |
+| `startupProbe.enabled`                                       | Turn on and off startup probe                           | `false`                                      |
+| `startupProbe.initialDelaySeconds`                           | Delay before readiness probe is initiated               | `30`                                        |
+| `startupProbe.periodSeconds`                                 | How often to perform the probe                          | `10`                                        |
+| `startupProbe.timeoutSeconds`                                | When the probe times out                                | `5`                                         |
+| `startupProbe.failureThreshold`                              | Minimum consecutive failures for the probe              | `30`                                         |
+| `startupProbe.successThreshold`                              | Minimum consecutive successes for the probe             | `1`                                         |
 | `hpa.enabled`                                                | Boolean to create a HorizontalPodAutoscaler             | `false`                                     |
 | `hpa.cputhreshold`                                           | CPU threshold percent for the HorizontalPodAutoscale    | `60`                                        |
 | `hpa.minPods`                                                | Min. pods for the Nextcloud HorizontalPodAutoscaler     | `1`                                         |

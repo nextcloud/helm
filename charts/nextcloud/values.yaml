@@ -334,18 +334,26 @@ resources: {}
 ##
 livenessProbe:
   enabled: true
-  initialDelaySeconds: 30
-  periodSeconds: 15
+  initialDelaySeconds: 10
+  periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3
   successThreshold: 1
 readinessProbe:
   enabled: true
-  initialDelaySeconds: 30
-  periodSeconds: 15
+  initialDelaySeconds: 10
+  periodSeconds: 10
   timeoutSeconds: 5
   failureThreshold: 3
   successThreshold: 1
+startupProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 30
+  successThreshold: 1
+
 
 ## Enable pod autoscaling using HorizontalPodAutoscaler
 ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
