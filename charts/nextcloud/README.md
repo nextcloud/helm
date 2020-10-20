@@ -133,6 +133,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.existingClaim`                                  | An Existing PVC name for nextcloud volume               | `nil` (uses alpha storage class annotation) |
 | `persistence.accessMode`                                     | PVC Access Mode for nextcloud volume                    | `ReadWriteOnce`                             |
 | `persistence.size`                                           | PVC Storage Request for nextcloud volume                | `8Gi`                                       |
+| `persistence.mountOptions`                                   | PVC mount options for nextcloud volume                  | `{}`                                       |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
 | `livenessProbe.enabled`                                      | Turn on and off liveness probe                          | `true`                                      |
 | `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `30`                                        |
