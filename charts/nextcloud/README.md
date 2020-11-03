@@ -100,7 +100,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `internalDatabase.database`                                  | Name of the existing database                           | `nextcloud`                                 |
 | `externalDatabase.enabled`                                   | Whether to use external database                        | `false`                                     |
 | `externalDatabase.type`                                      | External database type: `mysql`, `postgresql`           | `mysql`                                     |
-| `externalDatabase.host`                                      | Host of the external database                           | `nil`                                       |
+| `externalDatabase.host`                                      | Host of the external database in form of `host:port`    | `nil`                                       |
 | `externalDatabase.database`                                  | Name of the existing database                           | `nextcloud`                                 |
 | `externalDatabase.user`                                      | Existing username in the external db                    | `nextcloud`                                 |
 | `externalDatabase.password`                                  | Password for the above username                         | `nil`                                       |
