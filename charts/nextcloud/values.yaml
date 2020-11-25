@@ -64,6 +64,12 @@ nextcloud:
   host: nextcloud.kube.home
   username: admin
   password: changeme
+  ## Use an existing secret
+  existingSecret:
+    enabled: false
+    # secretName: nameofsecret
+    # usernameKey: username
+    # passwordKey: password
   update: 0
   datadir: /var/www/html/data
   tableprefix:
