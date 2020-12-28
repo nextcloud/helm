@@ -61,6 +61,10 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.host`                                             | nextcloud host to create application URLs               | `nextcloud.kube.home`                       |
 | `nextcloud.username`                                         | User of the application                                 | `admin`                                     |
 | `nextcloud.password`                                         | Application password                                    | `changeme`                                  |
+| `nextcloud.existingSecret.enabled`                           | Whether to use an existing secret or not                | `false`                                     |
+| `nextcloud.existingSecret.secretName`                        | Name of the existing secret                             | `nil`                                       |
+| `nextcloud.existingSecret.usernameKey`                       | Name of the key that contains the username              | `nil`                                       |
+| `nextcloud.existingSecret.passwordKey`                       | Name of the key that contains the password              | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
 | `nextcloud.tableprefix`                                      | nextcloud db table prefix                               | `''`                                        |

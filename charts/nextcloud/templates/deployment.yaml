@@ -115,13 +115,13 @@ spec:
         - name: NEXTCLOUD_ADMIN_USER
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
         - name: NEXTCLOUD_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         - name: NEXTCLOUD_TRUSTED_DOMAINS
           value: {{ .Values.nextcloud.host }}
         {{- if ne (int .Values.nextcloud.update) 0 }}
