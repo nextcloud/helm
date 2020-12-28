@@ -114,6 +114,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `mariadb.db.user`                                            | Database user to create                                 | `nextcloud`                                 |
 | `mariadb.rootUser.password`                                  | MariaDB admin password                                  | `nil`                                       |
 | `redis.enabled`                                              | Whether to install/use redis for locking                | `false`                                     |
+| `redis.usePassword`                                          | Whether to use a password with redis                    | `false`                                     |
+| `redis.password`                                             | The password redis uses                                 | `''`                                        |
 | `cronjob.enabled`                                            | Whether to enable/disable cronjob                       | `false`                                     |
 | `cronjob.schedule`                                           | Schedule for the CronJob                                | `*/15 * * * *`                              |
 | `cronjob.annotations`                                        | Annotations to add to the cronjob                       | {}                                          |
@@ -246,4 +248,30 @@ nextcloud:
           )
         )
       );
+```
+
+## Hugepages
+
+If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
+to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge pages on the node or map hugepages into the container:
+
+```yaml
+nextcloud:
+  extraVolumes:
+    - name: hugepages
+      emptyDir:
+        medium: HugePages-2Mi
+  extraVolumeMounts:
+    - name: hugepages
+      mountPath: /dev/hugepages
+  resources:
+    requests:
+      hugepages-2Mi: 500Mi
+      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+      memory: 500Mi
+    limits:
+      # limit and request must be the same for hugepages. They are a fixed resource.
+      hugepages-2Mi: 500Mi
+      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+      memory: 1Gi
 ```
