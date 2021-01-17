@@ -70,6 +70,8 @@ nextcloud:
     # secretName: nameofsecret
     # usernameKey: username
     # passwordKey: password
+    # smtpUsernameKey: smtp_username
+    # smtpPasswordKey: smtp_password
   update: 0
   datadir: /var/www/html/data
   tableprefix:
