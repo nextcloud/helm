@@ -150,13 +150,13 @@ spec:
         - name: SMTP_NAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: smtp-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey | default "smtp-username" }}
         - name: SMTP_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: smtp-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey | default "smtp-password" }}
         {{- end }}
         {{- if .Values.redis.enabled }}
         - name: REDIS_HOST
