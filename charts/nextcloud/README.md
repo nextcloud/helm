@@ -81,12 +81,12 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.persistence.subPath`                              | Set the subPath for nextcloud to use in volume          | `nil`                                       |
 | `nextcloud.phpConfigs`                                       | PHP Config files created in `/usr/local/etc/php/conf.d` | `{}`                                        |
 | `nextcloud.defaultConfigs.\.htaccess`                        | Default .htaccess to protect `/var/www/html/config`     | `true`                                      |
-| `nextcloud.defaultConfigs.\.redis\.config\.php`              | Default Redis configuration                             | `true`                                      |
-| `nextcloud.defaultConfigs.\.apache-pretty-urls\.config\.php` | Default Apache configuration for rewrite urls           | `true`                                      |
-| `nextcloud.defaultConfigs.\.apcu\.config\.php`               | Default configuration to define APCu as local cache     | `true`                                      |
-| `nextcloud.defaultConfigs.\.apps\.config\.php`               | Default configuration for apps                          | `true`                                      |
-| `nextcloud.defaultConfigs.\.autoconfig\.php`                 | Default auto-configuration for databases                | `true`                                      |
-| `nextcloud.defaultConfigs.\.smtp\.config\.php`               | Default configuration for smtp                          | `true`                                      |
+| `nextcloud.defaultConfigs.redis\.config\.php`              | Default Redis configuration                             | `true`                                      |
+| `nextcloud.defaultConfigs.apache-pretty-urls\.config\.php` | Default Apache configuration for rewrite urls           | `true`                                      |
+| `nextcloud.defaultConfigs.apcu\.config\.php`               | Default configuration to define APCu as local cache     | `true`                                      |
+| `nextcloud.defaultConfigs.apps\.config\.php`               | Default configuration for apps                          | `true`                                      |
+| `nextcloud.defaultConfigs.autoconfig\.php`                 | Default auto-configuration for databases                | `true`                                      |
+| `nextcloud.defaultConfigs.smtp\.config\.php`               | Default configuration for smtp                          | `true`                                      |
 | `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                                      |
 | `nextcloud.extraEnv`                                         | specify additional environment variables                | `{}`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
