@@ -89,7 +89,7 @@ nextcloud:
       name: user
       password: pass
   # PHP Configuration files
-  # Will be injected in /usr/local/etc/php/conf.d
+  # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
   phpConfigs: {}
   # Default config files
   # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself
