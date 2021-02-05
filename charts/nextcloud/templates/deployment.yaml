@@ -255,9 +255,10 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+        {{- $nginxEnabled := .Values.nginx.enabled -}}
         {{- range $key, $value := .Values.nextcloud.phpConfigs }}
         - name: nextcloud-phpconfig
-          mountPath: /usr/local/etc/php/conf.d/{{ $key }}
+          mountPath: {{ $nginxEnabled | ternary (printf "/usr/local/etc/php-fpm.d/%s" $key | quote) (printf "/usr/local/etc/php/conf.d/%s" $key | quote) }}
           subPath: {{ $key }}
         {{- end }}
         {{- if .Values.nextcloud.extraVolumeMounts }}
