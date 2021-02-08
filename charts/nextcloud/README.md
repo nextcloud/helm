@@ -61,6 +61,12 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.host`                                             | nextcloud host to create application URLs               | `nextcloud.kube.home`                       |
 | `nextcloud.username`                                         | User of the application                                 | `admin`                                     |
 | `nextcloud.password`                                         | Application password                                    | `changeme`                                  |
+| `nextcloud.existingSecret.enabled`                           | Whether to use an existing secret or not                | `false`                                     |
+| `nextcloud.existingSecret.secretName`                        | Name of the existing secret                             | `nil`                                       |
+| `nextcloud.existingSecret.usernameKey`                       | Name of the key that contains the username              | `nil`                                       |
+| `nextcloud.existingSecret.passwordKey`                       | Name of the key that contains the password              | `nil`                                       |
+| `nextcloud.existingSecret.smtpUsernameKey`                       | Name of the key that contains the SMTP username         | `nil`                                       |
+| `nextcloud.existingSecret.smtpPasswordKey`                       | Name of the key that contains the SMTP password         | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
 | `nextcloud.tableprefix`                                      | nextcloud db table prefix                               | `''`                                        |
@@ -114,6 +120,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `mariadb.db.user`                                            | Database user to create                                 | `nextcloud`                                 |
 | `mariadb.rootUser.password`                                  | MariaDB admin password                                  | `nil`                                       |
 | `redis.enabled`                                              | Whether to install/use redis for locking                | `false`                                     |
+| `redis.usePassword`                                          | Whether to use a password with redis                    | `false`                                     |
+| `redis.password`                                             | The password redis uses                                 | `''`                                        |
 | `cronjob.enabled`                                            | Whether to enable/disable cronjob                       | `false`                                     |
 | `cronjob.schedule`                                           | Schedule for the CronJob                                | `*/15 * * * *`                              |
 | `cronjob.annotations`                                        | Annotations to add to the cronjob                       | {}                                          |
@@ -135,17 +143,23 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.size`                                           | PVC Storage Request for nextcloud volume                | `8Gi`                                       |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
 | `livenessProbe.enabled`                                      | Turn on and off liveness probe                          | `true`                                      |
-| `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `30`                                        |
-| `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `15`                                        |
+| `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `10`                                        |
+| `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `10`                                        |
 | `livenessProbe.timeoutSeconds`                               | When the probe times out                                | `5`                                         |
 | `livenessProbe.failureThreshold`                             | Minimum consecutive failures for the probe              | `3`                                         |
 | `livenessProbe.successThreshold`                             | Minimum consecutive successes for the probe             | `1`                                         |
 | `readinessProbe.enabled`                                     | Turn on and off readiness probe                         | `true`                                      |
-| `readinessProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated               | `30`                                        |
-| `readinessProbe.periodSeconds`                               | How often to perform the probe                          | `15`                                        |
+| `readinessProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated               | `10`                                        |
+| `readinessProbe.periodSeconds`                               | How often to perform the probe                          | `10`                                        |
 | `readinessProbe.timeoutSeconds`                              | When the probe times out                                | `5`                                         |
 | `readinessProbe.failureThreshold`                            | Minimum consecutive failures for the probe              | `3`                                         |
 | `readinessProbe.successThreshold`                            | Minimum consecutive successes for the probe             | `1`                                         |
+| `startupProbe.enabled`                                       | Turn on and off startup probe                           | `false`                                      |
+| `startupProbe.initialDelaySeconds`                           | Delay before readiness probe is initiated               | `30`                                        |
+| `startupProbe.periodSeconds`                                 | How often to perform the probe                          | `10`                                        |
+| `startupProbe.timeoutSeconds`                                | When the probe times out                                | `5`                                         |
+| `startupProbe.failureThreshold`                              | Minimum consecutive failures for the probe              | `30`                                         |
+| `startupProbe.successThreshold`                              | Minimum consecutive successes for the probe             | `1`                                         |
 | `hpa.enabled`                                                | Boolean to create a HorizontalPodAutoscaler             | `false`                                     |
 | `hpa.cputhreshold`                                           | CPU threshold percent for the HorizontalPodAutoscale    | `60`                                        |
 | `hpa.minPods`                                                | Min. pods for the Nextcloud HorizontalPodAutoscaler     | `1`                                         |
