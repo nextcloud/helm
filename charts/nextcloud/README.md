@@ -281,3 +281,13 @@ nextcloud:
       # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
       memory: 1Gi
 ```
+
+## HPA (Clustering)
+If you want to have multiple nextcloud container regardless if dynamic sized or static - you need to use a shared persistence between the containers.
+
+Minimum cluster compatible persistence settings:
+```yaml
+persistence:
+  enabled: true
+  accessMode: ReadWriteMany
+```
