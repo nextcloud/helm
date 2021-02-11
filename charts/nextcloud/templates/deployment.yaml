@@ -115,13 +115,13 @@ spec:
         - name: NEXTCLOUD_ADMIN_USER
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
         - name: NEXTCLOUD_ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         - name: NEXTCLOUD_TRUSTED_DOMAINS
           value: {{ .Values.nextcloud.host }}
         {{- if ne (int .Values.nextcloud.update) 0 }}
@@ -150,19 +150,21 @@ spec:
         - name: SMTP_NAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: smtp-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey | default "smtp-username" }}
         - name: SMTP_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: smtp-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey | default "smtp-password" }}
         {{- end }}
         {{- if .Values.redis.enabled }}
         - name: REDIS_HOST
           value: {{ template "nextcloud.redis.fullname" . }}-master
         - name: REDIS_HOST_PORT
           value: {{ .Values.redis.redisPort | quote }}
+        - name: REDIS_HOST_PASSWORD
+          value: {{ .Values.redis.password }}
         {{- end }}
         {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv | indent 8 }}
@@ -201,6 +203,20 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /status.php
+            port: http
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.nextcloud.host | quote }}
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.startupProbe.successThreshold }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+        {{- end }}            
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
@@ -239,9 +255,10 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+        {{- $nginxEnabled := .Values.nginx.enabled -}}
         {{- range $key, $value := .Values.nextcloud.phpConfigs }}
         - name: nextcloud-phpconfig
-          mountPath: /usr/local/etc/php/conf.d/{{ $key }}
+          mountPath: {{ $nginxEnabled | ternary (printf "/usr/local/etc/php-fpm.d/%s" $key | quote) (printf "/usr/local/etc/php/conf.d/%s" $key | quote) }}
           subPath: {{ $key }}
         {{- end }}
         {{- if .Values.nextcloud.extraVolumeMounts }}
@@ -283,6 +300,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
+    
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
         volumeMounts:
