@@ -5,6 +5,10 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'README.md'
+      - 'charts/**/README.md'
+      - 'LICENSE'
 
 jobs:
   release:
