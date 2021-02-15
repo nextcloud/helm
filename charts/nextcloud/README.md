@@ -132,7 +132,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.nodeSelector`                                       | Cronjob Node selector                                   | `nil`                                       |
 | `cronjob.tolerations`                                        | Cronjob tolerations                                     | `nil`                                       |
 | `cronjob.affinity`                                           | Cronjob affinity                                        | `nil`                                       |
-| `service.type`                                               | Kubernetes Service type                                 | `ClusterIp`                                 |
+| `service.type`                                               | Kubernetes Service type                                 | `ClusterIP`                                 |
 | `service.loadBalancerIP`                                     | LoadBalancerIp for service type LoadBalancer            | `nil`                                       |
 | `service.nodePort`                                           | NodePort for service type NodePort                      | `nil`                                       |
 | `persistence.enabled`                                        | Enable persistence using PVC                            | `false`                                     |
