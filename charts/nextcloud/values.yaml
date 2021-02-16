@@ -22,7 +22,7 @@ ingress:
   annotations: {}
   #  nginx.ingress.kubernetes.io/proxy-body-size: 4G
   #  kubernetes.io/tls-acme: "true"
-  #  certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  #  cert-manager.io/cluster-issuer: letsencrypt-prod
   #  nginx.ingress.kubernetes.io/server-snippet: |-
   #    server_tokens off;
   #    proxy_hide_header X-Powered-By;
@@ -47,10 +47,10 @@ ingress:
   #    location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
   #      deny all;
   #    }
-  #  tls:
-  #    - secretName: nextcloud-tls
-  #      hosts:
-  #        - nextcloud.kube.home
+  # tls:
+  #   - secretName: nextcloud-tls
+  #     hosts:
+  #       - nextcloud.kube.home
   labels: {}
 
 
@@ -70,6 +70,8 @@ nextcloud:
     # secretName: nameofsecret
     # usernameKey: username
     # passwordKey: password
+    # smtpUsernameKey: smtp_username
+    # smtpPasswordKey: smtp_password
   update: 0
   datadir: /var/www/html/data
   tableprefix:
@@ -87,7 +89,7 @@ nextcloud:
       name: user
       password: pass
   # PHP Configuration files
-  # Will be injected in /usr/local/etc/php/conf.d
+  # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
   phpConfigs: {}
   # Default config files
   # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself

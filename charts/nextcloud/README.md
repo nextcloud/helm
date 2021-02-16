@@ -65,6 +65,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.secretName`                        | Name of the existing secret                             | `nil`                                       |
 | `nextcloud.existingSecret.usernameKey`                       | Name of the key that contains the username              | `nil`                                       |
 | `nextcloud.existingSecret.passwordKey`                       | Name of the key that contains the password              | `nil`                                       |
+| `nextcloud.existingSecret.smtpUsernameKey`                       | Name of the key that contains the SMTP username         | `nil`                                       |
+| `nextcloud.existingSecret.smtpPasswordKey`                       | Name of the key that contains the SMTP password         | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
 | `nextcloud.tableprefix`                                      | nextcloud db table prefix                               | `''`                                        |
@@ -81,12 +83,12 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.persistence.subPath`                              | Set the subPath for nextcloud to use in volume          | `nil`                                       |
 | `nextcloud.phpConfigs`                                       | PHP Config files created in `/usr/local/etc/php/conf.d` | `{}`                                        |
 | `nextcloud.defaultConfigs.\.htaccess`                        | Default .htaccess to protect `/var/www/html/config`     | `true`                                      |
-| `nextcloud.defaultConfigs.\.redis\.config\.php`              | Default Redis configuration                             | `true`                                      |
-| `nextcloud.defaultConfigs.\.apache-pretty-urls\.config\.php` | Default Apache configuration for rewrite urls           | `true`                                      |
-| `nextcloud.defaultConfigs.\.apcu\.config\.php`               | Default configuration to define APCu as local cache     | `true`                                      |
-| `nextcloud.defaultConfigs.\.apps\.config\.php`               | Default configuration for apps                          | `true`                                      |
-| `nextcloud.defaultConfigs.\.autoconfig\.php`                 | Default auto-configuration for databases                | `true`                                      |
-| `nextcloud.defaultConfigs.\.smtp\.config\.php`               | Default configuration for smtp                          | `true`                                      |
+| `nextcloud.defaultConfigs.redis\.config\.php`              | Default Redis configuration                             | `true`                                      |
+| `nextcloud.defaultConfigs.apache-pretty-urls\.config\.php` | Default Apache configuration for rewrite urls           | `true`                                      |
+| `nextcloud.defaultConfigs.apcu\.config\.php`               | Default configuration to define APCu as local cache     | `true`                                      |
+| `nextcloud.defaultConfigs.apps\.config\.php`               | Default configuration for apps                          | `true`                                      |
+| `nextcloud.defaultConfigs.autoconfig\.php`                 | Default auto-configuration for databases                | `true`                                      |
+| `nextcloud.defaultConfigs.smtp\.config\.php`               | Default configuration for smtp                          | `true`                                      |
 | `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                                      |
 | `nextcloud.extraEnv`                                         | specify additional environment variables                | `{}`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
@@ -130,7 +132,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.nodeSelector`                                       | Cronjob Node selector                                   | `nil`                                       |
 | `cronjob.tolerations`                                        | Cronjob tolerations                                     | `nil`                                       |
 | `cronjob.affinity`                                           | Cronjob affinity                                        | `nil`                                       |
-| `service.type`                                               | Kubernetes Service type                                 | `ClusterIp`                                 |
+| `service.type`                                               | Kubernetes Service type                                 | `ClusterIP`                                 |
 | `service.loadBalancerIP`                                     | LoadBalancerIp for service type LoadBalancer            | `nil`                                       |
 | `service.nodePort`                                           | NodePort for service type NodePort                      | `nil`                                       |
 | `persistence.enabled`                                        | Enable persistence using PVC                            | `false`                                     |
