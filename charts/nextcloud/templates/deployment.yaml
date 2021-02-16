@@ -333,6 +333,15 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.mariadb.enabled }}
+      initContainers:
+      - name: mariadb-isalive
+        image: bitnami/mariadb
+        command:
+          - "sh"
+          - "-c"
+          - {{ printf "until mysql --host=%s-mariadb --user=%s --password=%s --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name .Values.mariadb.db.user .Values.mariadb.db.password }}
+      {{- end }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
