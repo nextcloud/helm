@@ -337,10 +337,21 @@ spec:
       initContainers:
       - name: mariadb-isalive
         image: bitnami/mariadb
+        env:
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
         command:
           - "sh"
           - "-c"
-          - {{ printf "until mysql --host=%s-mariadb --user=%s --password=%s --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name .Values.mariadb.db.user .Values.mariadb.db.password }}
+          - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
