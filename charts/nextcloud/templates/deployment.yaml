@@ -130,10 +130,6 @@ spec:
         {{- end }}
         - name: NEXTCLOUD_DATA_DIR
           value: {{ .Values.nextcloud.datadir | quote }}
-        {{- if .Values.nextcloud.tableprefix }}
-        - name: NEXTCLOUD_TABLE_PREFIX
-          value: {{ .Values.nextcloud.tableprefix | quote }}
-        {{- end }}
         {{- if .Values.nextcloud.mail.enabled }}
         - name: MAIL_FROM_ADDRESS
           value: {{ .Values.nextcloud.mail.fromAddress | quote }}
@@ -224,7 +220,7 @@ spec:
           timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.startupProbe.successThreshold }}
           failureThreshold: {{ .Values.startupProbe.failureThreshold }}
-        {{- end }}            
+        {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
@@ -308,7 +304,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
-    
+
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
         volumeMounts:
