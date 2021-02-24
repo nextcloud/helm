@@ -163,8 +163,16 @@ spec:
           value: {{ template "nextcloud.redis.fullname" . }}-master
         - name: REDIS_HOST_PORT
           value: {{ .Values.redis.redisPort | quote }}
+        {{- if and .Values.redis.existingSecret .Values.redis.existingSecretPasswordKey }}
+        - name: REDIS_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.redis.existingSecret }}
+              key: {{ .Values.redis.existingSecretKey }}
+        {{- else }}
         - name: REDIS_HOST_PASSWORD
           value: {{ .Values.redis.password }}
+        {{- end }}
         {{- end }}
         {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv | indent 8 }}
