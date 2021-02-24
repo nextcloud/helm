@@ -163,8 +163,16 @@ spec:
           value: {{ template "nextcloud.redis.fullname" . }}-master
         - name: REDIS_HOST_PORT
           value: {{ .Values.redis.redisPort | quote }}
+        {{- if and .Values.redis.existingSecret .Values.redis.existingSecretPasswordKey }}
+        - name: REDIS_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.redis.existingSecret }}
+              key: {{ .Values.redis.existingSecretKey }}
+        {{- else }}
         - name: REDIS_HOST_PASSWORD
           value: {{ .Values.redis.password }}
+        {{- end }}
         {{- end }}
         {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv | indent 8 }}
@@ -352,6 +360,20 @@ spec:
           - "sh"
           - "-c"
           - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
+      {{- else if .Values.postgresql.enabled }}
+      initContainers:
+      - name: postgresql-isready
+        image: bitnami/postgresql
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+        command:
+          - "sh"
+          - "-c"
+          - {{ printf "until pg_isready -h %s-postgresql -U ${POSTGRES_USER} ; do sleep 2 ; done" .Release.Name }}
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
