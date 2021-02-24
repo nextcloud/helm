@@ -250,8 +250,8 @@ postgresql:
 
 redis:
   enabled: false
-  usePassword: false
-  password: ''
+  usePassword: true
+  password: 'changeme'
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#webcron
