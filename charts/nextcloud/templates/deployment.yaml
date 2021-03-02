@@ -130,10 +130,6 @@ spec:
         {{- end }}
         - name: NEXTCLOUD_DATA_DIR
           value: {{ .Values.nextcloud.datadir | quote }}
-        {{- if .Values.nextcloud.tableprefix }}
-        - name: NEXTCLOUD_TABLE_PREFIX
-          value: {{ .Values.nextcloud.tableprefix | quote }}
-        {{- end }}
         {{- if .Values.nextcloud.mail.enabled }}
         - name: MAIL_FROM_ADDRESS
           value: {{ .Values.nextcloud.mail.fromAddress | quote }}
@@ -163,8 +159,16 @@ spec:
           value: {{ template "nextcloud.redis.fullname" . }}-master
         - name: REDIS_HOST_PORT
           value: {{ .Values.redis.redisPort | quote }}
+        {{- if and .Values.redis.existingSecret .Values.redis.existingSecretPasswordKey }}
+        - name: REDIS_HOST_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.redis.existingSecret }}
+              key: {{ .Values.redis.existingSecretKey }}
+        {{- else }}
         - name: REDIS_HOST_PASSWORD
           value: {{ .Values.redis.password }}
+        {{- end }}
         {{- end }}
         {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv | indent 8 }}
@@ -216,7 +220,7 @@ spec:
           timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
           successThreshold: {{ .Values.startupProbe.successThreshold }}
           failureThreshold: {{ .Values.startupProbe.failureThreshold }}
-        {{- end }}            
+        {{- end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
@@ -300,7 +304,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
-    
+
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
         volumeMounts:
@@ -337,10 +341,35 @@ spec:
       initContainers:
       - name: mariadb-isalive
         image: bitnami/mariadb
+        env:
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
         command:
           - "sh"
           - "-c"
-          - {{ printf "until mysql --host=%s-mariadb --user=%s --password=%s --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name .Values.mariadb.db.user .Values.mariadb.db.password }}
+          - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
+      {{- else if .Values.postgresql.enabled }}
+      initContainers:
+      - name: postgresql-isready
+        image: bitnami/postgresql
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+                key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+        command:
+          - "sh"
+          - "-c"
+          - {{ printf "until pg_isready -h %s-postgresql -U ${POSTGRES_USER} ; do sleep 2 ; done" .Release.Name }}
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
