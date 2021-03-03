@@ -35,13 +35,13 @@ spec:
         - name: NEXTCLOUD_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
         - name: NEXTCLOUD_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-password" }}
         - name: NEXTCLOUD_SERVER
           value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
         - name: NEXTCLOUD_TIMEOUT
