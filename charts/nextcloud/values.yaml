@@ -245,13 +245,15 @@ mariadb:
       accessMode: ReadWriteOnce
       size: 8Gi
 
+##
+## PostgreSQL chart configuration
+## for more options see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+##
 postgresql:
   enabled: false
-  global:
-    postgresql:
-      postgresqlUsername: nextcloud
-      postgresqlPassword: changeme
-      postgresqlDatabase: nextcloud
+  postgresqlUsername: nextcloud
+  postgresqlPassword: changeme
+  postgresqlDatabase: nextcloud
   persistence:
     enabled: false
     # storageClass: ""
