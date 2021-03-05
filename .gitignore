@@ -1,0 +1,8 @@
+# IDE resources
+.vscode
+.idea
+.devcontainer/
+
+# Helm resources
+charts/*/Chart.lock
+charts/*/charts
