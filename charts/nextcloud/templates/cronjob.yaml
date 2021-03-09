@@ -70,6 +70,6 @@ spec:
     {{- end }}
     {{- with (default .Values.tolerations .Values.cronjob.tolerations) }}
           tolerations:
-{{ toYaml . | indent 12 }}:
+{{ toYaml . | indent 12 }}
     {{- end }}
 {{- end }}
