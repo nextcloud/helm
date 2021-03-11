@@ -176,7 +176,7 @@ spec:
         {{- if not .Values.nginx.enabled }}
         ports:
         - name: http
-          containerPort: 80
+          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
           protocol: TCP
         {{- end }}
         {{- if and .Values.livenessProbe.enabled (not .Values.nginx.enabled) }}
@@ -274,7 +274,7 @@ spec:
         imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.serverPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
           protocol: TCP
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
@@ -413,6 +413,7 @@ spec:
         {{- with .Values.securityContext }}
         {{- toYaml . | nindent 10 }}
         {{- end }}
+        {{- end }}
       {{- else }}
       # Will mount configuration files as www-data (id: 33) for nextcloud
       securityContext:
@@ -420,5 +421,6 @@ spec:
         {{- if .Values.securityContext }}
         {{- with .Values.securityContext }}
         {{- toYaml . | nindent 10 }}
+        {{- end }}
         {{- end }}
       {{- end }}

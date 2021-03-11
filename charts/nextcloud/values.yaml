@@ -74,7 +74,7 @@ nextcloud:
     # smtpPasswordKey: smtp_password
   update: 0
   # If web server is not binding default port, you can define it
-  #serverPort: 8080
+  #containerPort: 8080
   datadir: /var/www/html/data
   persistence:
     subPath:
