@@ -396,7 +396,7 @@ metrics:
   replicaCount: 1
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
-  timeout: 5s~
+  timeout: 5s
 
   image:
     repository: xperimental/nextcloud-exporter
