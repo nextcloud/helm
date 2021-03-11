@@ -73,6 +73,8 @@ nextcloud:
     # smtpUsernameKey: smtp_username
     # smtpPasswordKey: smtp_password
   update: 0
+  # If web server is not binding default port, you can define it
+  #serverPort: 8080
   datadir: /var/www/html/data
   persistence:
     subPath:
@@ -162,6 +164,13 @@ nextcloud:
   extraVolumeMounts:
   #  - name: nfs
   #    mountPath: "/legacy_data"
+
+  # Extra secuurityContext parameters. For example you may need to define runAsNonRoot directive
+  # extraSecurityContext:
+  #   runAsUser: "33"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
 
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
@@ -387,7 +396,7 @@ metrics:
   replicaCount: 1
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
-  timeout: 5s
+  timeout: 5s~
 
   image:
     repository: xperimental/nextcloud-exporter
