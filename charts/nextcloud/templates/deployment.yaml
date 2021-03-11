@@ -413,7 +413,6 @@ spec:
         {{- with .Values.securityContext }}
         {{- toYaml . | nindent 10 }}
         {{- end }}
-        {{- end }}
       {{- else }}
       # Will mount configuration files as www-data (id: 33) for nextcloud
       securityContext:

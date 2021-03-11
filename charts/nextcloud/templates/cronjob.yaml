@@ -59,20 +59,19 @@ spec:
                 - "http://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}/cron.php"
               {{- end }}
               # Will mount configuration files as www-data (id: 82) for nextcloud
-              {{- if .Values.nginx.enabled }}
               securityContext:
+                fsGroup: 82
                 {{- if .Values.securityContext }}
                 {{- with .Values.securityContext }}
                 {{- toYaml . | nindent 17 }}
-                {{- end }}
                 {{- end }}
               {{- else }}
               # Will mount configuration files as www-data (id: 33) for nextcloud
               securityContext:
+                fsGroup: 33
                 {{- if .Values.securityContext }}
                 {{- with .Values.securityContext }}
                 {{- toYaml . | nindent 17 }}
-                {{- end }}
                 {{- end }}
               {{- end }}
               resources:
