@@ -340,7 +340,7 @@ spec:
       {{- if .Values.mariadb.enabled }}
       initContainers:
       - name: mariadb-isalive
-        image: bitnami/mariadb
+        image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
         env:
           - name: MYSQL_USER
             valueFrom:
@@ -359,7 +359,7 @@ spec:
       {{- else if .Values.postgresql.enabled }}
       initContainers:
       - name: postgresql-isready
-        image: bitnami/postgresql
+        image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
         env:
           - name: POSTGRES_USER
             valueFrom:
