@@ -207,7 +207,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
-        {{- if .Values.startupProbe.enabled }}
+        {{- if and .Values.startupProbe.enabled (not .Values.nginx.enabled) }}
         startupProbe:
           httpGet:
             path: /status.php
