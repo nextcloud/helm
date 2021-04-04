@@ -164,7 +164,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Values.redis.existingSecret }}
-              key: {{ .Values.redis.existingSecretKey }}
+              key: {{ .Values.redis.existingSecretPasswordKey }}
         {{- else }}
         - name: REDIS_HOST_PASSWORD
           value: {{ .Values.redis.password }}
