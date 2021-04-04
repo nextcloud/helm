@@ -1,10 +1,14 @@
 apiVersion: v2
 name: nextcloud
 <<<<<<< HEAD
+<<<<<<< HEAD
 version: 2.6.3
 =======
 version: 2.5.16
 >>>>>>> 64760fd (bump version)
+=======
+version: 2.6.1
+>>>>>>> 80a9242 (Fix redis password secret key ref)
 appVersion: 19.0.3
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
