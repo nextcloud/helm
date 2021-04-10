@@ -141,6 +141,9 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.accessMode`                                     | PVC Access Mode for nextcloud volume                    | `ReadWriteOnce`                             |
 | `persistence.size`                                           | PVC Storage Request for nextcloud volume                | `8Gi`                                       |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
+| `rbac.enabled`                                               | Enable Role and rolebinding for priveledged PSP         | `false`                                     |
+| `rbac.serviceaccount.create`                                 | Wether to create a serviceaccount or use an existing one (requires rbac) | `true`                     |
+| `rbac.serviceaccount.name`                                   | The name of the sevice account that the deployment will use (requires rbac) | `nextcloud-serviceaccount` |
 | `livenessProbe.enabled`                                      | Turn on and off liveness probe                          | `true`                                      |
 | `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `10`                                        |
 | `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `10`                                        |

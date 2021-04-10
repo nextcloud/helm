@@ -424,3 +424,9 @@ metrics:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9205"
     labels: {}
+
+rbac:
+  enabled: false
+  serviceaccount:
+    create: true
+    name: nextcloud-serviceaccount
