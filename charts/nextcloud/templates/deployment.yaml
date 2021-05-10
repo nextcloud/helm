@@ -414,3 +414,6 @@ spec:
       securityContext:
         fsGroup: 33
       {{- end }}
+      {{- if .Values.rbac.enabled }}
+      serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+      {{- end }}
