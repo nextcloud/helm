@@ -52,4 +52,7 @@ spec:
         {{- if .Values.metrics.resources }}
         resources: {{- toYaml .Values.metrics.resources | nindent 10 }}
         {{- end }}
+        securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
 {{- end }}
