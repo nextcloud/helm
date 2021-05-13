@@ -68,6 +68,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpUsernameKey`                       | Name of the key that contains the SMTP username         | `nil`                                       |
 | `nextcloud.existingSecret.smtpPasswordKey`                       | Name of the key that contains the SMTP password         | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
+| `nextcloud.containerPort`                                    | Customize container port when not running as root                | `80`                                         |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
 | `nextcloud.mail.enabled`                                     | Whether to enable/disable email settings                | `false`                                     |
 | `nextcloud.mail.fromAddress`                                 | nextcloud mail send from field                          | `nil`                                       |
