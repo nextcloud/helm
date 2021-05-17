@@ -411,7 +411,7 @@ spec:
         fsGroup: 82
         {{- if .Values.securityContext }}
         {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 10 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- end }}
       {{- else }}
@@ -420,7 +420,7 @@ spec:
         fsGroup: 33
         {{- if .Values.securityContext }}
         {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 10 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- end }}
       {{- end }}
