@@ -283,7 +283,7 @@ nextcloud:
 ```
 
 ## HPA (Clustering)
-If you want to have multiple nextcloud container regardless if dynamic sized or static - you need to use a shared persistence between the containers.
+If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared persistence between the containers.
 
 Minimum cluster compatible persistence settings:
 ```yaml
