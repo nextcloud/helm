@@ -58,21 +58,10 @@ spec:
               {{- else }}
                 - "http://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}/cron.php"
               {{- end }}
-              # Will mount configuration files as www-data (id: 82) for nextcloud
-              {{- if .Values.nginx.enabled }}
+              {{- if .Values.cronjob.securityContext }}
               securityContext:
-                {{- if .Values.cronjob.securityContext }}
                 {{- with .Values.cronjob.securityContext }}
                 {{- toYaml . | nindent 17 }}
-                {{- end }}
-                {{- end }}
-              {{- else }}
-              # Will mount configuration files as www-data (id: 33) for nextcloud
-              securityContext:
-                {{- if .Values.cronjob.securityContext }}
-                {{- with .Values.cronjob.securityContext }}
-                {{- toYaml . | nindent 17 }}
-                {{- end }}
                 {{- end }}
               {{- end }}
               resources:
