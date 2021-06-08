@@ -313,6 +313,14 @@ cronjob:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
+# @deprecated nextcloud.securityContext and cronjob.securityContext should be used.
+# securityContext parameters. For example you may need to define runAsNonRoot directive
+# securityContext:
+#   runAsUser: "33"
+#   runAsGroup: "33"
+#   runAsNonRoot: true
+#   readOnlyRootFilesystem: true
+
 service:
   type: ClusterIP
   port: 8080

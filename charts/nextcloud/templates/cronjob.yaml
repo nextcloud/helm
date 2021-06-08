@@ -63,6 +63,11 @@ spec:
                 {{- with .Values.cronjob.securityContext }}
                 {{- toYaml . | nindent 17 }}
                 {{- end }}
+              {{- else if .Values.securityContext }}
+              securityContext:
+                {{- with .Values.securityContext }}
+                {{- toYaml . | nindent 17 }}
+                {{- end }}
               {{- end }}
               resources:
 {{ toYaml (default .Values.resources .Values.cronjob.resources) | indent 16 }}
