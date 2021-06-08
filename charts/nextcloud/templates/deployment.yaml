@@ -408,20 +408,22 @@ spec:
       {{- if .Values.nginx.enabled }}
       # Will mount configuration files as www-data (id: 82) for nextcloud
       securityContext:
-        fsGroup: 82
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
+        {{- if .Values.nextcloud.securityContext }}
+        {{- with .Values.nextcloud.securityContext }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- else }}
+        fsGroup: 82
         {{- end }}
       {{- else }}
       # Will mount configuration files as www-data (id: 33) for nextcloud
       securityContext:
-        fsGroup: 33
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
+        {{- if .Values.nextcloud.securityContext }}
+        {{- with .Values.nextcloud.securityContext }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- else }}
+        fsGroup: 33
         {{- end }}
       {{- end }}
       {{- if .Values.rbac.enabled }}

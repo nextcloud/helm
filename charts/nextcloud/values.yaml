@@ -165,8 +165,8 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Extra secuurityContext parameters. For example you may need to define runAsNonRoot directive
-  # extraSecurityContext:
+  # securityContext parameters. For example you may need to define runAsNonRoot directive
+  # securityContext:
   #   runAsUser: "33"
   #   runAsGroup: "33"
   #   runAsNonRoot: true
@@ -305,6 +305,13 @@ cronjob:
 
   # If not set, nextcloud deployment one will be set
   # affinity: {}
+
+  # securityContext parameters. For example you may need to define runAsNonRoot directive
+  # securityContext:
+  #   runAsUser: "33"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
 
 service:
   type: ClusterIP
