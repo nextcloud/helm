@@ -4,5 +4,4 @@
 .devcontainer/
 
 # Helm resources
-charts/*/Chart.lock
 charts/*/charts
