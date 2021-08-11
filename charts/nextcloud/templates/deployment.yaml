@@ -8,6 +8,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
+  {{- if .Values.deploymentLabels }}
+{{ toYaml .Values.deploymentLabels | indent 4 }}
+  {{- end }}
   {{- if .Values.deploymentAnnotations }}
   annotations:
 {{ toYaml .Values.deploymentAnnotations | indent 4 }}
@@ -29,6 +32,9 @@ spec:
         app.kubernetes.io/component: app
         {{- if .Values.redis.enabled }}
         {{ template "nextcloud.redis.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.podLabels }}
+{{ toYaml .Values.podLabels | indent 8 }}
         {{- end }}
       {{- if .Values.podAnnotations }}
       annotations:

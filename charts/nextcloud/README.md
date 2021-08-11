@@ -167,7 +167,9 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `hpa.cputhreshold`                                           | CPU threshold percent for the HorizontalPodAutoscale    | `60`                                        |
 | `hpa.minPods`                                                | Min. pods for the Nextcloud HorizontalPodAutoscaler     | `1`                                         |
 | `hpa.maxPods`                                                | Max. pods for the Nextcloud HorizontalPodAutoscaler     | `10`                                        |
+| `deploymentLabels`                                           | Labels to be added at 'deployment' level                | not set                                     |
 | `deploymentAnnotations`                                      | Annotations to be added at 'deployment' level           | not set                                     |
+| `podLabels`                                                  | Labels to be added at 'pod' level                       | not set                                     |
 | `podAnnotations`                                             | Annotations to be added at 'pod' level                  | not set                                     |
 | `metrics.enabled`                                            | Start Prometheus metrics exporter                       | `false`                                     |
 | `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
