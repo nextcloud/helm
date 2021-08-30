@@ -41,7 +41,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-password" }}
+              key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         - name: NEXTCLOUD_SERVER
           value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
         - name: NEXTCLOUD_TIMEOUT
