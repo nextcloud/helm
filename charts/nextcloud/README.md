@@ -116,10 +116,10 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `externalDatabase.existingSecret.usernameKey`                | Name of the key that contains the username              | `nil`                                       |
 | `externalDatabase.existingSecret.passwordKey`                | Name of the key that contains the password              | `nil`                                       |
 | `mariadb.enabled`                                            | Whether to use the MariaDB chart                        | `false`                                     |
-| `mariadb.db.name`                                            | Database name to create                                 | `nextcloud`                                 |
-| `mariadb.db.password`                                        | Password for the database                               | `changeme`                                  |
-| `mariadb.db.user`                                            | Database user to create                                 | `nextcloud`                                 |
-| `mariadb.rootUser.password`                                  | MariaDB admin password                                  | `nil`                                       |
+| `mariadb.auth.database`                                      | Database name to create                                 | `nextcloud`                                 |
+| `mariadb.auth.password`                                      | Password for the database                               | `changeme`                                  |
+| `mariadb.auth.username`                                      | Database user to create                                 | `nextcloud`                                 |
+| `mariadb.auth.rootPassword`                                  | MariaDB admin password                                  | `nil`                                       |
 | `redis.enabled`                                              | Whether to install/use redis for locking                | `false`                                     |
 | `redis.usePassword`                                          | Whether to use a password with redis                    | `false`                                     |
 | `redis.password`                                             | The password redis uses                                 | `''`                                        |
@@ -204,7 +204,7 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 
 ```console
 helm install --name my-release \
-  --set nextcloud.username=admin,nextcloud.password=password,mariadb.rootUser.password=secretpassword \
+  --set nextcloud.username=admin,nextcloud.password=password,mariadb.auth.rootPassword=secretpassword \
     nextcloud/nextcloud
 ```
 

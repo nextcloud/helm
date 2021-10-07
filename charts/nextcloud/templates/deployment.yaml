@@ -72,9 +72,9 @@ spec:
           value: {{ .Values.internalDatabase.name | quote }}
         {{- else if .Values.mariadb.enabled }}
         - name: MYSQL_HOST
-          value: {{ template "nextcloud.mariadb.fullname" . }}
+          value: {{ template "mariadb.primary.fullname" .Subcharts.mariadb }}
         - name: MYSQL_DATABASE
-          value: {{ .Values.mariadb.db.name | quote }}
+          value: {{ .Values.mariadb.auth.database | quote }}
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
