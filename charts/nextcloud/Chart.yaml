@@ -27,7 +27,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
 - name: mariadb
-  version: 7.10.*
+  version: 9.6.*
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled
 - name: redis
