@@ -228,18 +228,17 @@ mariadb:
   ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
   enabled: false
 
-  db:
-    name: nextcloud
-    user: nextcloud
+  auth:
+    database: nextcloud
+    username: nextcloud
     password: changeme
 
-  replication:
-    enabled: false
+  architecture: standalone
 
   ## Enable persistence using Persistent Volume Claims
   ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
-  master:
+  primary:
     persistence:
       enabled: false
       # storageClass: ""
