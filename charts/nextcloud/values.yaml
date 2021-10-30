@@ -53,6 +53,8 @@ ingress:
   #     hosts:
   #       - nextcloud.kube.home
   labels: {}
+  path: /
+  pathType: Prefix
 
 
 # Allow configuration of lifecycle hooks

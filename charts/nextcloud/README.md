@@ -58,6 +58,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `ingress.servicePort`                                        | Ingress' backend servicePort                            | `http`                                      |
 | `ingress.annotations`                                        | An array of service annotations                         | `nil`                                       |
 | `ingress.labels`                                             | An array of service labels                              | `nil`                                       |
+| `ingress.path`                                               | The `Path` to use in Ingress' `paths`                   | `/`                                         |
+| `ingress.pathType`                                           | The `PathType` to use in Ingress' `paths`               | `Prefix`                                    |
 | `ingress.tls`                                                | Ingress TLS configuration                               | `[]`                                        |
 | `nextcloud.host`                                             | nextcloud host to create application URLs               | `nextcloud.kube.home`                       |
 | `nextcloud.username`                                         | User of the application                                 | `admin`                                     |
