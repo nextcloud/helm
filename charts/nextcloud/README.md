@@ -68,10 +68,10 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.secretName`                        | Name of the existing secret                             | `nil`                                       |
 | `nextcloud.existingSecret.usernameKey`                       | Name of the key that contains the username              | `nil`                                       |
 | `nextcloud.existingSecret.passwordKey`                       | Name of the key that contains the password              | `nil`                                       |
-| `nextcloud.existingSecret.smtpUsernameKey`                       | Name of the key that contains the SMTP username         | `nil`                                       |
-| `nextcloud.existingSecret.smtpPasswordKey`                       | Name of the key that contains the SMTP password         | `nil`                                       |
+| `nextcloud.existingSecret.smtpUsernameKey`                   | Name of the key that contains the SMTP username         | `nil`                                       |
+| `nextcloud.existingSecret.smtpPasswordKey`                   | Name of the key that contains the SMTP password         | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
-| `nextcloud.containerPort`                                    | Customize container port when not running as root                | `80`                                         |
+| `nextcloud.containerPort`                                    | Customize container port when not running as root       | `80`                                        |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
 | `nextcloud.mail.enabled`                                     | Whether to enable/disable email settings                | `false`                                     |
 | `nextcloud.mail.fromAddress`                                 | nextcloud mail send from field                          | `nil`                                       |
@@ -86,13 +86,13 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.persistence.subPath`                              | Set the subPath for nextcloud to use in volume          | `nil`                                       |
 | `nextcloud.phpConfigs`                                       | PHP Config files created in `/usr/local/etc/php/conf.d` | `{}`                                        |
 | `nextcloud.defaultConfigs.\.htaccess`                        | Default .htaccess to protect `/var/www/html/config`     | `true`                                      |
-| `nextcloud.defaultConfigs.redis\.config\.php`              | Default Redis configuration                             | `true`                                      |
-| `nextcloud.defaultConfigs.apache-pretty-urls\.config\.php` | Default Apache configuration for rewrite urls           | `true`                                      |
-| `nextcloud.defaultConfigs.apcu\.config\.php`               | Default configuration to define APCu as local cache     | `true`                                      |
-| `nextcloud.defaultConfigs.apps\.config\.php`               | Default configuration for apps                          | `true`                                      |
-| `nextcloud.defaultConfigs.autoconfig\.php`                 | Default auto-configuration for databases                | `true`                                      |
-| `nextcloud.defaultConfigs.smtp\.config\.php`               | Default configuration for smtp                          | `true`                                      |
-| `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                                      |
+| `nextcloud.defaultConfigs.redis\.config\.php`                | Default Redis configuration                             | `true`                                      |
+| `nextcloud.defaultConfigs.apache-pretty-urls\.config\.php`   | Default Apache configuration for rewrite urls           | `true`                                      |
+| `nextcloud.defaultConfigs.apcu\.config\.php`                 | Default configuration to define APCu as local cache     | `true`                                      |
+| `nextcloud.defaultConfigs.apps\.config\.php`                 | Default configuration for apps                          | `true`                                      |
+| `nextcloud.defaultConfigs.autoconfig\.php`                   | Default auto-configuration for databases                | `true`                                      |
+| `nextcloud.defaultConfigs.smtp\.config\.php`                 | Default configuration for smtp                          | `true`                                      |
+| `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                        |
 | `nextcloud.extraEnv`                                         | specify additional environment variables                | `{}`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
 | `nextcloud.extraVolumeMounts`                                | specify additional volume mounts for the NextCloud pod  | `{}`                                        |
@@ -160,11 +160,11 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `readinessProbe.timeoutSeconds`                              | When the probe times out                                | `5`                                         |
 | `readinessProbe.failureThreshold`                            | Minimum consecutive failures for the probe              | `3`                                         |
 | `readinessProbe.successThreshold`                            | Minimum consecutive successes for the probe             | `1`                                         |
-| `startupProbe.enabled`                                       | Turn on and off startup probe                           | `false`                                      |
+| `startupProbe.enabled`                                       | Turn on and off startup probe                           | `false`                                     |
 | `startupProbe.initialDelaySeconds`                           | Delay before readiness probe is initiated               | `30`                                        |
 | `startupProbe.periodSeconds`                                 | How often to perform the probe                          | `10`                                        |
 | `startupProbe.timeoutSeconds`                                | When the probe times out                                | `5`                                         |
-| `startupProbe.failureThreshold`                              | Minimum consecutive failures for the probe              | `30`                                         |
+| `startupProbe.failureThreshold`                              | Minimum consecutive failures for the probe              | `30`                                        |
 | `startupProbe.successThreshold`                              | Minimum consecutive successes for the probe             | `1`                                         |
 | `hpa.enabled`                                                | Boolean to create a HorizontalPodAutoscaler             | `false`                                     |
 | `hpa.cputhreshold`                                           | CPU threshold percent for the HorizontalPodAutoscale    | `60`                                        |
