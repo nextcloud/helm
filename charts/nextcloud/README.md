@@ -144,6 +144,12 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.existingClaim`                                  | An Existing PVC name for nextcloud volume               | `nil` (uses alpha storage class annotation) |
 | `persistence.accessMode`                                     | PVC Access Mode for nextcloud volume                    | `ReadWriteOnce`                             |
 | `persistence.size`                                           | PVC Storage Request for nextcloud volume                | `8Gi`                                       |
+| `persistence.nextcloudData.enabled`                          | Create a second PVC for the data folder in nextcloud    | `false`                                     |
+| `persistence.nextcloudData.annotations`                      | see `persistence.annotations`                           | `{}`                                        |
+| `persistence.nextcloudData.storageClass`                     | see `persistence.storageClass`                          | `nil` (uses alpha storage class annotation) |
+| `persistence.nextcloudData.existingClaim`                    | see `persistence.existingClaim`                         | `nil` (uses alpha storage class annotation) |
+| `persistence.nextcloudData.accessMode`                       | see `persistence.accessMode`                            | `ReadWriteOnce`                             |
+| `persistence.nextcloudData.size`                             | see `persistence.size`                                  | `8Gi`                                       |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
 | `rbac.enabled`                                               | Enable Role and rolebinding for priveledged PSP         | `false`                                     |
 | `rbac.serviceaccount.create`                                 | Wether to create a serviceaccount or use an existing one (requires rbac) | `true`                     |
