@@ -19,6 +19,7 @@ It also packages the [Bitnami MariaDB chart](https://github.com/kubernetes/chart
 
 - Kubernetes 1.9+ with Beta APIs enabled
 - PV provisioner support in the underlying infrastructure
+- Helm >=3.7.0 ([for subchart scope exposing](nextcloud/helm#152))
 
 ## Installing the Chart
 
