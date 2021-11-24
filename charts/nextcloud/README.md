@@ -185,7 +185,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
 | `metrics.timeout`                                            | When the scrape times out                               | `5s`                                        |
 | `metrics.image.repository`                                   | Nextcloud metrics exporter image name                   | `xperimental/nextcloud-exporter`            |
-| `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `v0.3.0`                                    |
+| `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `v0.4.0`                                    |
 | `metrics.image.pullPolicy`                                   | Nextcloud metrics exporter image pull policy            | `IfNotPresent`                              |
 | `metrics.podAnnotations`                                     | Additional annotations for metrics exporter             | not set                                     |
 | `metrics.podLabels`                                          | Additional labels for metrics exporter                  | not set                                     |
