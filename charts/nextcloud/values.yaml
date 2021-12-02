@@ -10,6 +10,7 @@ image:
 
 nameOverride: ""
 fullnameOverride: ""
+podAnnotations: {}
 deploymentAnnotations: {}
 
 # Number of replicas to be deployed
