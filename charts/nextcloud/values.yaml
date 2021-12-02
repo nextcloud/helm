@@ -10,11 +10,8 @@ image:
 
 nameOverride: ""
 fullnameOverride: ""
-<<<<<<< HEAD
 podAnnotations: {}
-=======
 deploymentAnnotations: {}
->>>>>>> 28b62ee961ea07ad94bd0340d78f554b20cc662b
 
 # Number of replicas to be deployed
 replicaCount: 1
