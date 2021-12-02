@@ -1,7 +1,7 @@
 apiVersion: v2
 name: nextcloud
-version: 2.1.0
-appVersion: 17.0.0
+version: 2.10.0
+appVersion: 22.2.3
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
 - nextcloud
@@ -23,14 +23,14 @@ maintainers:
   email: jeff@billimek.com
 dependencies:
 - name: postgresql
-  version: 9.1.2
+  version: 10.13.*
   repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
 - name: mariadb
-  version: 7.7.1
+  version: 9.6.*
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled
 - name: redis
-  version: 10.7.17
+  version: 13.0.*
   repository: https://charts.bitnami.com/bitnami
   condition: redis.enabled

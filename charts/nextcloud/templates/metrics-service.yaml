@@ -4,7 +4,6 @@ kind: Service
 metadata:
   name: {{ template "nextcloud.fullname" . }}-metrics
   labels:
-  labels:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     helm.sh/chart: {{ include "nextcloud.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

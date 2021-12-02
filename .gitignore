@@ -1,0 +1,7 @@
+# IDE resources
+.vscode
+.idea
+.devcontainer/
+
+# Helm resources
+charts/*/charts

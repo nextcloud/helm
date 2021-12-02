@@ -39,6 +39,7 @@ data:
         'redis' => array(
           'host' => getenv('REDIS_HOST'),
           'port' => getenv('REDIS_HOST_PORT') ?: 6379,
+          'password' => getenv('REDIS_HOST_PASSWORD'),
         ),
       );
     }
@@ -99,9 +100,6 @@ data:
         $autoconfig_enabled = true;
     }
     if ($autoconfig_enabled) {
-        if (getenv('NEXTCLOUD_TABLE_PREFIX')) {
-            $AUTOCONFIG["dbtableprefix"] = getenv('NEXTCLOUD_TABLE_PREFIX');
-        }
         $AUTOCONFIG["directory"] = getenv('NEXTCLOUD_DATA_DIR') ?: "/var/www/html/data";
     }
 {{- end }}
