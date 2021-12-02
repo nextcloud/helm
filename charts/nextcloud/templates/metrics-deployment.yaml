@@ -15,6 +15,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "nextcloud.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: metrics
   template:
     metadata:
       annotations: {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
@@ -34,13 +35,13 @@ spec:
         - name: NEXTCLOUD_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-username
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
         - name: NEXTCLOUD_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "nextcloud.fullname" . }}
-              key: nextcloud-password
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         - name: NEXTCLOUD_SERVER
           value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
         - name: NEXTCLOUD_TIMEOUT
@@ -51,4 +52,7 @@ spec:
         {{- if .Values.metrics.resources }}
         resources: {{- toYaml .Values.metrics.resources | nindent 10 }}
         {{- end }}
+        securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
 {{- end }}
