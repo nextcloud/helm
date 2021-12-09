@@ -262,10 +262,16 @@ postgresql:
     enabled: false
     # storageClass: ""
 
+##
+## Redis chart configuration
+## for more options see https://github.com/bitnami/charts/tree/master/bitnami/redis
+##
+
 redis:
   enabled: false
-  usePassword: true
-  password: 'changeme'
+  auth:
+    enabled: true
+    password: 'changeme'
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#webcron
