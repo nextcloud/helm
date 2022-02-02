@@ -32,6 +32,13 @@ spec:
         image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
         imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
         env:
+        {{- if .Values.metrics.token }}
+        - name: NEXTCLOUD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+              key: {{ .Values.nextcloud.existingSecret.tokenKey | default "nextcloud-token" }}
+        {{- else }}
         - name: NEXTCLOUD_USERNAME
           valueFrom:
             secretKeyRef:
@@ -42,6 +49,7 @@ spec:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
               key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
+        {{- end }}
         - name: NEXTCLOUD_SERVER
           value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
         - name: NEXTCLOUD_TIMEOUT
