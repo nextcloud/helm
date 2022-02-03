@@ -257,8 +257,8 @@ externalDatabase:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: username
-    # passwordKey: password
+    # usernameKey: db-username
+    # passwordKey: db-password
 
 ##
 ## MariaDB chart configuration
