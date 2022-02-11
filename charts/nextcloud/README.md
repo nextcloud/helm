@@ -275,8 +275,8 @@ nextcloud:
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
-- Make sure your Ingress preserves source IP. If you you ingress-nginx, add the following annotations:
-```
+- Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
+```yaml
 ingress:
   annotations:
    nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -284,7 +284,7 @@ ingress:
 ```
 - The next layer is nextcloud pod's nginx if you use `nextcloud-fpm`, this can be left at default
 - Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
-```
+```php
   configs:
     proxy.config.php: |-
       <?php
