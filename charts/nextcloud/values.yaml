@@ -75,6 +75,7 @@ nextcloud:
     # secretName: nameofsecret
     # usernameKey: username
     # passwordKey: password
+    # tokenKey: serverinfo_token
     # smtpUsernameKey: smtp_username
     # smtpPasswordKey: smtp_password
   update: 0
@@ -419,11 +420,15 @@ metrics:
   replicaCount: 1
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
+  # Use API token if set, otherwise fall back to password authentication
+  # https://github.com/xperimental/nextcloud-exporter#token-authentication
+  # Currently you still need to set the token manually in your nextcloud install
+  token: ""
   timeout: 5s
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: v0.4.0
+    tag: v0.5.0
     pullPolicy: IfNotPresent
 
   ## Metrics exporter resource requests and limits

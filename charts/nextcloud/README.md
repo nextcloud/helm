@@ -183,9 +183,10 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podAnnotations`                                             | Annotations to be added at 'pod' level                  | not set                                     |
 | `metrics.enabled`                                            | Start Prometheus metrics exporter                       | `false`                                     |
 | `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
+| `metrics.token`                                              | Uses token for auth instead of username/password        | `""`                                        |
 | `metrics.timeout`                                            | When the scrape times out                               | `5s`                                        |
 | `metrics.image.repository`                                   | Nextcloud metrics exporter image name                   | `xperimental/nextcloud-exporter`            |
-| `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `v0.4.0`                                    |
+| `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `v0.5.0`                                    |
 | `metrics.image.pullPolicy`                                   | Nextcloud metrics exporter image pull policy            | `IfNotPresent`                              |
 | `metrics.podAnnotations`                                     | Additional annotations for metrics exporter             | not set                                     |
 | `metrics.podLabels`                                          | Additional labels for metrics exporter                  | not set                                     |
@@ -268,6 +269,31 @@ nextcloud:
             'use_ssl'    => true
           )
         )
+      );
+```
+
+## Preserving Source IP
+
+- Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
+- Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
+```yaml
+ingress:
+  annotations:
+   nginx.ingress.kubernetes.io/enable-cors: "true"
+   nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+```
+- The next layer is nextcloud pod's nginx if you use `nextcloud-fpm`, this can be left at default
+- Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
+```php
+  configs:
+    proxy.config.php: |-
+      <?php
+      $CONFIG = array (
+        'trusted_proxies' => array(
+          0 => '127.0.0.1',
+          1 => '10.0.0.0/8',
+        ),
+        'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
       );
 ```
 
