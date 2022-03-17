@@ -67,6 +67,10 @@ spec:
         {{-   end }}
         {{- end }}
         env:
+        {{- if .Values.phpClientHttpsFix.enabled }}
+        - name: OVERWRITEPROTOCOL
+          value: {{ .Values.phpClientHttpsFix.protocol | quote }}
+        {{- end }}
         {{- if .Values.internalDatabase.enabled }}
         - name: SQLITE_DATABASE
           value: {{ .Values.internalDatabase.name | quote }}
