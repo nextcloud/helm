@@ -428,7 +428,7 @@ metrics:
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: v0.5.0
+    tag: 0.5.0
     pullPolicy: IfNotPresent
 
   ## Metrics exporter resource requests and limits

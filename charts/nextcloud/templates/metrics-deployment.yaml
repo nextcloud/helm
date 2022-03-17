@@ -33,7 +33,7 @@ spec:
         imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
         env:
         {{- if .Values.metrics.token }}
-        - name: NEXTCLOUD_TOKEN
+        - name: NEXTCLOUD_AUTH_TOKEN
           valueFrom:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
