@@ -272,6 +272,31 @@ nextcloud:
       );
 ```
 
+## Preserving Source IP
+
+- Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
+- Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
+```yaml
+ingress:
+  annotations:
+   nginx.ingress.kubernetes.io/enable-cors: "true"
+   nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+```
+- The next layer is nextcloud pod's nginx if you use `nextcloud-fpm`, this can be left at default
+- Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
+```php
+  configs:
+    proxy.config.php: |-
+      <?php
+      $CONFIG = array (
+        'trusted_proxies' => array(
+          0 => '127.0.0.1',
+          1 => '10.0.0.0/8',
+        ),
+        'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
+      );
+```
+
 ## Hugepages
 
 If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
