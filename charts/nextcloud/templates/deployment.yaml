@@ -36,10 +36,15 @@ spec:
         {{- if .Values.podLabels }}
 {{ toYaml .Values.podLabels | indent 8 }}
         {{- end }}
-      {{- if .Values.podAnnotations }}
       annotations:
+        nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
+        php-config-hash: {{ toJson .Values.nextcloud.phpConfigs | sha256sum }}
+        {{- if .Values.nginx.enabled }}
+        nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
+        {{- end }}
+        {{- if .Values.podAnnotations }}
 {{ toYaml .Values.podAnnotations | indent 8 }}
-      {{- end }}
+        {{- end }}
     spec:
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
