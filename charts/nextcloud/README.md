@@ -151,6 +151,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `persistence.nextcloudData.existingClaim`                    | see `persistence.existingClaim`                         | `nil` (uses alpha storage class annotation) |
 | `persistence.nextcloudData.accessMode`                       | see `persistence.accessMode`                            | `ReadWriteOnce`                             |
 | `persistence.nextcloudData.size`                             | see `persistence.size`                                  | `8Gi`                                       |
+| `phpClientHttpsFix.enabled`                                  | Sets OVERWRITEPROTOCOL for https ingress redirect       | `false`                                     |
+| `phpClientHttpsFix.protocol`                                 | Sets OVERWRITEPROTOCOL for https ingress redirect       | `https`                                     |
 | `resources`                                                  | CPU/Memory resource requests/limits                     | `{}`                                        |
 | `rbac.enabled`                                               | Enable Role and rolebinding for priveledged PSP         | `false`                                     |
 | `rbac.serviceaccount.create`                                 | Wether to create a serviceaccount or use an existing one (requires rbac) | `true`                     |

@@ -1,6 +1,6 @@
 apiVersion: v2
 name: nextcloud
-version: 2.13.1
+version: 2.13.2
 appVersion: 23.0.2
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:

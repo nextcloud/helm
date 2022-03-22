@@ -65,6 +65,10 @@ lifecycle: {}
   # postStartCommand: []
   # preStopCommand: []
 
+phpClientHttpsFix:
+  enabled: false
+  protocol: https
+
 nextcloud:
   host: nextcloud.kube.home
   username: admin
