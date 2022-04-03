@@ -42,6 +42,10 @@ spec:
             - name: {{ . }}
           {{- end }}
           {{- end }}
+          {{- with .Values.cronjob.hostAliases }}
+          hostAliases:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
             - name: {{ .Chart.Name }}
               image: "{{ default .Values.image.repository .Values.cronjob.image.repository }}:{{ default .Values.image.tag .Values.cronjob.image.tag }}"

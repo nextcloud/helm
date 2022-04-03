@@ -312,6 +312,8 @@ cronjob:
     #  cpu: 100m
     #  memory: 128Mi
 
+  # hostAliases: {}
+
   # If not set, nextcloud deployment one will be set
   # nodeSelector: {}
 
