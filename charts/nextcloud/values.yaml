@@ -3,7 +3,7 @@
 ##
 image:
   repository: nextcloud
-  tag: 23.0.2-apache
+  tag: 23.0.3-apache
   pullPolicy: IfNotPresent
   # pullSecrets:
   #   - myRegistrKeySecretName
@@ -434,7 +434,7 @@ metrics:
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: 0.5.0
+    tag: 0.5.1
     pullPolicy: IfNotPresent
 
   ## Metrics exporter resource requests and limits

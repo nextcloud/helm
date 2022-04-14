@@ -173,7 +173,7 @@ spec:
         - name: REDIS_HOST
           value: {{ template "nextcloud.redis.fullname" . }}-master
         - name: REDIS_HOST_PORT
-          value: {{ .Values.redis.master.service.port | quote }}
+          value: {{ .Values.redis.master.service.ports.redis | quote }}
         {{- if and .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey }}
         - name: REDIS_HOST_PASSWORD
           valueFrom:
