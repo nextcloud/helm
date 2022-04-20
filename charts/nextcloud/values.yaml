@@ -260,12 +260,16 @@ mariadb:
 ##
 postgresql:
   enabled: false
-  postgresqlUsername: nextcloud
-  postgresqlPassword: changeme
-  postgresqlDatabase: nextcloud
-  persistence:
-    enabled: false
-    # storageClass: ""
+  global:
+    postgresql:
+      auth:
+        username: nextcloud
+        password: changeme
+        database: nextcloud
+  primary:
+    persistence:
+      enabled: false
+      # storageClass: ""
 
 ##
 ## Redis chart configuration
