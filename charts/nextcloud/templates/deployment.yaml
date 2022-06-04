@@ -390,7 +390,7 @@ spec:
       {{- if .Values.mariadb.enabled }}
       initContainers:
       - name: mariadb-isalive
-        image: {{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+        image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
         env:
           - name: MYSQL_USER
             valueFrom:
