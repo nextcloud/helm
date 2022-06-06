@@ -3,8 +3,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ template "nextcloud.fullname" . }}
-  {{- if .Values..metrics.serviceMonitor.namespace }}
-  namespace: {{ .Values..metrics.serviceMonitor.namespace | quote }}
+  {{- if .Values.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.metrics.serviceMonitor.namespace | quote }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
@@ -18,7 +18,7 @@ metadata:
     {{ toYaml .Values.metrics.serviceMonitor.labels | nindent 4 }}
     {{- end -}}
 spec:
-  jobLabel: {{ .Values.server.metrics.serviceMonitor.jobLabel | quote }}
+  jobLabel: {{ .Values.metrics.serviceMonitor.jobLabel | quote }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "nextcloud.name" . }}
