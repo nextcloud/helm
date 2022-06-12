@@ -470,3 +470,4 @@ rbac:
   serviceaccount:
     create: true
     name: nextcloud-serviceaccount
+    annotations: {}
