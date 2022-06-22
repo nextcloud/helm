@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/component: metrics
     {{- if .Values.metrics.serviceMonitor.labels -}}
     {{ toYaml .Values.metrics.serviceMonitor.labels | nindent 4 }}
-    {{- end -}}
+    {{- end }}
 spec:
   jobLabel: {{ .Values.metrics.serviceMonitor.jobLabel | quote }}
   selector:
