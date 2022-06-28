@@ -204,6 +204,12 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `metrics.service.nodePort`                                   | Metrics: NodePort for service type NodePort             | `nil`                                       |
 | `metrics.service.annotations`                                | Additional annotations for service metrics exporter     | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
 | `metrics.service.labels`                                     | Additional labels for service metrics exporter          | `{}`                                        |
+| `metrics.serviceMonitor.enabled`                             | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator | `false`                |
+| `metrics.serviceMonitor.namespace`                           | Namespace in which Prometheus is running                | ``                                          |
+| `metrics.serviceMonitor.jobLabel`                            | The name of the label on the target service to use as the job name in prometheus | ``                 |
+| `metrics.serviceMonitor.interval`                            | Interval at which metrics should be scraped             | `30s`                                       |
+| `metrics.serviceMonitor.scrapeTimeout`                       | Specify the timeout after which the scrape is ended     | ``                                          |
+| `metrics.serviceMonitor.labels`                              | Extra labels for the ServiceMonitor                     | `{}                                         |
 
 > **Note**:
 >
