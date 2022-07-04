@@ -51,6 +51,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | Parameter                                                    | Description                                             | Default                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------- |
 | `image.repository`                                           | nextcloud Image name                                    | `nextcloud`                                 |
+| `image.flavor`                                               | nextcloud Image type                                    | `apache`                                    |
 | `image.tag`                                                  | nextcloud Image tag                                     | `{VERSION}`                                 |
 | `image.pullPolicy`                                           | Image pull policy                                       | `IfNotPresent`                              |
 | `image.pullSecrets`                                          | Specify image pull secrets                              | `nil`                                       |
