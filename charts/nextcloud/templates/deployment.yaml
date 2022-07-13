@@ -318,7 +318,7 @@ spec:
         imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort | default "8080" }}
           protocol: TCP
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
@@ -380,8 +380,8 @@ spec:
           mountPath: /var/www/html/themes
           subPath: {{ ternary "themes" (printf "%s/%s" .Values.nextcloud.persistence.subPath "themes") (empty .Values.nextcloud.persistence.subPath) }}
         - name: nextcloud-nginx-config
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -462,22 +462,20 @@ spec:
       {{- end }}
       {{- if .Values.nginx.enabled }}
       # Will mount configuration files as www-data (id: 82) for nextcloud
+      {{- if .Values.podSecurityContext }}
       securityContext:
-        fsGroup: 82
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
+        {{- with .Values.podSecurityContext }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- end }}
+      {{- end }}
       {{- else }}
       # Will mount configuration files as www-data (id: 33) for nextcloud
+      {{- if .Values.podSecurityContext }}
       securityContext:
-        fsGroup: 33
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
+        {{- with .Values.podSecurityContext }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        {{- end }}
+      {{- end }}
       {{- end }}
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ .Values.rbac.serviceaccount.name }}

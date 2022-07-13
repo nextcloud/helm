@@ -183,18 +183,19 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Extra secuurityContext parameters. For example you may need to define runAsNonRoot directive
-  # extraSecurityContext:
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+# podSecurityContext parameters. For example you may need to define runAsNonRoot directive
+podSecurityContext:
+  fsGroup: 33  # change to 101 for fpm with nginx-unprivileged
+#   runAsUser: "33"
+#   runAsGroup: "33"
+#   runAsNonRoot: true
+#   readOnlyRootFilesystem: true
 
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
   image:
-    repository: nginx
+    repository: nginxinc/nginx-unprivileged
     tag: alpine
     pullPolicy: IfNotPresent
 
