@@ -1,4 +1,3 @@
-
 name: Release Charts
 
 on:
@@ -22,7 +21,7 @@ jobs:
         with:
           continue-after-seconds: 180
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch history
         run: git fetch --prune --unshallow
@@ -45,6 +44,6 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.0
         with:
-          charts_repo_url: https://nextcloud.github.io/helm
+          charts_repo_url: https://spirkaa.github.io/helm
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
