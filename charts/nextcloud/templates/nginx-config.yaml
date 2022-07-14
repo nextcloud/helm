@@ -11,9 +11,29 @@ metadata:
 data:
   default.conf: |-
 {{- if .Values.nginx.config.default }}
+    upstream php-handler {
+        server 127.0.0.1:9000;
+    }
+
+    # Set the `immutable` cache control options only for assets with a cache busting `v` argument
+    map $arg_v $asset_immutable {
+        "" "";
+        default "immutable";
+    }
+
     server {
         listen 8080;
         access_log off;
+
+        aio            threads;
+        sendfile       on;
+        tcp_nopush     on;
+
+        # Path to the root of your installation
+        root /var/www/html;
+
+        # Prevent nginx HTTP Server Detection
+        server_tokens off;
 
         # HSTS settings
         # WARNING: Only add the preload option once you read about
@@ -23,8 +43,9 @@ data:
         # could take several months.
         #add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;" always;
 
-        # set max upload size
+        # set max upload size and increase upload timeout:
         client_max_body_size 10G;
+        client_body_timeout 300s;
         fastcgi_buffers 64 4K;
 
         # Enable gzip but do not remove ETag headers
@@ -33,11 +54,16 @@ data:
         gzip_comp_level 4;
         gzip_min_length 256;
         gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
-        gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
+        gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/wasm application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
 
         # Pagespeed is not supported by Nextcloud, so if your server is built
         # with the `ngx_pagespeed` module, uncomment this line to disable it.
         #pagespeed off;
+
+        # The settings allows you to optimize the HTTP2 bandwitdth.
+        # See https://blog.cloudflare.com/delivering-http-2-upload-speed-improvements/
+        # for tunning hints
+        client_body_buffer_size 512k;
 
         # HTTP response headers borrowed from Nextcloud `.htaccess`
         add_header Referrer-Policy                      "no-referrer"   always;
@@ -50,9 +76,6 @@ data:
 
         # Remove X-Powered-By, which is an information leak
         fastcgi_hide_header X-Powered-By;
-
-        # Path to the root of your installation
-        root /var/www/html;
 
         # Specify how to handle directories -- specifying `/index.php$request_uri`
         # here as the fallback means that Nginx always exhibits the desired behaviour
@@ -84,25 +107,32 @@ data:
         # `location ~ /(\.|autotest|...)` which would otherwise handle requests
         # for `/.well-known`.
         location ^~ /.well-known {
-            # The following 6 rules are borrowed from `.htaccess`
+            # The rules in this block are an adaptation of the rules
+            # in `.htaccess` that concern `/.well-known`.
 
-            location = /.well-known/carddav     { return 301 /remote.php/dav/; }
-            location = /.well-known/caldav      { return 301 /remote.php/dav/; }
-            # Anything else is dynamically handled by Nextcloud
-            location ^~ /.well-known            { return 301 /index.php$uri; }
+            location = /.well-known/carddav { return 301 /remote.php/dav/; }
+            location = /.well-known/caldav  { return 301 /remote.php/dav/; }
 
-            try_files $uri $uri/ =404;
+            location /.well-known/acme-challenge    { try_files $uri $uri/ =404; }
+            location /.well-known/pki-validation    { try_files $uri $uri/ =404; }
+
+            # Let Nextcloud's API for `/.well-known` URIs handle all other
+            # requests by passing them to the front-end controller.
+            return 301 /index.php$request_uri;
         }
 
         # Rules borrowed from `.htaccess` to hide certain paths from clients
         location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)(?:$|/)  { return 404; }
-        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console)              { return 404; }
+        location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console)                { return 404; }
 
         # Ensure this block, which passes PHP files to the PHP process, is above the blocks
         # which handle static assets (as seen below). If this block is not declared first,
         # then Nginx will encounter an infinite rewriting loop when it prepends `/index.php`
         # to the URI, resulting in a HTTP 500 error response.
         location ~ \.php(?:$|/) {
+            # Required for legacy support
+            rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|oc[ms]-provider\/.+|.+\/richdocumentscode\/proxy) /index.php$request_uri;
+
             fastcgi_split_path_info ^(.+?\.php)(/.*)$;
             set $path_info $fastcgi_path_info;
 
@@ -119,18 +149,29 @@ data:
 
             fastcgi_intercept_errors on;
             fastcgi_request_buffering off;
+
+            fastcgi_max_temp_file_size 0;
         }
 
-        location ~ \.(?:css|js|svg|gif)$ {
+        location ~ \.(?:css|js|svg|gif|png|jpg|ico|wasm|tflite|map)$ {
             try_files $uri /index.php$request_uri;
-            expires 6M;         # Cache-Control policy borrowed from `.htaccess`
+            add_header Cache-Control "public, max-age=15778463, $asset_immutable";
             access_log off;     # Optional: Don't log access to assets
+
+            location ~ \.wasm$ {
+                default_type application/wasm;
+            }
         }
 
         location ~ \.woff2?$ {
             try_files $uri /index.php$request_uri;
             expires 7d;         # Cache-Control policy borrowed from `.htaccess`
             access_log off;     # Optional: Don't log access to assets
+        }
+
+        # Rule borrowed from `.htaccess`
+        location /remote {
+            return 301 /remote.php$request_uri;
         }
 
         location / {
