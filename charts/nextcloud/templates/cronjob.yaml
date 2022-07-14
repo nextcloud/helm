@@ -52,8 +52,7 @@ spec:
               {{- if .Values.cronjob.curlInsecure }}
                 - "-k"
               {{- end }}
-                - "--fail"
-                - "-L"
+                - "-fsSL"
               {{- if .Values.ingress.tls }}
                 - "https://{{ .Values.nextcloud.host }}/cron.php"
               {{- else }}
