@@ -13,6 +13,7 @@ data:
 {{- if .Values.nginx.config.default }}
     server {
         listen 8080;
+        access_log off;
 
         # HSTS settings
         # WARNING: Only add the preload option once you read about
