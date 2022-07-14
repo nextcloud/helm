@@ -185,9 +185,11 @@ nextcloud:
 
 # podSecurityContext parameters. For example you may need to define runAsNonRoot directive
 podSecurityContext:
-  fsGroup: 33  # change to 101 for fpm with nginx-unprivileged
-#   runAsUser: "33"
-#   runAsGroup: "33"
+  # Mount configuration files as www-data group for nextcloud.
+  # change to 101 for fpm with nginx-unprivileged
+  fsGroup: 33
+#   runAsUser: 33
+#   runAsGroup: 33
 #   runAsNonRoot: true
 #   readOnlyRootFilesystem: true
 

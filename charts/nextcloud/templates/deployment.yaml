@@ -479,20 +479,14 @@ spec:
 {{ toYaml .Values.nextcloud.extraVolumes | indent 6 }}
       {{- end }}
       {{- if .Values.nginx.enabled }}
-      # Will mount configuration files as www-data (id: 82) for nextcloud
-      {{- if .Values.podSecurityContext }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- with .Values.podSecurityContext }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
       {{- end }}
       {{- else }}
-      # Will mount configuration files as www-data (id: 33) for nextcloud
-      {{- if .Values.podSecurityContext }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- with .Values.podSecurityContext }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
       {{- end }}
       {{- end }}
       {{- if .Values.rbac.enabled }}
