@@ -62,19 +62,19 @@ spec:
               {{- else }}
                 - "http://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}/cron.php"
               {{- end }}
-              {{- if .Values.nginx.enabled }}
-              {{- with .Values.podSecurityContext }}
-              securityContext:
-                {{- toYaml . | nindent 16 }}
-              {{- end }}
-              {{- else }}
-              {{- with .Values.podSecurityContext }}
-              securityContext:
-                {{- toYaml . | nindent 16 }}
-              {{- end }}
-              {{- end }}
               resources:
 {{ toYaml (default .Values.resources .Values.cronjob.resources) | indent 16 }}
+          {{- if .Values.nginx.enabled }}
+          {{- with .Values.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- else }}
+          {{- with .Values.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           {{- if .Values.rbac.enabled }}
           serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
           {{- end }}
