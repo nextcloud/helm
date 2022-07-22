@@ -58,7 +58,7 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ include "nextcloud.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.lifecycle }}
         lifecycle:

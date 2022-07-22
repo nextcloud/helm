@@ -39,6 +39,18 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Create image name that is used in the deployment
+*/}}
+{{- define "nextcloud.image" -}}
+{{- if .Values.image.tag -}}
+{{- printf "%s:%s" .Values.image.repository .Values.image.tag -}}
+{{- else -}}
+{{- printf "%s:%s-%s" .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
+{{- end -}}
+{{- end -}}
+
+
 {{- define "nextcloud.ingress.apiVersion" -}}
 {{- if semverCompare "<1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- print "extensions/v1beta1" -}}
