@@ -149,7 +149,7 @@ data:
 
             fastcgi_intercept_errors on;
             fastcgi_request_buffering off;
-
+            fastcgi_read_timeout 1200;
             fastcgi_max_temp_file_size 0;
         }
 
