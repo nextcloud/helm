@@ -409,7 +409,7 @@ spec:
       {{- else if .Values.postgresql.enabled }}
       initContainers:
       - name: postgresql-isready
-        image: {{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+        image: {{ default "docker.io" .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
         env:
           - name: POSTGRES_USER
             valueFrom:
