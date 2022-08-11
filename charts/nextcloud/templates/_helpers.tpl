@@ -46,7 +46,7 @@ Create image name that is used in the deployment
 {{- if .Values.image.tag -}}
 {{- printf "%s:%s" .Values.image.repository .Values.image.tag -}}
 {{- else -}}
-{{- printf "%s:%s-%s" .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
+{{- printf "%s:%s-%s" .Values.image.repository .Chart.AppVersion (default "apache" .Values.image.flavor) -}}
 {{- end -}}
 {{- end -}}
 
