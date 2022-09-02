@@ -60,6 +60,12 @@ spec:
       - name: {{ .Chart.Name }}
         image: {{ include "nextcloud.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if .Values.systemCron.enabled }}
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "busybox crond -l 0 -L /dev/stdout ; /entrypoint.sh apache2-foreground"
+        {{- end }}
         {{- if .Values.lifecycle }}
         lifecycle:
         {{-   if .Values.lifecycle.postStartCommand }}
