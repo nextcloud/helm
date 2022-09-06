@@ -52,10 +52,6 @@ spec:
         - name: {{ . }}
       {{- end}}
       {{- end }}
-      {{- if .Values.nextcloud.extraInitContainers }}
-      initContainers:
-      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 8 }}
-      {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ include "nextcloud.image" . }}
@@ -387,8 +383,12 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.mariadb.enabled }}
+      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
+      {{- if .Values.nextcloud.extraInitContainers }}
+      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 8 }}
+      {{- end }}
+      {{- if .Values.mariadb.enabled }}
       - name: mariadb-isalive
         image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
         env:
@@ -407,7 +407,6 @@ spec:
           - "-c"
           - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
       {{- else if .Values.postgresql.enabled }}
-      initContainers:
       - name: postgresql-isready
         image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
         env:
@@ -420,6 +419,7 @@ spec:
           - "sh"
           - "-c"
           - {{ printf "until pg_isready -h %s-postgresql -U ${POSTGRES_USER} ; do sleep 2 ; done" .Release.Name }}
+      {{- end }}
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
