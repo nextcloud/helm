@@ -3,7 +3,9 @@
 ##
 image:
   repository: nextcloud
-  # tag: 24.0.3-apache
+  flavor: apache
+  # If tag is unset, uses .Chart.AppVersion + flavor to create tag
+  # tag: e.g. 24.0.6-apache
   pullPolicy: IfNotPresent
   # pullSecrets:
   #   - myRegistrKeySecretName
