@@ -192,7 +192,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                  | Labels to be added at 'pod' level                       | not set                                     |
 | `podAnnotations`                                             | Annotations to be added at 'pod' level                  | not set                                     |
 | `metrics.enabled`                                            | Start Prometheus metrics exporter                       | `false`                                     |
-| `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
+| `metrics.https.enabled`                                      | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
+| `metrics.https.skipVerify`                                   | Skip TLS certificate verification when connecting to nextcloud        | `false`                     |
 | `metrics.token`                                              | Uses token for auth instead of username/password        | `""`                                        |
 | `metrics.timeout`                                            | When the scrape times out                               | `5s`                                        |
 | `metrics.image.repository`                                   | Nextcloud metrics exporter image name                   | `xperimental/nextcloud-exporter`            |
