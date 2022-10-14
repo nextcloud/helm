@@ -51,9 +51,11 @@ spec:
               key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         {{- end }}
         - name: NEXTCLOUD_SERVER
-          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
+          value: http{{ if .Values.metrics.https.enabled }}s{{ end }}://{{ .Values.nextcloud.host }}
         - name: NEXTCLOUD_TIMEOUT
           value: {{ .Values.metrics.timeout }}
+        - name: NEXTCLOUD_TLS_SKIP_VERIFY
+          value: {{ if .Values.metrics.https.skipVerify }}true{{ else }}false{{ end }}
         ports:
         - name: metrics
           containerPort: 9205
