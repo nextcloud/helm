@@ -55,7 +55,7 @@ spec:
         - name: NEXTCLOUD_TIMEOUT
           value: {{ .Values.metrics.timeout }}
         - name: NEXTCLOUD_TLS_SKIP_VERIFY
-          value: {{ if .Values.metrics.https.skipVerify }}true{{ else }}false{{ end }}
+          value: {{ .Values.metrics.https.skipVerify | quote }}
         ports:
         - name: metrics
           containerPort: 9205
