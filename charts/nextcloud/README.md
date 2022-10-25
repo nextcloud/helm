@@ -134,15 +134,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.auth.enabled`                                         | Whether to enable password authentication with redis    | `true`                                      |
 | `redis.auth.password`                                        | The password redis uses                                 | `''`                                        |
 | `cronjob.enabled`                                            | Whether to enable/disable cronjob                       | `false`                                     |
-| `cronjob.schedule`                                           | Schedule for the CronJob                                | `*/15 * * * *`                              |
-| `cronjob.annotations`                                        | Annotations to add to the cronjob                       | {}                                          |
-| `cronjob.curlInsecure`                                       | Set insecure (-k) option to curl                        | false                                       |
-| `cronjob.failedJobsHistoryLimit`                             | Specify the number of failed Jobs to keep               | `5`                                         |
-| `cronjob.successfulJobsHistoryLimit`                         | Specify the number of completed Jobs to keep            | `2`                                         |
-| `cronjob.resources`                                          | Cronjob Resources                                       | `nil`                                       |
-| `cronjob.nodeSelector`                                       | Cronjob Node selector                                   | `nil`                                       |
-| `cronjob.tolerations`                                        | Cronjob tolerations                                     | `nil`                                       |
-| `cronjob.affinity`                                           | Cronjob affinity                                        | `nil`                                       |
+| `cronjob.lifecycle.postStartCommand`                         | Specify deployment lifecycle hook postStartCommand      | `nil`                                       |
+| `cronjob.lifecycle.preStopCommand`                           | Specify deployment lifecycle hook preStopCommand        | `nil`                                       |
 | `service.type`                                               | Kubernetes Service type                                 | `ClusterIP`                                 |
 | `service.loadBalancerIP`                                     | LoadBalancerIp for service type LoadBalancer            | `nil`                                       |
 | `service.nodePort`                                           | NodePort for service type NodePort                      | `nil`                                       |
