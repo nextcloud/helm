@@ -125,6 +125,7 @@ spec:
 {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+      {{- if .Values.cronjob.enabled }}
       - name: {{ .Chart.Name }}-cron
         image: {{ include "nextcloud.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -151,7 +152,8 @@ spec:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:
 {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
-        {{- if .Values.nginx.enabled }}
+      {{- end }}
+      {{- if .Values.nginx.enabled }}
       - name: {{ .Chart.Name }}-nginx
         image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
         imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
