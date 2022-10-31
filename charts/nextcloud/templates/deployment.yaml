@@ -231,7 +231,7 @@ spec:
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
       {{- if .Values.nextcloud.extraInitContainers }}
-      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 8 }}
+      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 6 }}
       {{- end }}
       {{- if .Values.mariadb.enabled }}
       - name: mariadb-isalive
