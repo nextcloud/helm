@@ -23,4 +23,5 @@ spec:
     {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: app
