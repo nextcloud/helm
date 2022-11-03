@@ -169,6 +169,15 @@ nextcloud:
   #    image: busybox
   #    command: ['do', 'something']
 
+  # Extra sidecar containers.
+  extraSidecarContainers: []
+  #  - name: nextcloud-logger
+  #    image: busybox
+  #    command: [/bin/sh, -c, 'while ! test -f "/run/nextcloud/data/nextcloud.log"; do sleep 1; done; tail -n+1 -f /run/nextcloud/data/nextcloud.log']
+  #    volumeMounts:
+  #    - name: nextcloud-data
+  #      mountPath: /run/nextcloud/data
+
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
   extraVolumes:

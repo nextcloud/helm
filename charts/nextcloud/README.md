@@ -96,6 +96,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.defaultConfigs.smtp\.config\.php`                 | Default configuration for smtp                          | `true`                                      |
 | `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                        |
 | `nextcloud.extraEnv`                                         | specify additional environment variables                | `{}`                                        |
+| `nextcloud.extraSidecarContainers`                           | specify additional sidecar containers                   | `[]`                                        |
 | `nextcloud.extraInitContainers`                              | specify additional init containers                      | `[]`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
 | `nextcloud.extraVolumeMounts`                                | specify additional volume mounts for the NextCloud pod  | `{}`                                        |
