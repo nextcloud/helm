@@ -224,6 +224,9 @@ spec:
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
       {{- end }}
+      {{- with .Values.nextcloud.extraSidecarContainers }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
