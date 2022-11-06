@@ -169,6 +169,15 @@ nextcloud:
   #    image: busybox
   #    command: ['do', 'something']
 
+  # Extra sidecar containers.
+  extraSidecarContainers: []
+  #  - name: nextcloud-logger
+  #    image: busybox
+  #    command: [/bin/sh, -c, 'while ! test -f "/run/nextcloud/data/nextcloud.log"; do sleep 1; done; tail -n+1 -f /run/nextcloud/data/nextcloud.log']
+  #    volumeMounts:
+  #    - name: nextcloud-data
+  #      mountPath: /run/nextcloud/data
+
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
   extraVolumes:
@@ -294,47 +303,16 @@ systemCron: # run a system cron job inside the nextcloud image
 
 
 ## Cronjob to execute Nextcloud background tasks
-## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#webcron
+## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
 ##
 cronjob:
   enabled: false
-  # Nexcloud image is used as default but only curl is needed
-  image: {}
-    # repository: nextcloud
-    # tag: 16.0.3-apache
-    # pullPolicy: IfNotPresent
-    # pullSecrets:
-    #   - myRegistrKeySecretName
-  # Every 5 minutes
-  # Note: Setting this to any any other value than 5 minutes might
-  #  cause issues with how nextcloud background jobs are executed
-  schedule: "*/5 * * * *"
-  annotations: {}
-  # Set curl's insecure option if you use e.g. self-signed certificates
-  curlInsecure: false
-  failedJobsHistoryLimit: 5
-  successfulJobsHistoryLimit: 2
-  # If not set, nextcloud deployment one will be set
-  # resources:
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #  cpu: 100m
-    #  memory: 128Mi
-    # requests:
-    #  cpu: 100m
-    #  memory: 128Mi
 
-  # If not set, nextcloud deployment one will be set
-  # nodeSelector: {}
-
-  # If not set, nextcloud deployment one will be set
-  # tolerations: []
-
-  # If not set, nextcloud deployment one will be set
-  # affinity: {}
+  # Allow configuration of lifecycle hooks
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+  lifecycle: {}
+    # postStartCommand: []
+    # preStopCommand: []
 
 service:
   type: ClusterIP
@@ -474,7 +452,7 @@ metrics:
   ##
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
-      ##
+    ##
     enabled: false
 
     ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
