@@ -1,36 +1,36 @@
 apiVersion: v2
 name: nextcloud
-version: 3.2.4
-appVersion: 24.0.5
+version: 3.3.3
+appVersion: 25.0.1
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
-- nextcloud
-- storage
-- http
-- web
-- php
+  - nextcloud
+  - storage
+  - http
+  - web
+  - php
 home: https://nextcloud.com/
 icon: https://cdn.rawgit.com/docker-library/docs/defa5ffc7123177acd60ddef6e16bddf694cc35f/nextcloud/logo.svg
 sources:
-- https://github.com/nextcloud/helm
-- https://github.com/nextcloud/docker
+  - https://github.com/nextcloud/helm
+  - https://github.com/nextcloud/docker
 maintainers:
-- name: skjnldsv
-  email: skjnldsv@protonmail.com
-- name: chrisingenhaag
-  email: christian.ingenhaag@googlemail.com
-- name: billimek
-  email: jeff@billimek.com
+  - name: skjnldsv
+    email: skjnldsv@protonmail.com
+  - name: chrisingenhaag
+    email: christian.ingenhaag@googlemail.com
+  - name: billimek
+    email: jeff@billimek.com
 dependencies:
-- name: postgresql
-  version: 11.6.*
-  repository: https://charts.bitnami.com/bitnami
-  condition: postgresql.enabled
-- name: mariadb
-  version: 11.0.*
-  repository: https://charts.bitnami.com/bitnami
-  condition: mariadb.enabled
-- name: redis
-  version: 16.12.*
-  repository: https://charts.bitnami.com/bitnami
-  condition: redis.enabled
+  - name: postgresql
+    version: 11.6.*
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: mariadb
+    version: 11.0.*
+    repository: https://charts.bitnami.com/bitnami
+    condition: mariadb.enabled
+  - name: redis
+    version: 16.12.*
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
