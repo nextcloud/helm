@@ -248,9 +248,9 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end }}
+{{- end }}
 {{- if .Values.nextcloud.extraVolumeMounts }}
 {{- toYaml .Values.nextcloud.extraVolumeMounts }}
-{{- end }}
 {{- end }}
 {{- $nginxEnabled := .Values.nginx.enabled -}}
 {{- range $key, $value := .Values.nextcloud.phpConfigs }}
