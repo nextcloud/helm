@@ -15,7 +15,7 @@ spec:
   {{- end }}
   ports:
   - port: {{ .Values.service.port }}
-    targetPort: http
+    targetPort: {{ .Values.nextcloud.containerPort | default "http" }}
     protocol: TCP
     name: http
     {{- if eq .Values.service.type "NodePort" }}
