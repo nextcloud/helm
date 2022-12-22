@@ -417,10 +417,12 @@ metrics:
   # Currently you still need to set the token manually in your nextcloud install
   token: ""
   timeout: 5s
+  # if set to true, exporter skips certificate verification of Nextcloud server.
+  tlsSkipVerify: false
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: 0.5.1
+    tag: 0.6.0
     pullPolicy: IfNotPresent
 
   ## Metrics exporter resource requests and limits
