@@ -190,6 +190,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `metrics.https`                                            | Defines if https is used to connect to nextcloud                                 | `false` (uses http)                                          |
 | `metrics.token`                                            | Uses token for auth instead of username/password                                 | `""`                                                         |
 | `metrics.timeout`                                          | When the scrape times out                                                        | `5s`                                                         |
+| `metrics.tlsSkipVerify`                                      | Skips certificate verification of Nextcloud server      | `false`                                    |
 | `metrics.image.repository`                                 | Nextcloud metrics exporter image name                                            | `xperimental/nextcloud-exporter`                             |
 | `metrics.image.tag`                                        | Nextcloud metrics exporter image tag                                             | `0.5.1`                                                      |
 | `metrics.image.pullPolicy`                                 | Nextcloud metrics exporter image pull policy                                     | `IfNotPresent`                                               |
