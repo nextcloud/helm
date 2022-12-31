@@ -305,6 +305,7 @@ redis:
 ##
 cronjob:
   enabled: false
+  command: [/cron.sh]
   resources: {}
     # limits:
     #  cpu: 100m
