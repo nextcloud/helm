@@ -96,6 +96,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.defaultConfigs.smtp\.config\.php`                 | Default configuration for smtp                          | `true`                                      |
 | `nextcloud.strategy`                                         | specifies the strategy used to replace old Pods by new ones | `type: Recreate`                        |
 | `nextcloud.extraEnv`                                         | specify additional environment variables                | `{}`                                        |
+| `nextcloud.extraSidecarContainers`                           | specify additional sidecar containers                   | `[]`                                        |
 | `nextcloud.extraInitContainers`                              | specify additional init containers                      | `[]`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
 | `nextcloud.extraVolumeMounts`                                | specify additional volume mounts for the NextCloud pod  | `{}`                                        |
@@ -134,15 +135,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.auth.enabled`                                         | Whether to enable password authentication with redis    | `true`                                      |
 | `redis.auth.password`                                        | The password redis uses                                 | `''`                                        |
 | `cronjob.enabled`                                            | Whether to enable/disable cronjob                       | `false`                                     |
-| `cronjob.schedule`                                           | Schedule for the CronJob                                | `*/15 * * * *`                              |
-| `cronjob.annotations`                                        | Annotations to add to the cronjob                       | {}                                          |
-| `cronjob.curlInsecure`                                       | Set insecure (-k) option to curl                        | false                                       |
-| `cronjob.failedJobsHistoryLimit`                             | Specify the number of failed Jobs to keep               | `5`                                         |
-| `cronjob.successfulJobsHistoryLimit`                         | Specify the number of completed Jobs to keep            | `2`                                         |
-| `cronjob.resources`                                          | Cronjob Resources                                       | `nil`                                       |
-| `cronjob.nodeSelector`                                       | Cronjob Node selector                                   | `nil`                                       |
-| `cronjob.tolerations`                                        | Cronjob tolerations                                     | `nil`                                       |
-| `cronjob.affinity`                                           | Cronjob affinity                                        | `nil`                                       |
+| `cronjob.lifecycle.postStartCommand`                         | Specify deployment lifecycle hook postStartCommand      | `nil`                                       |
+| `cronjob.lifecycle.preStopCommand`                           | Specify deployment lifecycle hook preStopCommand        | `nil`                                       |
 | `service.type`                                               | Kubernetes Service type                                 | `ClusterIP`                                 |
 | `service.loadBalancerIP`                                     | LoadBalancerIp for service type LoadBalancer            | `nil`                                       |
 | `service.nodePort`                                           | NodePort for service type NodePort                      | `nil`                                       |
@@ -164,6 +158,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `rbac.enabled`                                               | Enable Role and rolebinding for priveledged PSP         | `false`                                     |
 | `rbac.serviceaccount.create`                                 | Wether to create a serviceaccount or use an existing one (requires rbac) | `true`                     |
 | `rbac.serviceaccount.name`                                   | The name of the sevice account that the deployment will use (requires rbac) | `nextcloud-serviceaccount` |
+| `rbac.serviceaccount.annotations`                            | Serviceaccount annotations                              | `{}`                                        |
 | `livenessProbe.enabled`                                      | Turn on and off liveness probe                          | `true`                                      |
 | `livenessProbe.initialDelaySeconds`                          | Delay before liveness probe is initiated                | `10`                                        |
 | `livenessProbe.periodSeconds`                                | How often to perform the probe                          | `10`                                        |
@@ -194,6 +189,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
 | `metrics.token`                                              | Uses token for auth instead of username/password        | `""`                                        |
 | `metrics.timeout`                                            | When the scrape times out                               | `5s`                                        |
+| `metrics.tlsSkipVerify`                                      | Skips certificate verification of Nextcloud server      | `false`                                    |
 | `metrics.image.repository`                                   | Nextcloud metrics exporter image name                   | `xperimental/nextcloud-exporter`            |
 | `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `0.5.1`                                     |
 | `metrics.image.pullPolicy`                                   | Nextcloud metrics exporter image pull policy            | `IfNotPresent`                              |
