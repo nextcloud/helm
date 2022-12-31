@@ -1,0 +1,65 @@
+{{- if .Values.cronjobs.enabled }}
+{{- range $index, $cronjob := .Values.cronjobs.cronjobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "nextcloud.fullname" $ }}-{{ $cronjob.name }}
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" $ }}
+    helm.sh/chart: {{ include "nextcloud.chart" $ }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  schedule: {{ $cronjob.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" $ }}
+        helm.sh/chart: {{ include "nextcloud.chart" $ }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+        app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ include "nextcloud.name" $ }}
+            helm.sh/chart: {{ include "nextcloud.chart" $ }}
+            app.kubernetes.io/instance: {{ $.Release.Name }}
+            app.kubernetes.io/managed-by: {{ $.Release.Service }}
+        spec:
+          serviceAccount: {{ template "nextcloud.fullname" $ }}-cronjobs
+          {{- with $.Values.image.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml $.Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: {{ template "nextcloud.fullname" $ }}-{{ $cronjob.name }}
+              image: "{{ $.Values.cronjobs.image.repository }}:{{ $.Values.cronjobs.image.tag | default "latest" }}"
+              imagePullPolicy: {{ default $.Values.image.pullPolicy $.Values.cronjobs.image.pullPolicy }}
+              command:
+                - "/bin/sh"
+                - "-c"
+                - |
+                  POD=$(
+                    kubectl get pods \
+                    -n {{ $.Release.Namespace }} \
+                    -l app.kubernetes.io/instance={{ $.Release.Name }} \
+                    -l app.kubernetes.io/component=app \
+                    -o jsonpath='{.items[0].metadata.name}'
+                  )
+                  kubectl -n {{ $.Release.Namespace }} exec $POD -c {{ $.Chart.Name }} -- \
+                    sh -c '{{ $cronjob.command }}'
+              {{- with $.Values.cronjobs.env }}
+              env: {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with $.Values.cronjobs.envFrom }}
+              envFrom: {{- toYaml . | nindent 16 }}
+              {{- end }}
+          restartPolicy: Never
+{{- end }}
+{{- end }}

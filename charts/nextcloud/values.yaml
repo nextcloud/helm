@@ -321,6 +321,17 @@ cronjob:
     # postStartCommand: []
     # preStopCommand: []
 
+## Kubernetes Cronjobs to execute Nextcloud background tasks
+cronjobs:
+  enabled: false
+  image:
+    repository: ghcr.io/spirkaa/kubectl
+    tag: latest
+  cronjobs:
+    - name: cron
+      schedule: "*/5 * * * *"
+      command: php -f /var/www/html/cron.php
+
 service:
   type: ClusterIP
   port: 8080
