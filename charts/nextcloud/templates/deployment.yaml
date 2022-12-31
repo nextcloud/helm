@@ -127,7 +127,7 @@ spec:
 {{ toYaml .Values.resources | indent 10 }}
       {{- if .Values.cronjob.enabled }}
       - name: {{ .Chart.Name }}-cron
-        image: {{ include "nextcloud.image" . }}
+        image: {{ .Values.cronjob.image | default (include "nextcloud.image" .)}}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         command:
           {{- toYaml .Values.cronjob.command | nindent 10 -}}
