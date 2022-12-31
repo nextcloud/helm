@@ -149,7 +149,7 @@ spec:
         env:
 {{- include "nextcloud.env" . | indent 8 }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.cronjob.resources | indent 10 }}
         volumeMounts:
 {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
       {{- end }}

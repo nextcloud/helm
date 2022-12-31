@@ -305,6 +305,13 @@ redis:
 ##
 cronjob:
   enabled: false
+  resources: {}
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
 
   # Allow configuration of lifecycle hooks
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
