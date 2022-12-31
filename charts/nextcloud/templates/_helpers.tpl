@@ -98,15 +98,27 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ .Values.postgresql.global.postgresql.auth.database | quote }}
   {{- end }}
 - name: POSTGRES_USER
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+  {{- if .Values.postgresql.auth.username }}
+  value: {{ .Values.postgresql.auth.username | quote }}
+  {{ else }}
+  value: {{ .Values.postgresql.global.postgresql.auth.username | quote }}
+  {{- end }}
 - name: POSTGRES_PASSWORD
+  {{- if or .Values.postgresql.auth.existingSecret .Values.postgresql.global.postgresql.auth.existingSecret }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      {{- if .Values.postgresql.auth.existingSecret }}
+      name: {{ .Values.postgresql.auth.existingSecret }}
+      key: {{ .Values.postgresql.auth.secretKeys.userPasswordKey }}
+      {{ else if .Values.postgresql.global.postgresql.auth.existingSecret }}
+      name: {{ .Values.postgresql.global.postgresql.auth.existingSecret }}
+      key: {{ .Values.postgresql.global.postgresql.auth.secretKeys.userPasswordKey }}
+      {{- end }}
+  {{ else if .Values.postgresql.auth.password }}
+  value: {{ .Values.postgresql.auth.password | quote }}
+  {{ else }}
+  value: {{ .Values.postgresql.global.postgresql.auth.password | quote }}
+  {{- end }}
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
