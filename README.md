@@ -2,19 +2,19 @@
 
 [Helm](https://helm.sh) repo for different charts related to Nextcloud which can be installed on [Kubernetes](https://kubernetes.io)
 
-### Add Helm repository
+## Add Helm repository
 
 To install the repo just run:
 
-```bash
-helm repo add nextcloud https://nextcloud.github.io/helm/
+```console
+helm repo add nextcloud https://spirkaa.github.io/helm-nextcloud
 helm repo update
 ```
 
-### Helm Charts
+## Helm Charts
 
-* [nextcloud](https://nextcloud.github.io/helm/)
+* [nextcloud](https://spirkaa.github.io/helm-nextcloud)
 
-  ```bash
+  ```console
   helm install my-release nextcloud/nextcloud
   ```
