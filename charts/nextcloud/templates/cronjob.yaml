@@ -31,9 +31,11 @@ spec:
             app.kubernetes.io/managed-by: {{ $.Release.Service }}
         spec:
           serviceAccount: {{ template "nextcloud.fullname" $ }}-cronjobs
-          {{- with $.Values.image.imagePullSecrets }}
+          {{- if $.Values.image.pullSecrets }}
           imagePullSecrets:
-            {{- toYaml . | nindent 12 }}
+          {{- range $.Values.image.pullSecrets }}
+            - name: {{ . }}
+          {{- end }}
           {{- end }}
           securityContext:
             {{- toYaml $.Values.podSecurityContext | nindent 12 }}
