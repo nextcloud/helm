@@ -305,6 +305,7 @@ redis:
 ##
 cronjob:
   enabled: false
+  # image: busybox
   command: [/cron.sh]
   resources: {}
     # limits:
