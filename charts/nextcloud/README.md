@@ -2,10 +2,10 @@
 
 [nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
 
-## TL;DR;
+## TL;DR
 
 ```console
-helm repo add nextcloud https://nextcloud.github.io/helm/
+helm repo add nextcloud https://spirkaa.github.io/helm-nextcloud/
 helm install my-release nextcloud/nextcloud
 ```
 
@@ -26,7 +26,7 @@ It also packages the [Bitnami MariaDB chart](https://github.com/kubernetes/chart
 To install the chart with the release name `my-release`:
 
 ```console
-helm repo add nextcloud https://nextcloud.github.io/helm/
+helm repo add nextcloud https://spirkaa.github.io/helm-nextcloud/
 helm install my-release nextcloud/nextcloud
 ```
 
@@ -287,26 +287,29 @@ nextcloud:
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
 - Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
-```yaml
-ingress:
-  annotations:
-   nginx.ingress.kubernetes.io/enable-cors: "true"
-   nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
-```
+
+  ```yaml
+  ingress:
+    annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+  ```
+
 - The next layer is nextcloud pod's nginx if you use `nextcloud-fpm`, this can be left at default
 - Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
-```php
-  configs:
-    proxy.config.php: |-
-      <?php
-      $CONFIG = array (
-        'trusted_proxies' => array(
-          0 => '127.0.0.1',
-          1 => '10.0.0.0/8',
-        ),
-        'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
-      );
-```
+
+  ```php
+    configs:
+      proxy.config.php: |-
+        <?php
+        $CONFIG = array (
+          'trusted_proxies' => array(
+            0 => '127.0.0.1',
+            1 => '10.0.0.0/8',
+          ),
+          'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
+        );
+  ```
 
 ## Hugepages
 
@@ -335,9 +338,11 @@ nextcloud:
 ```
 
 ## HPA (Clustering)
+
 If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared persistence between the containers.
 
 Minimum cluster compatible persistence settings:
+
 ```yaml
 persistence:
   enabled: true
