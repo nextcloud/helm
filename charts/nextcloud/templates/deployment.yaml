@@ -121,10 +121,16 @@ spec:
           successThreshold: {{ .Values.startupProbe.successThreshold }}
           failureThreshold: {{ .Values.startupProbe.failureThreshold }}
         {{- end }}
-        volumeMounts:
-{{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.nextcloud.securityContext}}
+        securityContext:
+          {{- with .Values.nextcloud.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
+        volumeMounts:
+        {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
       {{- if .Values.cronjob.enabled }}
       - name: {{ .Chart.Name }}-cron
         image: {{ include "nextcloud.image" . }}
@@ -150,6 +156,12 @@ spec:
 {{- include "nextcloud.env" . | indent 8 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.cronjob.securityContext}}
+        securityContext:
+          {{- with .Values.cronjob.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         volumeMounts:
 {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
       {{- end }}
@@ -192,6 +204,12 @@ spec:
 
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
+        {{- if .Values.nginx.securityContext}}
+        securityContext:
+          {{- with .Values.nginx.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         volumeMounts:
         - name: nextcloud-main
           mountPath: /var/www/
@@ -308,23 +326,23 @@ spec:
       {{- if .Values.nextcloud.extraVolumes }}
 {{ toYaml .Values.nextcloud.extraVolumes | indent 6 }}
       {{- end }}
-      {{- if .Values.nginx.enabled }}
-      # Will mount configuration files as www-data (id: 82) for nextcloud
       securityContext:
-        fsGroup: 82
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- if .Values.nextcloud.podSecurityContext }}
+        {{- with .Values.nextcloud.podSecurityContext }}
+          {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- else }}
-      # Will mount configuration files as www-data (id: 33) for nextcloud
-      securityContext:
+        {{- if .Values.nginx.enabled }}
+        # Will mount configuration files as www-data (id: 82) for nextcloud
+        fsGroup: 82
+        {{- else }}
+        # Will mount configuration files as www-data (id: 33) for nextcloud
         fsGroup: 33
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if .Values.securityContext }}
+          {{- with .Values.securityContext }}
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
         {{- end }}
       {{- end }}
       {{- if .Values.rbac.enabled }}
