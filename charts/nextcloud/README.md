@@ -100,6 +100,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraInitContainers`                              | specify additional init containers                      | `[]`                                        |
 | `nextcloud.extraVolumes`                                     | specify additional volumes for the NextCloud pod        | `{}`                                        |
 | `nextcloud.extraVolumeMounts`                                | specify additional volume mounts for the NextCloud pod  | `{}`                                        |
+| `nextcloud.securityContext`                                  | Optional security context for the NextCloud container   | `nil`                                       |
+| `nextcloud.podSecurityContext`                               | specify additional volume mounts for the NextCloud pod  | `nil`                                       |
 | `nginx.enabled`                                              | Enable nginx (requires you use php-fpm image)           | `false`                                     |
 | `nginx.image.repository`                                     | nginx Image name                                        | `nginx`                                     |
 | `nginx.image.tag`                                            | nginx Image tag                                         | `alpine`                                    |
@@ -107,6 +109,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nginx.config.default`                                       | Whether to use nextclouds recommended nginx config      | `true`                                      |
 | `nginx.config.custom`                                        | Specify a custom config for nginx                       | `{}`                                        |
 | `nginx.resources`                                            | nginx resources                                         | `{}`                                        |
+| `nginx.securityContext`                                      | Optional security context for the nginx container       | `nil`                                       |
 | `lifecycle.postStartCommand`                                 | Specify deployment lifecycle hook postStartCommand      | `nil`                                       |
 | `lifecycle.preStopCommand`                                   | Specify deployment lifecycle hook preStopCommand        | `nil`                                       |
 | `internalDatabase.enabled`                                   | Whether to use internal sqlite database                 | `true`                                      |
@@ -137,6 +140,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.enabled`                                            | Whether to enable/disable cronjob                       | `false`                                     |
 | `cronjob.lifecycle.postStartCommand`                         | Specify deployment lifecycle hook postStartCommand      | `nil`                                       |
 | `cronjob.lifecycle.preStopCommand`                           | Specify deployment lifecycle hook preStopCommand        | `nil`                                       |
+| `cronjob.securityContext`                                    | Optional security context for cronjob                   | `nil`                                       |
 | `service.type`                                               | Kubernetes Service type                                 | `ClusterIP`                                 |
 | `service.loadBalancerIP`                                     | LoadBalancerIp for service type LoadBalancer            | `nil`                                       |
 | `service.nodePort`                                           | NodePort for service type NodePort                      | `nil`                                       |

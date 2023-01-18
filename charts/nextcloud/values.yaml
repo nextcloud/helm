@@ -190,8 +190,15 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Extra secuurityContext parameters. For example you may need to define runAsNonRoot directive
-  # extraSecurityContext:
+  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  securityContext: {}
+  #   runAsUser: "33"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
+
+  # Set securityContext parameters for the pod. For example, you may need to define runAsNonRoot directive
+  podSecurityContext: {}
   #   runAsUser: "33"
   #   runAsGroup: "33"
   #   runAsNonRoot: true
@@ -212,6 +219,13 @@ nginx:
     #     worker_processes  1;..
 
   resources: {}
+
+  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  securityContext: {}
+  #   runAsUser: "82"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
 
 internalDatabase:
   enabled: true
@@ -308,6 +322,12 @@ cronjob:
   lifecycle: {}
     # postStartCommand: []
     # preStopCommand: []
+  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  securityContext: {}
+  #   runAsUser: "33"
+  #   runAsGroup: "33"
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
 
 service:
   type: ClusterIP
@@ -481,3 +501,7 @@ rbac:
     create: true
     name: nextcloud-serviceaccount
     annotations: {}
+
+
+## @param securityContext @deprecated Use `nextcloud.podSecurityContext` instead
+securityContext: {}
