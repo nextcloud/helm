@@ -51,7 +51,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | Parameter                                                    | Description                                             | Default                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------- |
 | `image.repository`                                           | nextcloud Image name                                    | `nextcloud`                                 |
-| `image.flavor`                                               | nextcloud Image type                                    | `apache`                                    |
+| `image.flavor`                                               | nextcloud Image type (Options: apache, fpm)             | `apache`                                    |
 | `image.tag`                                                  | nextcloud Image tag                                     | `{VERSION}`                                 |
 | `image.pullPolicy`                                           | Image pull policy                                       | `IfNotPresent`                              |
 | `image.pullSecrets`                                          | Specify image pull secrets                              | `nil`                                       |
@@ -193,7 +193,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `metrics.https`                                              | Defines if https is used to connect to nextcloud        | `false` (uses http)                         |
 | `metrics.token`                                              | Uses token for auth instead of username/password        | `""`                                        |
 | `metrics.timeout`                                            | When the scrape times out                               | `5s`                                        |
-| `metrics.tlsSkipVerify`                                      | Skips certificate verification of Nextcloud server      | `false`                                    |
+| `metrics.tlsSkipVerify`                                      | Skips certificate verification of Nextcloud server      | `false`                                     |
 | `metrics.image.repository`                                   | Nextcloud metrics exporter image name                   | `xperimental/nextcloud-exporter`            |
 | `metrics.image.tag`                                          | Nextcloud metrics exporter image tag                    | `0.5.1`                                     |
 | `metrics.image.pullPolicy`                                   | Nextcloud metrics exporter image pull policy            | `IfNotPresent`                              |
@@ -287,6 +287,24 @@ nextcloud:
       );
 ```
 
+## Using nginx
+To use nginx instead of apache to serve nextcloud, Set the following parameters in your `values.yaml`:
+
+```yaml
+# This Generates an image tag using the chart's app version
+# e.g. if the app version is 25.0.3, the image tag will be 25.0.3-fpm
+image:
+  flavor: fpm
+  # You can also specify a tag directly. this version is an example:
+  # tag: 25.0.3-fpm
+```
+
+```yaml
+# this deploys an nginx container within the nextcloud pod
+nginx
+  enabled: true
+```
+
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
@@ -297,7 +315,7 @@ ingress:
    nginx.ingress.kubernetes.io/enable-cors: "true"
    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
 ```
-- The next layer is nextcloud pod's nginx if you use `nextcloud-fpm`, this can be left at default
+- The next layer is nextcloud pod's nginx container. In in your `values.yaml`, if `nextcloud.tag` has `fpm` in it, or `image.flavor` is set to `fpm`, this can be left at default
 - Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
 ```php
   configs:
