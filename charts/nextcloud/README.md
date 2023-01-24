@@ -55,6 +55,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `image.tag`                                                  | nextcloud Image tag                                     | `{VERSION}`                                 |
 | `image.pullPolicy`                                           | Image pull policy                                       | `IfNotPresent`                              |
 | `image.pullSecrets`                                          | Specify image pull secrets                              | `nil`                                       |
+| `replicaCount`                                               | Number of nextcloud pods to deploy                      | `1`                                         |
 | `ingress.className`                                          | Name of the ingress class to use                        | `nil`                                       |
 | `ingress.enabled`                                            | Enable use of ingress controllers                       | `false`                                     |
 | `ingress.servicePort`                                        | Ingress' backend servicePort                            | `http`                                      |
