@@ -129,11 +129,14 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `mariadb.auth.password`                                      | Password for the database                               | `changeme`                                  |
 | `mariadb.auth.username`                                      | Database user to create                                 | `nextcloud`                                 |
 | `mariadb.auth.rootPassword`                                  | MariaDB admin password                                  | `nil`                                       |
+| `mariadb.primary.persistence.enabled`                        | Whether or not to Use a PVC on MariaDB primary          | `false`                                     |
+| `mariadb.primary.persistence.existingClaim`                  | Use an existing PVC for MariaDB primary                 | `nil`                                       |
 | `postgresql.enabled`                                         | Whether to use the PostgreSQL chart                     | `false`                                     |
 | `postgresql.global.postgresql.auth.username`                 | Database user to create                                 | `nextcloud`                                 |
 | `postgresql.global.postgresql.auth.password`                 | Password for the database                               | `changeme`                                  |
 | `postgresql.global.postgresql.auth.database`                 | Database name to create                                 | `nextcloud`                                 |
 | `postgresql.primary.persistence.enabled`                     | Whether or not to use PVC on PostgreSQL primary         | `false`                                     |
+| `postgresql.primary.persistence.existingClaim`               | Use an existing PVC for PostgreSQL primary              | `nil`                                       |
 | `redis.enabled`                                              | Whether to install/use redis for locking                | `false`                                     |
 | `redis.auth.enabled`                                         | Whether to enable password authentication with redis    | `true`                                      |
 | `redis.auth.password`                                        | The password redis uses                                 | `''`                                        |
