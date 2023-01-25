@@ -279,6 +279,8 @@ mariadb:
   primary:
     persistence:
       enabled: false
+      # Use an existing Persistent Volume Claim (must be created ahead of time)
+      # existingClaim: ""
       # storageClass: ""
       accessMode: ReadWriteOnce
       size: 8Gi
@@ -298,6 +300,8 @@ postgresql:
   primary:
     persistence:
       enabled: false
+      # Use an existing Persistent Volume Claim (must be created ahead of time)
+      # existingClaim: ""
       # storageClass: ""
 
 ##
