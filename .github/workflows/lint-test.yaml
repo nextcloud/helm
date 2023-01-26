@@ -8,6 +8,7 @@ on:
       - 'LICENSE'
       - '.github/ISSUE_TEMPLATE/**'
       - '.github/pull_request_template.md'
+      - 'CODE_OF_CONDUCT.md'
 
 jobs:
   lint-test:
