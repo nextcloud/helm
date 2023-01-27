@@ -83,6 +83,7 @@ nextcloud:
     # smtpUsernameKey: smtp_username
     # smtpPasswordKey: smtp_password
   update: 0
+  initLock: false
   # If web server is not binding default port, you can define it
   # containerPort: 8080
   datadir: /var/www/html/data

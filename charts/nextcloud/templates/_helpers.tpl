@@ -156,6 +156,10 @@ Create environment variables used to configure the nextcloud container as well a
 - name: NEXTCLOUD_UPDATE
   value: {{ .Values.nextcloud.update | quote }}
 {{- end }}
+{{- if .Values.nextcloud.initLock }}
+- name: NEXTCLOUD_INIT_LOCK
+  value: "true"
+{{- end }}
 - name: NEXTCLOUD_DATA_DIR
   value: {{ .Values.nextcloud.datadir | quote }}
 {{- if .Values.nextcloud.mail.enabled }}
