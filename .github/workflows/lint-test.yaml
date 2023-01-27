@@ -6,6 +6,9 @@ on:
       - 'README.md'
       - 'charts/**/README.md'
       - 'LICENSE'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/pull_request_template.md'
+      - 'CODE_OF_CONDUCT.md'
 
 jobs:
   lint-test:
@@ -14,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0        
+          fetch-depth: 0
 
       - name: Install Helm
         uses: azure/setup-helm@v3.1
@@ -26,7 +29,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.3.0
+        uses: helm/chart-testing-action@v2.3.1
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -42,7 +45,7 @@ jobs:
         run: ct lint --config ct.yaml
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.3.0
+        uses: helm/kind-action@v1.4.0
         with:
           install_local_path_provisioner: true
         if: steps.list-changed.outputs.changed == 'true'
