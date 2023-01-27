@@ -266,7 +266,6 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
       {{- if .Values.nextcloud.extraInitContainers }}
       {{- toYaml .Values.nextcloud.extraInitContainers | nindent 6 }}
@@ -305,7 +304,27 @@ spec:
           - "-c"
           - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
       {{- end }}
-      {{- end }}
+      - name: {{ .Chart.Name }}-upgrade
+        image: {{ include "nextcloud.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          # Do upgrade and then exit
+          # This avoids doing it in the container, which could get killed by failed liveness probes
+          - "true"
+        env:
+        - name: NEXTCLOUD_UPDATE
+          value: "1"
+{{- include "nextcloud.env" . | indent 8 }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.nextcloud.securityContext}}
+        securityContext:
+          {{- with .Values.nextcloud.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
+        volumeMounts:
+        {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
     {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
