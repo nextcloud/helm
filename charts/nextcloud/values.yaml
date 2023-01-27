@@ -12,6 +12,7 @@ nameOverride: ""
 fullnameOverride: ""
 podAnnotations: {}
 deploymentAnnotations: {}
+deploymentLabels: {}
 
 # Number of replicas to be deployed
 replicaCount: 1
