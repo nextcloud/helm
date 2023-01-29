@@ -78,11 +78,11 @@ nextcloud:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: username
-    # passwordKey: password
-    # tokenKey: serverinfo_token
-    # smtpUsernameKey: smtp_username
-    # smtpPasswordKey: smtp_password
+    # usernameKey: nextcloud-username
+    # passwordKey: nextcloud-password
+    # tokenKey: nextcloud-token
+    # smtpUsernameKey: smtp-username
+    # smtpPasswordKey: smtp-password
   update: 0
   # If web server is not binding default port, you can define it
   # containerPort: 8080
@@ -257,8 +257,8 @@ externalDatabase:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: username
-    # passwordKey: password
+    # usernameKey: db-username
+    # passwordKey: db-password
 
 ##
 ## MariaDB chart configuration
