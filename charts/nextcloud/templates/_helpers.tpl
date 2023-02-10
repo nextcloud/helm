@@ -258,7 +258,4 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   mountPath: {{ $nginxEnabled | ternary (printf "/usr/local/etc/php-fpm.d/%s" $key | quote) (printf "/usr/local/etc/php/conf.d/%s" $key | quote) }}
   subPath: {{ $key }}
 {{- end }}
-{{- if .Values.nextcloud.extraVolumeMounts }}
-{{ toYaml .Values.nextcloud.extraVolumeMounts }}
-{{- end -}}
 {{- end -}}
