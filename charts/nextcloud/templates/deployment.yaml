@@ -155,7 +155,7 @@ spec:
         env:
 {{- include "nextcloud.env" . | indent 8 }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.cronjob.resources | indent 10 }}
         {{- if .Values.cronjob.securityContext}}
         securityContext:
           {{- with .Values.cronjob.securityContext }}
