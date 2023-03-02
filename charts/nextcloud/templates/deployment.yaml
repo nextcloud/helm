@@ -337,7 +337,7 @@ spec:
           defaultMode: 420
           items:
             - key: nginx.conf
-              mode: 0420
+              mode: 292
               path: nginx.conf
       {{- if .Values.metrics.nginx.enabled }}
       - name: nginx-metrics-config
@@ -345,7 +345,7 @@ spec:
           defaultMode: 420
           items:
             - key: metrics.conf
-              mode: 0420
+              mode: 292
               path: metrics.conf
       {{- end }}
       {{- end }}
