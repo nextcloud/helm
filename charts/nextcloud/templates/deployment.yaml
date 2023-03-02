@@ -173,6 +173,9 @@ spec:
         - name: http
           containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
           protocol: TCP
+        - name: metrics
+          containerPort: {{ .Values.metrics.nginx.service.port | default "8081" }}
+          protocol: TCP
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
           httpGet:
@@ -238,6 +241,12 @@ spec:
         - name: nextcloud-main
           mountPath: /var/www/html/themes
           subPath: {{ ternary "themes" (printf "%s/%s" .Values.nextcloud.persistence.subPath "themes") (empty .Values.nextcloud.persistence.subPath) }}
+        {{- if .Values.metrics.nginx.enabled }}
+        - name: nginx-metrics-config
+          mountPath: /etc/nginx/conf.d/metrics.conf
+          readOnly: true
+          subPath: metrics.conf
+        {{- end }}
         - name: nextcloud-nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
@@ -325,6 +334,20 @@ spec:
       - name: nextcloud-nginx-config
         configMap:
           name: {{ template "nextcloud.fullname" . }}-nginxconfig
+          defaultMode: 420
+          items:
+            - key: nginx.conf
+              mode: 0420
+              path: nginx.conf
+      {{- if .Values.metrics.nginx.enabled }}
+      - name: nginx-metrics-config
+        configMap:
+          defaultMode: 420
+          items:
+            - key: metrics.conf
+              mode: 0420
+              path: metrics.conf
+      {{- end }}
       {{- end }}
       {{- if .Values.nextcloud.extraVolumes }}
 {{ toYaml .Values.nextcloud.extraVolumes | indent 6 }}

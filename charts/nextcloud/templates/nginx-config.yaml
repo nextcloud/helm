@@ -9,6 +9,36 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+{{- if .Values.metrics.nginx.enabled }}
+  metrics.conf: |
+    server {
+        listen {{ .Values.metrics.nginx.service.port | default "8081" }};
+
+        # Path to the root of your installation
+        root /var/www/html;
+
+        # Prevent nginx HTTP Server Detection
+        server_tokens off;
+
+        add_header Referrer-Policy                      "no-referrer"   always;
+        add_header X-Content-Type-Options               "nosniff"       always;
+        add_header X-Download-Options                   "noopen"        always;
+        add_header X-Frame-Options                      "SAMEORIGIN"    always;
+        add_header X-Permitted-Cross-Domain-Policies    "none"          always;
+        add_header X-Robots-Tag                         "none"          always;
+        add_header X-XSS-Protection                     "1; mode=block" always;
+
+        # NGINX metrics
+        location /stub_status {
+            stub_status on;
+            allow 127.0.0.1;
+            {{- range .Values.metrics.nginx.allow }}
+                allow {{ . }};
+            {{- end }}
+            deny all;
+        }
+    }
+{{- end }}
   nginx.conf: |-
 {{- if .Values.nginx.config.default }}
     worker_processes auto;
@@ -44,7 +74,7 @@ data:
         }
 
         server {
-            listen 80;
+            listen {{ .Values.nextcloud.containerPort | default "80" }};
 
             # HSTS settings
             # WARNING: Only add the preload option once you read about
@@ -168,6 +198,10 @@ data:
                 try_files $uri $uri/ /index.php$request_uri;
             }
         }
+
+        {{- if .Values.metrics.nginx.enabled }}
+        include /etc/nginx/conf.d/metrics.conf;
+        {{- end }}
     }
 {{- else }}
 {{ .Values.nginx.config.custom | indent 4 }}
