@@ -242,7 +242,7 @@ spec:
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
         {{- if .Values.nextcloud.extraVolumeMounts }}
-          {{- toYaml .Values.nextcloud.extraVolumeMounts | indent 8 }}
+          {{- toYaml .Values.nextcloud.extraVolumeMounts | nindent 8 }}
         {{- end }}
       {{- end }}
       {{- with .Values.nextcloud.extraSidecarContainers }}
