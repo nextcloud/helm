@@ -265,7 +265,7 @@ externalDatabase:
 ## ref: https://github.com/bitnami/charts/tree/main/bitnami/mariadb
 ##
 mariadb:
-  ## Whether to deploy a mariadb server from the bitnami mariab db helm chart 
+  ## Whether to deploy a mariadb server from the bitnami mariab db helm chart
   # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
@@ -300,7 +300,7 @@ postgresql:
   enabled: false
   global:
     postgresql:
-      # global.postgresql.auth overrides postgresql.auth 
+      # global.postgresql.auth overrides postgresql.auth
       auth:
         username: nextcloud
         password: changeme
