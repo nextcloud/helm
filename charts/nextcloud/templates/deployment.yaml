@@ -127,10 +127,16 @@ spec:
           successThreshold: {{ .Values.startupProbe.successThreshold }}
           failureThreshold: {{ .Values.startupProbe.failureThreshold }}
         {{- end }}
-        volumeMounts:
-{{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
+        {{- if .Values.nextcloud.securityContext}}
+        securityContext:
+          {{- with .Values.nextcloud.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
+        volumeMounts:
+        {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
       {{- if .Values.cronjob.enabled }}
       - name: {{ .Chart.Name }}-cron
         image: {{ include "nextcloud.image" . }}
@@ -155,7 +161,13 @@ spec:
         env:
 {{- include "nextcloud.env" . | indent 8 }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.cronjob.resources | indent 10 }}
+        {{- if .Values.cronjob.securityContext}}
+        securityContext:
+          {{- with .Values.cronjob.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         volumeMounts:
 {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
       {{- end }}
@@ -198,6 +210,12 @@ spec:
 
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
+        {{- if .Values.nginx.securityContext}}
+        securityContext:
+          {{- with .Values.nginx.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         volumeMounts:
         - name: nextcloud-main
           mountPath: /var/www/
@@ -229,6 +247,9 @@ spec:
         - name: nextcloud-nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
+        {{- if .Values.nextcloud.extraVolumeMounts }}
+          {{- toYaml .Values.nextcloud.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 6 }}
@@ -240,7 +261,7 @@ spec:
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
       {{- if .Values.nextcloud.extraInitContainers }}
-      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 8 }}
+      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 6 }}
       {{- end }}
       {{- if .Values.mariadb.enabled }}
       - name: mariadb-isalive
@@ -314,23 +335,23 @@ spec:
       {{- if .Values.nextcloud.extraVolumes }}
 {{ toYaml .Values.nextcloud.extraVolumes | indent 6 }}
       {{- end }}
-      {{- if .Values.nginx.enabled }}
-      # Will mount configuration files as www-data (id: 82) for nextcloud
       securityContext:
-        fsGroup: 82
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- if .Values.nextcloud.podSecurityContext }}
+        {{- with .Values.nextcloud.podSecurityContext }}
+          {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- else }}
-      # Will mount configuration files as www-data (id: 33) for nextcloud
-      securityContext:
+        {{- if .Values.nginx.enabled }}
+        # Will mount configuration files as www-data (id: 82) for nextcloud
+        fsGroup: 82
+        {{- else }}
+        # Will mount configuration files as www-data (id: 33) for nextcloud
         fsGroup: 33
-        {{- if .Values.securityContext }}
-        {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 8 }}
         {{- end }}
+        {{- if .Values.securityContext }}
+          {{- with .Values.securityContext }}
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
         {{- end }}
       {{- end }}
       {{- if .Values.rbac.enabled }}
