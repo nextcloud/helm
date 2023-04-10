@@ -343,6 +343,7 @@ service:
   type: ClusterIP
   port: 8080
   loadBalancerIP: nil
+  # loadBalancerClass:
   nodePort: nil
 
 ## Enable persistence using Persistent Volume Claims
