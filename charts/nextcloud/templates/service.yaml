@@ -10,18 +10,18 @@ metadata:
     app.kubernetes.io/component: app
 spec:
   type: {{ .Values.service.type }}
-  {{- if .Values.service.externalTrafficPolicy }}
+  {{- if and .Values.service.externalTrafficPolicy (or (eq .Values.service.type "LoadBalancer") (eq .Values.service.type "NodePort"))}}
   externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
   {{- end }}
   {{- if eq .Values.service.type "LoadBalancer" }}
   loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
-  {{- end }}
-  {{- if and .Values.service.loadBalancerClass (eq .Values.service.type "LoadBalancer") }}
-  loadBalancerClass: {{ .Values.service.loadBalancerClass }}
+  {{- if .Values.service.loadBalancerClass }}
+  loadBalancerClass: {{ default "" .Values.service.loadBalancerClass }}
   {{- end }}
   {{- with .Values.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
   {{- toYaml . | nindent 2 }}
+  {{- end }}
   {{- end }}
   ports:
   - port: {{ .Values.service.port }}
