@@ -3,7 +3,10 @@
 ##
 image:
   repository: nextcloud
-  # tag: 24.0.3-apache
+  # flavor can also be set to fpm if you'd like to use nginx instead of apache with nextcloud
+  flavor: apache
+  # tag defaults to current app version in helm chart + default flavor (apache)
+  # tag: 26.0.0-apache
   pullPolicy: IfNotPresent
   # pullSecrets:
   #   - myRegistrKeySecretName
