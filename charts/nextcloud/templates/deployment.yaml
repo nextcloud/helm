@@ -54,7 +54,11 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ include "nextcloud.image" . }}
+        {{- if .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        {{ else }}
+        image: {{ .Values.image.repository }}:{{ .Chart.AppVersion }}-{{( .Values.image.flavor }} 
+        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- if .Values.lifecycle }}
         lifecycle:
