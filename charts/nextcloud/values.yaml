@@ -341,6 +341,7 @@ cronjob:
 
 service:
   type: ClusterIP
+  # externalTrafficPolicy:
   port: 8080
   loadBalancerIP: nil
   # loadBalancerClass:
