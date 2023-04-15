@@ -191,19 +191,20 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
+  # For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  #   readOnlyRootFilesystem: false
 
-  # Set securityContext parameters for the pod. For example, you may need to define runAsNonRoot directive
+  # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
   podSecurityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  #   readOnlyRootFilesystem: false
 
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
@@ -221,10 +222,11 @@ nginx:
 
   resources: {}
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "82"
-  #   runAsGroup: "33"
+  # the nginx alpine container default user is 82
+  #   runAsUser: 82
+  #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
@@ -356,8 +358,8 @@ cronjob:
     # preStopCommand: []
   # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
@@ -535,5 +537,5 @@ rbac:
     annotations: {}
 
 
-## @param securityContext @deprecated Use `nextcloud.podSecurityContext` instead
+## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
