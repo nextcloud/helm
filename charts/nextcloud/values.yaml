@@ -30,8 +30,8 @@ ingress:
   #  nginx.ingress.kubernetes.io/server-snippet: |-
   #    server_tokens off;
   #    proxy_hide_header X-Powered-By;
-
-  #    rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+  #    rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+  #    rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
   #    rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
   #    rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
   #    location = /.well-known/carddav {
