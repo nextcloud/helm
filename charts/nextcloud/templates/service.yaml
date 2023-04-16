@@ -21,6 +21,12 @@ spec:
     {{- if eq .Values.service.type "NodePort" }}
     nodePort: {{ default "" .Values.service.nodePort}}
     {{- end }}
+  {{- if and .Values.nginx.enabled .Values.metrics.nginx.enabled }}
+  - name: metrics
+    port: {{ .Values.metrics.nginx.service.port | default "8081" }}
+    protocol: TCP
+    targetPort: metrics
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

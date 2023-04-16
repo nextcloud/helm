@@ -248,6 +248,9 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.image.repository`             | Nextcloud metrics exporter image name                                           | `xperimental/nextcloud-exporter`                             |
 | `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                            | `0.6.0`                                                      |
 | `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                    | `IfNotPresent`                                               |
+| `metrics.nginx.enabled`                | Start NGINX metrics configuration                                               | `false`                                                      |
+| `metrics.nginx.allow`                  | NGINX metrics configuration allow list                                          | not set                                                      |
+| `metrics.nginx.service.port`           | NGINX metrics configuration service port                                        | `8081`                                                       |
 | `metrics.podAnnotations`               | Additional annotations for metrics exporter                                     | not set                                                      |
 | `metrics.podLabels`                    | Additional labels for metrics exporter                                          | not set                                                      |
 | `metrics.service.type`                 | Metrics: Kubernetes Service type                                                | `ClusterIP`                                                  |
