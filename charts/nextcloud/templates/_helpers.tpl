@@ -152,7 +152,7 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
 - name: NEXTCLOUD_TRUSTED_DOMAINS
 {{- if .Values.metrics.enabled }}
-  value: {{ .Values.nextcloud.host }} metrics-server
+  value: "{{ .Values.nextcloud.host }} metrics-server"
 {{- else }}
   value: {{ .Values.nextcloud.host }}
 {{- end }}

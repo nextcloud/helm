@@ -227,8 +227,9 @@ nginx:
 
   resources: {}
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
-  securityContext:
+  # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
+  securityContext: {}
+    # the nginx alpine container default user is 82
     # allowPrivilegeEscalation: false
     # capabilities:
     #   add:
@@ -502,9 +503,10 @@ metrics:
 
   nginx:
     enabled: false
-    allow:
-    - 10.233.105.0/24
-    - 10.43.0.0/16
+    allow: []
+    # Example
+    # - 10.233.105.0/24
+    # - 10.43.0.0/16
     service:
       port: 8081
 
