@@ -335,13 +335,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- else }}
-        {{- if .Values.nginx.enabled }}
-        # Will mount configuration files as www-data (id: 82) for nextcloud
-        fsGroup: 82
-        {{- else }}
-        # Will mount configuration files as www-data (id: 33) for nextcloud
-        fsGroup: 33
-        {{- end }}
+        # this is deprecated and will be removed in a future release - use nextcloud.podSecurityContext instead
         {{- if .Values.securityContext }}
           {{- with .Values.securityContext }}
             {{- toYaml . | nindent 8 }}
