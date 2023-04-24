@@ -4,7 +4,7 @@ name: Release Charts
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - '.github/**'
       - 'charts/**/README.md'
