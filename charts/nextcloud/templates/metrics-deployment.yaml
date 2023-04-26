@@ -51,7 +51,7 @@ spec:
               key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         {{- end }}
         - name: NEXTCLOUD_SERVER
-          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
+          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}
         - name: NEXTCLOUD_TIMEOUT
           value: {{ .Values.metrics.timeout }}
         - name: NEXTCLOUD_TLS_SKIP_VERIFY
