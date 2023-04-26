@@ -478,6 +478,8 @@ metrics:
     repository: xperimental/nextcloud-exporter
     tag: 0.6.0
     pullPolicy: IfNotPresent
+    # pullSecrets:
+    #   - myRegistrKeySecretName
 
   ## Metrics exporter resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
