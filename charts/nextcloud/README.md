@@ -2,6 +2,8 @@
 
 [nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
 
+> **Warning**: Please see [Breaking Changes](#breaking-changes) before upgrading this helm chart!
+
 ## TL;DR;
 
 ```console
@@ -429,4 +431,11 @@ These are all the [SecurityContext](https://kubernetes.io/docs/reference/generat
 | `nginx.securityContext`     | Optional SecurityContext for the nginx container in the nextcloud pod |
 
 You can also set the [PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#podsecuritycontext-v1-core) for the nextcloud pod.
-By default, `nextcloud.podSecurityContext.fsGroup` is set to `33` (the `www-data` user's GID) by default. Set this to `82` if you're using an alpine nextcloud image.
+By default, `nextcloud.podSecurityContext.fsGroup` is set to `33` (the `www-data` user's GID). Set this to `82` if you're using an alpine nextcloud image.
+
+
+# Breaking Changes
+Note changes that may cause disruptions between helm chart upgrades.
+
+## `3.5.11` -> `3.6.0`
+By default, `nextcloud.podSecurityContext.fsGroup` is set to `33` (the `www-data` user's GID). Set this to `82` if you're using an alpine nextcloud image.
