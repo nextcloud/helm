@@ -27,6 +27,12 @@ spec:
 {{ toYaml .Values.metrics.podLabels | indent 8 }}
       {{- end }}
     spec:
+      {{- if .Values.metrics.image.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.metrics.image.pullSecrets }}
+        - name: {{ . }}
+      {{- end}}
+      {{- end }}
       containers:
       - name: metrics-exporter
         image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"

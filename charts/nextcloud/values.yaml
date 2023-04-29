@@ -30,8 +30,8 @@ ingress:
   #  nginx.ingress.kubernetes.io/server-snippet: |-
   #    server_tokens off;
   #    proxy_hide_header X-Powered-By;
-
-  #    rewrite ^/.well-known/webfinger /public.php?service=webfinger last;
+  #    rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+  #    rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
   #    rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
   #    rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
   #    location = /.well-known/carddav {
@@ -191,19 +191,20 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
+  # For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  #   readOnlyRootFilesystem: false
 
-  # Set securityContext parameters for the pod. For example, you may need to define runAsNonRoot directive
+  # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
   podSecurityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  #   readOnlyRootFilesystem: false
 
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
@@ -221,10 +222,11 @@ nginx:
 
   resources: {}
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "82"
-  #   runAsGroup: "33"
+  # the nginx alpine container default user is 82
+  #   runAsUser: 82
+  #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
@@ -267,15 +269,21 @@ externalDatabase:
 
 ##
 ## MariaDB chart configuration
+## ref: https://github.com/bitnami/charts/tree/main/bitnami/mariadb
 ##
 mariadb:
-  ## Whether to deploy a mariadb server to satisfy the applications database requirements. To use an external database set this to false and configure the externalDatabase parameters
+  ## Whether to deploy a mariadb server from the bitnami mariab db helm chart
+  # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
+  # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
 
   auth:
     database: nextcloud
     username: nextcloud
     password: changeme
+    # Use existing secret (auth.rootPassword, auth.password, and auth.replicationPassword will be ignored).
+    # secret must contain the keys mariadb-root-password, mariadb-replication-password and mariadb-password
+    existingSecret: ""
 
   architecture: standalone
 
@@ -293,16 +301,27 @@ mariadb:
 
 ##
 ## PostgreSQL chart configuration
-## for more options see https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+## for more options see https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 ##
 postgresql:
   enabled: false
   global:
     postgresql:
+      # global.postgresql.auth overrides postgresql.auth
       auth:
         username: nextcloud
         password: changeme
         database: nextcloud
+        # Name of existing secret to use for PostgreSQL credentials.
+        # auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret.
+        # secret might also contains the key ldap-password if LDAP is enabled.
+        # ldap.bind_password will be ignored and picked from this secret in this case.
+        existingSecret: ""
+        # Names of keys in existing secret to use for PostgreSQL credentials
+        secretKeys:
+          adminPasswordKey: ""
+          userPasswordKey: ""
+          replicationPasswordKey: ""
   primary:
     persistence:
       enabled: false
@@ -312,7 +331,7 @@ postgresql:
 
 ##
 ## Redis chart configuration
-## for more options see https://github.com/bitnami/charts/tree/master/bitnami/redis
+## for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
 ##
 
 redis:
@@ -320,6 +339,11 @@ redis:
   auth:
     enabled: true
     password: 'changeme'
+    # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
+    existingSecret: ""
+    # Password key to be retrieved from existing secret
+    existingSecretPasswordKey: ""
+
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
@@ -339,8 +363,8 @@ cronjob:
     # preStopCommand: []
   # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: "33"
-  #   runAsGroup: "33"
+  #   runAsUser: 33
+  #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
@@ -459,6 +483,8 @@ metrics:
     repository: xperimental/nextcloud-exporter
     tag: 0.6.0
     pullPolicy: IfNotPresent
+    # pullSecrets:
+    #   - myRegistrKeySecretName
 
   ## Metrics exporter resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -518,5 +544,5 @@ rbac:
     annotations: {}
 
 
-## @param securityContext @deprecated Use `nextcloud.podSecurityContext` instead
+## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
