@@ -76,14 +76,14 @@ spec:
         {{- if not .Values.nginx.enabled }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort }}
           protocol: TCP
         {{- end }}
         {{- if and .Values.livenessProbe.enabled (not .Values.nginx.enabled) }}
         livenessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -97,7 +97,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -111,7 +111,7 @@ spec:
         startupProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -171,7 +171,7 @@ spec:
         imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort }}
           protocol: TCP
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
@@ -191,7 +191,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port: {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
