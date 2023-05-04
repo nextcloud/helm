@@ -19,7 +19,7 @@ helm repo update
   helm install my-release nextcloud/nextcloud
   ```
 
-For more information, please checkout the chart level [README.md](./helm/charts/nextcloud/README.md).
+For more information, please checkout the chart level [README.md](./charts/nextcloud/README.md).
 
 ### Support and Contribution
 Please also review the official [NextCloud Code of Conduct](https://nextcloud.com/contribute/code-of-conduct/) before contributing.
