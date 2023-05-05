@@ -3,12 +3,11 @@ name: Lint and Test Charts
 on:
   pull_request:
     paths-ignore:
-      - 'README.md'
+      - '.github/**'
       - 'charts/**/README.md'
-      - 'LICENSE'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/pull_request_template.md'
       - 'CODE_OF_CONDUCT.md'
+      - 'LICENSE'
+      - 'README.md'
 
 jobs:
   lint-test:
@@ -22,35 +21,33 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3.5
         with:
-          version: v3.6.3
+          version: v3.11.1
 
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.3.1
+        uses: helm/chart-testing-action@v2.4.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          changed=$(ct list-changed)
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
           if [[ -n "$changed" ]]; then
-            echo "::set-output name=changed::true"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run chart-testing (lint)
         id: lint
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct lint --config ct.yaml
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.5.0
-        with:
-          install_local_path_provisioner: true
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
         id: install
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --config ct.yaml
+        run: ct install --target-branch ${{ github.event.repository.default_branch }}

@@ -4,11 +4,12 @@ name: Release Charts
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
-      - 'README.md'
+      - '.github/**'
       - 'charts/**/README.md'
       - 'LICENSE'
+      - 'README.md'
 
 jobs:
   release:
@@ -36,7 +37,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v3.5
         with:
-          version: v3.6.3
+          version: v3.11.1
 
       - name: Add dependency chart repos
         run: |
@@ -44,7 +45,5 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
-        with:
-          charts_repo_url: https://nextcloud.github.io/helm
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
