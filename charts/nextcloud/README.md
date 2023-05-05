@@ -1,7 +1,6 @@
 # nextcloud
 
-[nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back
-into your hands.
+[nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
 
 ## TL;DR;
 
@@ -12,17 +11,13 @@ helm install my-release nextcloud/nextcloud
 
 ## Introduction
 
-This chart bootstraps an [nextcloud](https://hub.docker.com/_/nextcloud/) deployment on
-a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart bootstraps an [nextcloud](https://hub.docker.com/_/nextcloud/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
-You will also need a database compatible with Nextcloud. For more info, please see
-the [Database Configuration](#database-configurations) section below.
+You will also need a database compatible with Nextcloud. For more info, please see the [Database Configuration](#database-configurations) section below.
 
-If you want to persist data accross installs and upgrades, you'll need to configure persistence. For more info, please
-see the [Persistence Configuration](#persistence-configurations) section below.
+If you want to persist data accross installs and upgrades, you'll need to configure persistence. For more info, please see the [Persistence Configuration](#persistence-configurations) section below.
 
 We also package a Redis helm chart as an _optional_ caching system from Bitnami:
-
 - [Bitnami Redis Chart](https://github.com/bitnami/charts/tree/main/bitnami/redis)
 
 ## Prerequisites
@@ -40,8 +35,7 @@ helm repo add nextcloud https://nextcloud.github.io/helm/
 helm install my-release nextcloud/nextcloud
 ```
 
-The command deploys nextcloud on the Kubernetes cluster in the default configuration.
-The [configuration](#configuration) section lists the parameters that can be configured during installation.
+The command deploys nextcloud on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
@@ -172,22 +166,16 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                          | Labels to be added at 'pod' level                                                      | not set                                      |
 | `podAnnotations`                                                     | Annotations to be added at 'pod' level                                                 | not set                                      |
 
-### Database Configurations
 
-By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for
-testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure
-the `externalDatabase` parameters below.
+### Database Configurations
+By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
 
 For convenience, we packages the following Bitnami charts for databases (feel free to choose _one_ below):
-
 - [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/main/bitnami/mariadb)
 - [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
 
-If you choose to use one of the prepackaged Bitnami helm charts, you must configure both the `externalDatabase`
-parameters, and the parameters for the chart you choose. For instance, if you choose to use the Bitnami PostgreSQL chart
-that we've prepackaged, you need to also configure all the parameters for `postgresql`. You do not need to use the
-Bitnami helm charts. If you want to use an already configured database that you have externally, just
-set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
+If you choose to use one of the prepackaged Bitnami helm charts, you must configure both the `externalDatabase` parameters, and the parameters for the chart you choose. For instance, if you choose to use the Bitnami PostgreSQL chart that we've prepackaged, you need to also configure all the parameters for `postgresql`. You do not need to use the Bitnami helm charts. If you want to use an already configured database that you have externally, just set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
+
 
 | Parameter                                                            | Description                                                                            | Default         |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------------|
@@ -222,14 +210,14 @@ set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` 
 | `postgresql.primary.persistence.enabled`                             | Whether or not to use PVC on PostgreSQL primary                                        | `false`         |
 | `postgresql.primary.persistence.existingClaim`                       | Use an existing PVC for PostgreSQL primary                                             | `nil`           |
 
-Is there a missing parameter for one of the Bitnami helm charts listed above? Please feel free to submit a PR to add
-that parameter in our values.yaml, but be sure to also update this README file :)
+Is there a missing parameter for one of the Bitnami helm charts listed above? Please feel free to submit a PR to add that parameter in our values.yaml, but be sure to also update this README file :)
+
 
 ### Persistence Configurations
 
-The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at
-the `/var/www/html` paths of the container. Persistent Volume Claims are used to keep the data across deployments. This
-is known to work with GKE, EKS, K3s, and minikube.
+The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at the `/var/www/html` paths of the container.
+Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
+
 
 | Parameter                                                            | Description                                                                            | Default                                      |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------|
@@ -246,10 +234,10 @@ is known to work with GKE, EKS, K3s, and minikube.
 | `persistence.nextcloudData.accessMode`                               | see `persistence.accessMode`                                                           | `ReadWriteOnce`                              |
 | `persistence.nextcloudData.size`                                     | see `persistence.size`                                                                 | `8Gi`                                        |
 
+
 ### Metrics Configurations
 
-We include an optional experimental Nextcloud Metrics exporter
-from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-exporter).
+We include an optional experimental Nextcloud Metrics exporter from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-exporter).
 
 | Parameter                              | Description                                                                  | Default                                                      |
 |----------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------|
@@ -276,6 +264,8 @@ from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-e
 | `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                          | ``                                                           |
 | `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                          | `{}                                                          |
 
+
+
 > **Note**:
 >
 > For nextcloud to function correctly, you should specify the `nextcloud.host` parameter to specify the FQDN (recommended) or the public IP address of the nextcloud service.
@@ -298,11 +288,9 @@ helm install --name my-release \
     nextcloud/nextcloud
 ```
 
-The above command sets the nextcloud administrator account username and password to `admin` and `password` respectively.
-Additionally, it sets the MariaDB `root` user password to `secretpassword`.
+The above command sets the nextcloud administrator account username and password to `admin` and `password` respectively. Additionally, it sets the MariaDB `root` user password to `secretpassword`.
 
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the
-chart. For example,
+Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
 
 ```console
 helm install --name my-release -f values.yaml nextcloud/nextcloud
@@ -312,26 +300,20 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 
 ## Cronjob
 
-This chart can utilize Kubernetes `CronJob` resource to
-execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html)
-.
+This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html).
 
-To use this functionality, set `cronjob.enabled` parameter to `true` and switch background mode to Webcron in your
-nextcloud settings page. See the [Configuration](#configuration) section for further configuration of the cronjob
-resource.
+To use this functionality, set `cronjob.enabled` parameter to `true` and switch background mode to Webcron in your nextcloud settings page.
+See the [Configuration](#configuration) section for further configuration of the cronjob resource.
 
 > **Note**: For the cronjobs to work correctly, ingress must be also enabled (set `ingress.enabled` to `true`) and `nextcloud.host` has to be publicly resolvable.
 
 ## Multiple config.php file
 
-Nextcloud supports loading configuration parameters from multiple files. You can add arbitrary files ending
-with `.config.php` in the `config/` directory.
-See [documentation](https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file)
-.
+Nextcloud supports loading configuration parameters from multiple files.
+You can add arbitrary files ending with `.config.php` in the `config/` directory.
+See [documentation](https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file).
 
-For example, following config will configure Nextcloud
-with [S3 as primary storage](https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3)
-by creating file `/var/www/html/config/s3.config.php`:
+For example, following config will configure Nextcloud with [S3 as primary storage](https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3) by creating file `/var/www/html/config/s3.config.php`:
 
 ```yaml
 nextcloud:
@@ -354,7 +336,6 @@ nextcloud:
 ```
 
 ## Using nginx
-
 To use nginx instead of apache to serve nextcloud, Set the following parameters in your `values.yaml`:
 
 ```yaml
@@ -369,25 +350,21 @@ image:
 ```yaml
 # this deploys an nginx container within the nextcloud pod
 nginx
-enabled: true
+  enabled: true
 ```
 
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
 - Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
-
 ```yaml
 ingress:
   annotations:
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
+   nginx.ingress.kubernetes.io/enable-cors: "true"
+   nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
 ```
-
-- The next layer is nextcloud pod's nginx container. In in your `values.yaml`, if `nextcloud.tag` has `fpm` in it,
-  or `image.flavor` is set to `fpm`, this can be left at default
+- The next layer is nextcloud pod's nginx container. In in your `values.yaml`, if `nextcloud.tag` has `fpm` in it, or `image.flavor` is set to `fpm`, this can be left at default
 - Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
-
 ```php
   configs:
     proxy.config.php: |-
@@ -403,9 +380,8 @@ ingress:
 
 ## Hugepages
 
-If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error
-in Apache. This is due to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge
-pages on the node or map hugepages into the container:
+If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
+to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge pages on the node or map hugepages into the container:
 
 ```yaml
 nextcloud:
@@ -429,12 +405,9 @@ nextcloud:
 ```
 
 ## HPA (Clustering)
-
-If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared
-persistence between the containers.
+If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared persistence between the containers.
 
 Minimum cluster compatible persistence settings:
-
 ```yaml
 persistence:
   enabled: true
