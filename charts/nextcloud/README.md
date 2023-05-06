@@ -24,7 +24,7 @@ We also package a Redis helm chart as an _optional_ caching system from Bitnami:
 
 - Kubernetes 1.20+
 - Persistent Volume provisioner support in the underlying infrastructure
-- Helm >=3.7.0 ([for subchart scope exposing](nextcloud/helm#152))
+- Helm >=3.7.0 ([for subchart scope exposing](https://github.com/nextcloud/helm/pull/152))
 
 ## Installing the Chart
 
