@@ -60,7 +60,7 @@ spec:
         command:
           - "/bin/sh"
           - "-c"
-          - "busybox crond -l 0 -L /dev/stdout ; /entrypoint.sh apache2-foreground"
+          - "busybox crond -l 0 -L /dev/stdout ; sed -i 's/opcache.enable=.*/opcache.enable=0/g' /usr/local/etc/php/conf.d/opcache-recommended.ini && /entrypoint.sh apache2-foreground"
         {{- end }}
         {{- if .Values.lifecycle }}
         lifecycle:
