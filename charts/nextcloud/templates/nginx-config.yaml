@@ -9,36 +9,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  nginx.conf: |-
 {{- if .Values.nginx.config.default }}
-    worker_processes auto;
-
-    error_log  /var/log/nginx/error.log warn;
-    pid        /var/run/nginx.pid;
-
-
-    events {
-        worker_connections  1024;
-    }
-
-
+  nginx.conf: |-
     http {
-        include       /etc/nginx/mime.types;
-        default_type  application/octet-stream;
-
-        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                          '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for"';
-
-        access_log  /var/log/nginx/access.log  main;
-
-        sendfile        on;
-        #tcp_nopush     on;
-
-        keepalive_timeout  65;
-
-        #gzip  on;
-
         upstream php-handler {
             server 127.0.0.1:9000;
         }
@@ -169,7 +142,9 @@ data:
             }
         }
     }
-{{- else }}
+{{- end }}
+{{- if .Values.nginx.config.custom }}
+  custom.conf: |-
 {{ .Values.nginx.config.custom | indent 4 }}
 {{- end }}
 {{- end }}
