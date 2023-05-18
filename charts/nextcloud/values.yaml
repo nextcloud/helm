@@ -158,38 +158,38 @@ nextcloud:
   ##
   ## Extra environment variables
   extraEnv:
-  #  - name: SOME_SECRET_ENV
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: nextcloud
-  #        key: secret_key
+  #- name: SOME_SECRET_ENV
+  #  valueFrom:
+  #    secretKeyRef:
+  #      name: nextcloud
+  #      key: secret_key
 
   # Extra init containers that runs before pods start.
   extraInitContainers: []
-  #  - name: do-something
-  #    image: busybox
-  #    command: ['do', 'something']
+  #- name: do-something
+  #  image: busybox
+  #  command: ['do', 'something']
 
   # Extra sidecar containers.
   extraSidecarContainers: []
-  #  - name: nextcloud-logger
-  #    image: busybox
-  #    command: [/bin/sh, -c, 'while ! test -f "/run/nextcloud/data/nextcloud.log"; do sleep 1; done; tail -n+1 -f /run/nextcloud/data/nextcloud.log']
-  #    volumeMounts:
-  #    - name: nextcloud-data
-  #      mountPath: /run/nextcloud/data
+  #- name: nextcloud-logger
+  #  image: busybox
+  #  command: [/bin/sh, -c, 'while ! test -f "/run/nextcloud/data/nextcloud.log"; do sleep 1; done; tail -n+1 -f /run/nextcloud/data/nextcloud.log']
+  #  volumeMounts:
+  #  - name: nextcloud-data
+  #    mountPath: /run/nextcloud/data
 
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
   extraVolumes:
-  #  - name: nfs
-  #    nfs:
-  #      server: "10.0.0.1"
-  #      path: "/nextcloud_data"
-  #      readOnly: false
+  #- name: nfs
+  #  nfs:
+  #    server: "10.0.0.1"
+  #    path: "/nextcloud_data"
+  #    readOnly: false
   extraVolumeMounts:
-  #  - name: nfs
-  #    mountPath: "/legacy_data"
+  #- name: nfs
+  #  mountPath: "/legacy_data"
 
   # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
   # For example, you may need to define runAsNonRoot directive
