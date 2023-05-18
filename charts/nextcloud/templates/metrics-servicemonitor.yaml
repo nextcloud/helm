@@ -21,11 +21,11 @@ spec:
   jobLabel: {{ .Values.metrics.serviceMonitor.jobLabel | quote }}
   namespaceSelector:
     matchNames:
-      {{- if .Values.metrics.serviceMonitor.namespace }}
-      - {{ .Values.metrics.serviceMonitor.namespace | quote }}
-      {{- else }}
-      - {{ .Release.Namespace | quote }}
-      {{- end }}
+    {{- if .Values.metrics.serviceMonitor.namespace }}
+    - {{ .Values.metrics.serviceMonitor.namespace | quote }}
+    {{- else }}
+    - {{ .Release.Namespace | quote }}
+    {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "nextcloud.name" . }}
