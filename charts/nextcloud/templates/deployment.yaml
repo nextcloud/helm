@@ -260,6 +260,12 @@ spec:
       {{- if .Values.mariadb.enabled }}
       - name: mariadb-isalive
         image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+        {{- if .Values.nextcloud.securityContext}}
+        securityContext:
+          {{- with .Values.nextcloud.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         env:
           - name: MYSQL_USER
             valueFrom:
@@ -278,6 +284,12 @@ spec:
       {{- else if .Values.postgresql.enabled }}
       - name: postgresql-isready
         image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+        {{- if .Values.nextcloud.securityContext}}
+        securityContext:
+          {{- with .Values.nextcloud.securityContext }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- end }}
         env:
           - name: POSTGRES_USER
             valueFrom:
