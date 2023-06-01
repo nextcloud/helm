@@ -299,7 +299,7 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 
 ## Cronjob
 
-This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html). Background jobs are important for tasks that do not necessirly need user intevention but still need to be executed frequently (cleaning up, sending some notifications, etc.).
+This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html). Background jobs are important for tasks that do not necessarily need user intervention but still need to be executed frequently (cleaning up, sending some notifications, etc.).
 
 To use this functionality, set `cronjob.enabled` parameter to `true` and make sure the background jobs mode in your nextcloud basic settings is set to ***Cron***.
 
