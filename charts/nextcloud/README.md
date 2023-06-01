@@ -303,7 +303,7 @@ This chart can utilize Kubernetes `CronJob` resource to execute [background task
 
 To use this functionality, set `cronjob.enabled` parameter to `true` and make sure the background jobs mode in your nextcloud basic settings is set to ***Cron***.
 
-Enabling the cronjob in this helm chart will create an addintioal container of Nextcloud image that has a preconfigured *crond* entry, which will automatically take the responsibility of executing the cron.php script (part of Nextcloud), and consequently do the background tasks.
+Enabling the cronjob in this helm chart will create an additional container of Nextcloud image that has a preconfigured *crond* entry, which will automatically take the responsibility of executing the Nextcloud cron.php script , and consequently do the background tasks.
 
 ## Multiple config.php file
 
