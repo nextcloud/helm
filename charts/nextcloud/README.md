@@ -299,12 +299,11 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 
 ## Cronjob
 
-This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html).
+This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html). Background jobs are important for tasks that do not necessirly need user intevention but still need to be executed frequently (cleaning up, sending some notifications, etc.).
 
-To use this functionality, set `cronjob.enabled` parameter to `true` and switch background mode to Webcron in your nextcloud settings page.
-See the [Configuration](#configuration) section for further configuration of the cronjob resource.
+To use this functionality, set `cronjob.enabled` parameter to `true` and make sure the background jobs mode in your nextcloud basic settings is set to ***Cron***.
 
-> **Note**: For the cronjobs to work correctly, ingress must be also enabled (set `ingress.enabled` to `true`) and `nextcloud.host` has to be publicly resolvable.
+Enabling the cronjob in this helm chart will create an addintioal container of Nextcloud image that has a preconfigured *crond* entry, which will automatically take the responsibility of executing the cron.php script (part of Nextcloud), and consequently do the background tasks.
 
 ## Multiple config.php file
 
