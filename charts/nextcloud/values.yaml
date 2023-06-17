@@ -365,8 +365,11 @@ cronjob:
 
 service:
   type: ClusterIP
+  externalTrafficPolicy: nil
   port: 8080
   loadBalancerIP: nil
+  loadBalancerClass: nil
+  loadBalancerSourceRanges: []
   nodePort: nil
 
 ## Enable persistence using Persistent Volume Claims
