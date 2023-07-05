@@ -1,7 +1,7 @@
 apiVersion: v2
 name: nextcloud
-version: 3.5.13
-appVersion: 26.0.1
+version: 3.5.16
+appVersion: 27.0.0
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
   - nextcloud
