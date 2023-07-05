@@ -76,14 +76,14 @@ spec:
         {{- if not .Values.nginx.enabled }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort }}
           protocol: TCP
         {{- end }}
         {{- if and .Values.livenessProbe.enabled (not .Values.nginx.enabled) }}
         livenessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -97,7 +97,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -111,7 +111,7 @@ spec:
         startupProbe:
           httpGet:
             path: /status.php
-            port: http
+            port:  {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -155,7 +155,7 @@ spec:
         env:
 {{- include "nextcloud.env" . | indent 8 }}
         resources:
-{{ toYaml .Values.resources | indent 10 }}
+{{ toYaml .Values.cronjob.resources | indent 10 }}
         {{- if .Values.cronjob.securityContext}}
         securityContext:
           {{- with .Values.cronjob.securityContext }}
@@ -171,7 +171,7 @@ spec:
         imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
         ports:
         - name: http
-          containerPort: {{ .Values.nextcloud.containerPort | default "80" }}
+          containerPort: {{ .Values.nextcloud.containerPort }}
           protocol: TCP
         {{- if .Values.livenessProbe.enabled }}
         livenessProbe:
@@ -191,7 +191,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /status.php
-            port: http
+            port: {{ .Values.nextcloud.containerPort }}
             httpHeaders:
             - name: Host
               value: {{ .Values.nextcloud.host | quote }}
@@ -201,6 +201,20 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
         {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /status.php
+            port:  {{ .Values.nextcloud.containerPort }}
+            httpHeaders:
+            - name: Host
+              value: {{ .Values.nextcloud.host | quote }}
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.startupProbe.successThreshold }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+         {{- end }}
 
         resources:
 {{ toYaml .Values.nginx.resources | indent 10 }}
@@ -241,6 +255,9 @@ spec:
         - name: nextcloud-nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
+        {{- if .Values.nextcloud.extraVolumeMounts }}
+          {{- toYaml .Values.nextcloud.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 6 }}
@@ -252,7 +269,7 @@ spec:
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
       {{- if .Values.nextcloud.extraInitContainers }}
-      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 8 }}
+      {{- toYaml .Values.nextcloud.extraInitContainers | nindent 6 }}
       {{- end }}
       {{- if .Values.mariadb.enabled }}
       - name: mariadb-isalive

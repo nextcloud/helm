@@ -4,15 +4,16 @@ name: Release Charts
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
-      - 'README.md'
+      - '.github/**'
       - 'charts/**/README.md'
       - 'LICENSE'
+      - 'README.md'
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -34,17 +35,15 @@ jobs:
 
       # See https://github.com/helm/chart-releaser-action/issues/6
       - name: Set up Helm
-        uses: azure/setup-helm@v3.1
+        uses: azure/setup-helm@v3.5
         with:
-          version: v3.6.3
+          version: v3.11.1
 
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.4.1
-        with:
-          charts_repo_url: https://nextcloud.github.io/helm
+        uses: helm/chart-releaser-action@v1.5.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
