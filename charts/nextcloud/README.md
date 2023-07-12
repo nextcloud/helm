@@ -450,7 +450,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ myocccomand"
 Here are some examples below.
 
 ### Putting Nextcloud into maintanence mode
-Some admin actions require you to put your Nextcloud instance into [maintanence mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups). You can do so like this:
+Some admin actions require you to put your Nextcloud instance into [maintanence mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups):
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
@@ -458,7 +458,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```
 
 ### Downloading models for recognize
-[Recognize](https://github.com/nextcloud/recognize) requies you download models before using it, so you would do so like this:
+[Recognize](https://github.com/nextcloud/recognize) requires you to download models before using it:
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
