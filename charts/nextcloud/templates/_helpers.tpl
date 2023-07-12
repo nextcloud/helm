@@ -126,6 +126,7 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
   {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
