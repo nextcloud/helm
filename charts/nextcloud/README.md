@@ -190,6 +190,8 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `externalDatabase.existingSecret.secretName`                         | Name of the existing secret                                                            | `nil`           |
 | `externalDatabase.existingSecret.usernameKey`                        | Name of the key that contains the username                                             | `nil`           |
 | `externalDatabase.existingSecret.passwordKey`                        | Name of the key that contains the password                                             | `nil`           |
+| `externalDatabase.existingSecret.hostKey`                            | Name of the key that contains the database hostname or IP address                      | `nil`           |
+| `externalDatabase.existingSecret.databaseKey`                        | Name of the key that contains the database name                                        | `nil`           |
 | `mariadb.enabled`                                                    | Whether to use the MariaDB chart                                                       | `false`         |
 | `mariadb.auth.database`                                              | Database name to create                                                                | `nextcloud`     |
 | `mariadb.auth.username`                                              | Database user to create                                                                | `nextcloud`     |
