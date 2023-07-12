@@ -444,10 +444,10 @@ Sometimes you need to run an [occ](https://docs.nextcloud.com/server/latest/admi
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ myocccomand"
+kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ myocccomand"
 ```
 
-Here's some examples below.
+Here are some examples below.
 
 ### Putting Nextcloud into maintanence mode
 Some admin actions require you to put your Nextcloud instance into [maintanence mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups). You can do so like this:
