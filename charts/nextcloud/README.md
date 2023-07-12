@@ -454,7 +454,7 @@ Some admin actions require you to put your Nextcloud instance into [maintanence 
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ maintenance:mode --on"
+kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mode --on"
 ```
 
 ### Downloading models for recognize
@@ -462,5 +462,5 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ maintenance:
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ recognize:download-models"
+kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
 ```
