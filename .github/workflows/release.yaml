@@ -1,5 +1,8 @@
 
 name: Release Charts
+# only run one instance of this workflow at a time
+# ref: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
+concurrency: chart_releaser
 
 on:
   push:
@@ -17,13 +20,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Turnstyle
-        uses: softprops/turnstyle@v1
-        with:
-          continue-after-seconds: 180
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
 
       - name: Fetch history
         run: git fetch --prune --unshallow
