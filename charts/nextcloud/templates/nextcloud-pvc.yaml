@@ -27,5 +27,9 @@ spec:
   storageClassName: "{{ .Values.persistence.storageClass }}"
 {{- end }}
 {{- end }}
+{{- if .Values.persistence.localPath -}}
+  local:
+    path: .Values.persistence.localPath
+{{- end }}
 {{- end -}}
 {{- end -}}

@@ -27,5 +27,9 @@ spec:
   storageClassName: "{{ .Values.persistence.nextcloudData.storageClass }}"
 {{- end }}
 {{- end }}
+{{- if .Values.persistence.nextcloudData.localPath -}}
+  local:
+    path: .Values.persistence.nextcloudData.localPath
+{{- end }}
 {{- end -}}
 {{- end -}}

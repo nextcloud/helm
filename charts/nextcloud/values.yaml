@@ -395,6 +395,9 @@ persistence:
   accessMode: ReadWriteOnce
   size: 8Gi
 
+  ## Specify the local.path when using local persistent volumes
+  # localPath:
+
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
@@ -405,6 +408,9 @@ persistence:
     # existingClaim:
     accessMode: ReadWriteOnce
     size: 8Gi
+
+    ## Specify the local.path when using local persistent volumes
+    # localPath:
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
