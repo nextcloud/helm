@@ -28,6 +28,8 @@ helm install my-release nextcloud/nextcloud
 * [Running `occ` commands](#running-occ-commands)
     * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
     * [Downloading models for recognize](#downloading-models-for-recognize)
+* [Backups](#backups)
+* [Upgrades](#upgrades)
 
 ## Introduction
 
@@ -465,4 +467,19 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
+```
+
+# Backups
+Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero). 
+
+# Upgrades
+Since this chart utilizes the [nextcloud/docker](https://github.com/nextcloud/docker) image, provided you are using persistent volumes, [upgrades of your Nextcloud server are handled automatically](https://github.com/nextcloud/docker#update-to-a-newer-version) from one version to the next, however, you can only upgrade one major version at a time. For example, if you want to upgrade from version `25` to `27`, you will have to upgrade from version `25` to `26`, then from `26` to `27`. Since our docker tag is set via the [`appVersion` in `Chart.yaml`](https://github.com/nextcloud/helm/blob/main/charts/nextcloud/Chart.yaml#L4), you'll need to make sure you gradually upgrade the helm chart if you have missed serveral app versions. 
+
+⚠️ *Before Upgrading Nextcloud or the attached database, always make sure you take [backups](#backups)!*
+
+After an upgrade, you may have missing indices. To fix this, you can run:
+
+```bash
+# where NEXTCLOUD_POD is *your* nextcloud pod
+kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ db:add-missing-indices"
 ```
