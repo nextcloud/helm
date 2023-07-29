@@ -481,5 +481,5 @@ After an upgrade, you may have missing indices. To fix this, you can run:
 
 ```bash
 # where NEXTCLOUD_POD is *your* nextcloud pod
-kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/bash www-data -c "php occ db:add-missing-indices"
+kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-missing-indices"
 ```
