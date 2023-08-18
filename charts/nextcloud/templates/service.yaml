@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: app
 spec:
   type: {{ .Values.service.type }}
-  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
   {{- end }}
   ports:
