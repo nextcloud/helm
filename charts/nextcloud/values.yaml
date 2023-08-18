@@ -368,7 +368,7 @@ cronjob:
 service:
   type: ClusterIP
   port: 8080
-  loadBalancerIP: nil
+  # loadBalancerIP: 203.0.113.42
   nodePort: nil
 
 ## Enable persistence using Persistent Volume Claims
