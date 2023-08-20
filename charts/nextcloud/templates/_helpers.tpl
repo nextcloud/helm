@@ -110,9 +110,23 @@ Create environment variables used to configure the nextcloud container as well a
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: POSTGRES_DB
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
@@ -125,9 +139,23 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
   {{- else }}
 - name: MYSQL_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: MYSQL_DATABASE
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
