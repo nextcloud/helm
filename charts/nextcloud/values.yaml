@@ -261,6 +261,8 @@ externalDatabase:
     # secretName: nameofsecret
     # usernameKey: db-username
     # passwordKey: db-password
+    # hostKey: db-hostname-or-ip
+    # databaseKey: db-name
 
 ##
 ## MariaDB chart configuration
@@ -476,7 +478,7 @@ metrics:
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: 0.6.0
+    tag: 0.6.1
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName
