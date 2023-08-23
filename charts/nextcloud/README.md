@@ -156,7 +156,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.resources`                                        | CPU/Memory resource requests/limits for the cronjob sidecar                            | `{}`                       |
 | `cronjob.securityContext`                                  | Optional security context for cronjob                                                  | `nil`                      |
 | `service.type`                                             | Kubernetes Service type                                                                | `ClusterIP`                |
-| `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer (leave unset to omit)                     | ``                         |
+| `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer                     | `""`                         |
 | `service.nodePort`                                         | NodePort for service type NodePort                                                     | `nil`                      |
 | `phpClientHttpsFix.enabled`                                | Sets OVERWRITEPROTOCOL for https ingress redirect                                      | `false`                    |
 | `phpClientHttpsFix.protocol`                               | Sets OVERWRITEPROTOCOL for https ingress redirect                                      | `https`                    |
