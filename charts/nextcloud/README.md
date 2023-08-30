@@ -19,7 +19,7 @@ helm install my-release nextcloud/nextcloud
     * [Database Configurations](#database-configurations)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
-* [Cronjob](#cronjob)
+* [Cron jobs](#cron-jobs)
 * [Multiple config.php file](#multiple-configphp-file)
 * [Using nginx](#using-nginx)
 * [Preserving Source IP](#preserving-source-ip)
@@ -150,11 +150,11 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.auth.password`                                      | The password redis uses                                                                | `''`                       |
 | `redis.auth.existingSecret`                                | The name of an existing secret with Redis® credentials                                 | `''`                       |
 | `redis.auth.existingSecretPasswordKey`                     | Password key to be retrieved from existing secret                                      | `''`                       |
-| `cronjob.enabled`                                          | Whether to enable/disable cronjob                                                      | `false`                    |
-| `cronjob.lifecycle.postStartCommand`                       | Specify deployment lifecycle hook postStartCommand                                     | `nil`                      |
-| `cronjob.lifecycle.preStopCommand`                         | Specify deployment lifecycle hook preStopCommand                                       | `nil`                      |
-| `cronjob.resources`                                        | CPU/Memory resource requests/limits for the cronjob sidecar                            | `{}`                       |
-| `cronjob.securityContext`                                  | Optional security context for cronjob                                                  | `nil`                      |
+| `cronjob.enabled`                                          | Whether to enable/disable cron jobs sidecar                                            | `false`                    |
+| `cronjob.lifecycle.postStartCommand`                       | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar           | `nil`                      |
+| `cronjob.lifecycle.preStopCommand`                         | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar             | `nil`                      |
+| `cronjob.resources`                                        | CPU/Memory resource requests/limits for the cron jobs sidecar                          | `{}`                       |
+| `cronjob.securityContext`                                  | Optional security context for cron jobs sidecar                                          | `nil`                      |
 | `service.type`                                             | Kubernetes Service type                                                                | `ClusterIP`                |
 | `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer                                           | `""`                       |
 | `service.nodePort`                                         | NodePort for service type NodePort                                                     | `nil`                      |
@@ -326,14 +326,11 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
-## Cronjob
+## Cron jobs
 
-This chart can utilize Kubernetes `CronJob` resource to execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html).
+To execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html) by using system cron instead of default Ajax cron, set `cronjob.enabled` parameter to `true`. Background jobs are important for tasks that do not necessarily need user intervention, but still need to be executed frequently (cleaning up, sending some notifications, pulling RSS feeds, etc.).
 
-To use this functionality, set `cronjob.enabled` parameter to `true` and switch background mode to Webcron in your nextcloud settings page.
-See the [Configuration](#configuration) section for further configuration of the cronjob resource.
-
-> **Note**: For the cronjobs to work correctly, ingress must be also enabled (set `ingress.enabled` to `true`) and `nextcloud.host` has to be publicly resolvable.
+Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to ***Cron***.
 
 ## Multiple config.php file
 
