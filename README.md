@@ -22,7 +22,7 @@ helm repo update
 For more information, please checkout the chart level [README.md](./charts/nextcloud/README.md).
 
 ### Support and Contribution
-This helm chart is community maintained. Please also review the official [NextCloud Code of Conduct](https://nextcloud.com/contribute/code-of-conduct/) before contributing.
+This helm chart is community maintained, and not supported by Nextcloud GmbH. Please also review the official [NextCloud Code of Conduct](https://nextcloud.com/contribute/code-of-conduct/) before contributing.
 
 #### Questions and Discussions
 [GitHub Discussion](https://github.com/nextcloud/helm/discussions)
