@@ -96,7 +96,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `ingress.path`                                             | The `Path` to use in Ingress' `paths`                                                  | `/`                        |
 | `ingress.pathType`                                         | The `PathType` to use in Ingress' `paths`                                              | `Prefix`                   |
 | `ingress.tls`                                              | Ingress TLS configuration                                                              | `[]`                       |
-| `nextcloud.host`                                           | nextcloud host to create application URLs                                              | `nextcloud.kube.home`      |
+| `nextcloud.host`                                           | nextcloud host to create application URLs, updates trusted_domains at installation time only| `nextcloud.kube.home` |
 | `nextcloud.username`                                       | User of the application                                                                | `admin`                    |
 | `nextcloud.password`                                       | Application password                                                                   | `changeme`                 |
 | `nextcloud.existingSecret.enabled`                         | Whether to use an existing secret or not                                               | `false`                    |
@@ -137,7 +137,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.securityContext`                                | Optional security context for the NextCloud container                                  | `nil`                      |
 | `nextcloud.podSecurityContext`                             | Optional security context for the NextCloud pod (applies to all containers in the pod) | `nil`                      |
 | `nginx.enabled`                                            | Enable nginx (requires you use php-fpm image)                                          | `false`                    |
-| `nginx.image.repository`                                   | nginx Image name                                                                       | `nginx`                    |
+| `nginx.image.repository`                                   | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container        | `nginx`                    |
 | `nginx.image.tag`                                          | nginx Image tag                                                                        | `alpine`                   |
 | `nginx.image.pullPolicy`                                   | nginx Image pull policy                                                                | `IfNotPresent`             |
 | `nginx.config.default`                                     | Whether to use nextcloud's recommended nginx config                                    | `true`                     |
@@ -159,6 +159,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `service.type`                                             | Kubernetes Service type                                                                | `ClusterIP`                |
 | `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer                                           | `""`                       |
 | `service.nodePort`                                         | NodePort for service type NodePort                                                     | `nil`                      |
+| `service.ipFamilies`                                       | Set ipFamilies as in k8s service objects                                               | `nil`                      |
+| `service.ipFamyPolicy`                                     | define IP protocol bindings as in k8s service objects                                  | `nil`                      |
 | `phpClientHttpsFix.enabled`                                | Sets OVERWRITEPROTOCOL for https ingress redirect                                      | `false`                    |
 | `phpClientHttpsFix.protocol`                               | Sets OVERWRITEPROTOCOL for https ingress redirect                                      | `https`                    |
 | `resources`                                                | CPU/Memory resource requests/limits                                                    | `{}`                       |

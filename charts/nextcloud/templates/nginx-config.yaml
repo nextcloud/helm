@@ -1,20 +1,8 @@
-{{- if .Values.nginx.enabled -}}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "nextcloud.fullname" . }}-nginxconfig
-  labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-data:
-  nginx.conf: |-
-{{- if .Values.nginx.config.default }}
+{{- define "nginx.conf" }}
     worker_processes auto;
 
     error_log  /var/log/nginx/error.log warn;
-    pid        /var/run/nginx.pid;
+    pid        /tmp/nginx.pid;
 
 
     events {
@@ -44,7 +32,7 @@ data:
         }
 
         server {
-            listen 80;
+            listen {{ .Values.nextcloud.containerPort }};
 
             # HSTS settings
             # WARNING: Only add the preload option once you read about
@@ -172,6 +160,22 @@ data:
             }
         }
     }
+{{- end }}
+
+{{- if .Values.nginx.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-nginxconfig
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  nginx.conf: |-
+{{- if .Values.nginx.config.default }}
+    {{- template "nginx.conf" $ }}
 {{- else }}
 {{ .Values.nginx.config.custom | indent 4 }}
 {{- end }}
