@@ -32,7 +32,7 @@
         }
 
         server {
-            listen {{ .Values.nextcloud.containerPort }};
+            listen {{ .Values.nginx.containerPort }};
 
             # HSTS settings
             # WARNING: Only add the preload option once you read about
