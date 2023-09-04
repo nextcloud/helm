@@ -84,7 +84,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 |------------------------------------------------------------|----------------------------------------------------------------------------------------|----------------------------|
 | `image.repository`                                         | nextcloud Image name                                                                   | `nextcloud`                |
 | `image.flavor`                                             | nextcloud Image type (Options: apache, fpm)                                            | `apache`                   |
-| `image.tag`                                                | nextcloud Image tag                                                                    | `appVersion`               |
+| `image.tag`                                                | nextcloud Image tag                                                                    | [`appVersion`]             |
 | `image.pullPolicy`                                         | Image pull policy                                                                      | `IfNotPresent`             |
 | `image.pullSecrets`                                        | Specify image pull secrets                                                             | `nil`                      |
 | `replicaCount`                                             | Number of nextcloud pods to deploy                                                     | `1`                        |
@@ -481,3 +481,5 @@ After an upgrade, you may have missing indices. To fix this, you can run:
 # where NEXTCLOUD_POD is *your* nextcloud pod
 kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-missing-indices"
 ```
+
+[`appVersion`]: https://github.com/nextcloud/helm/blob/main/charts/nextcloud/Chart.yaml#L4 "appVersion on line 4 of Chart.yaml"

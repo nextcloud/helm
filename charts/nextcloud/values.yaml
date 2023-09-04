@@ -3,7 +3,10 @@
 ##
 image:
   repository: nextcloud
-  # tag: 24.0.3-apache
+  # tag defaults to appVersion in Chart.yaml
+  tag: ""
+  # flavor can be either fpm or apache. Set to fpm if using nginx
+  flavor: ""
   pullPolicy: IfNotPresent
   # pullSecrets:
   #   - myRegistrKeySecretName
