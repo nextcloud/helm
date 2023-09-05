@@ -298,10 +298,12 @@ spec:
               secretKeyRef:
                 name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
                 key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+          - name: POSTGRES_HOST
+            value: {{ template "postgresql.primary.fullname" .Subcharts.postgresql }}
         command:
           - "sh"
           - "-c"
-          - {{ printf "until pg_isready -h %s-postgresql -U ${POSTGRES_USER} ; do sleep 2 ; done" .Release.Name }}
+          - {{ printf "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done" }}
       {{- end }}
       {{- end }}
     {{- with .Values.affinity }}
