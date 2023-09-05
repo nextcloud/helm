@@ -56,8 +56,9 @@ spec:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
               key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
         {{- end }}
+        # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
         - name: NEXTCLOUD_SERVER
-          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
+          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}
         - name: NEXTCLOUD_TIMEOUT
           value: {{ .Values.metrics.timeout }}
         - name: NEXTCLOUD_TLS_SKIP_VERIFY

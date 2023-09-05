@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -110,9 +109,23 @@ Create environment variables used to configure the nextcloud container as well a
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: POSTGRES_DB
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
@@ -125,9 +138,23 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
   {{- else }}
 - name: MYSQL_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: MYSQL_DATABASE
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
@@ -163,14 +190,17 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ .Values.nextcloud.mail.fromAddress | quote }}
 - name: MAIL_DOMAIN
   value: {{ .Values.nextcloud.mail.domain | quote }}
-- name: SMTP_HOST
-  value: {{ .Values.nextcloud.mail.smtp.host | quote }}
 - name: SMTP_SECURE
   value: {{ .Values.nextcloud.mail.smtp.secure | quote }}
 - name: SMTP_PORT
   value: {{ .Values.nextcloud.mail.smtp.port | quote }}
 - name: SMTP_AUTHTYPE
   value: {{ .Values.nextcloud.mail.smtp.authtype | quote }}
+- name: SMTP_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpHostKey | default "smtp-host" }}
 - name: SMTP_NAME
   valueFrom:
     secretKeyRef:
