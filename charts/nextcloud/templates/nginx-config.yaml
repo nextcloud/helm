@@ -32,7 +32,7 @@
         }
 
         server {
-            listen {{ .Values.nginx.containerPort }};
+            listen {{ .Values.nginx.containerPort | default "80" }};
 
             # HSTS settings
             # WARNING: Only add the preload option once you read about

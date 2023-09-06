@@ -214,6 +214,7 @@ nginx:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
+  containerPort: 80
 
   config:
     # This generates the default nginx config as per the nextcloud documentation
