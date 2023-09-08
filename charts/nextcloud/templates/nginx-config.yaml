@@ -1,22 +1,10 @@
-{{- if .Values.nginx.enabled -}}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "nextcloud.fullname" . }}-nginxconfig
-  labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-data:
-{{- if .Values.nginx.config.default }}
-  default.conf: |-
+{{- define "default.conf" }}
     upstream php-handler {
         server 127.0.0.1:9000;
     }
 
     server {
-        listen 80;
+        listen {{ .Values.nginx.containerPort | default "80" }};
 
         # HSTS settings
         # WARNING: Only add the preload option once you read about
@@ -143,6 +131,22 @@ data:
             try_files $uri $uri/ /index.php$request_uri;
         }
     }
+{{- end }}
+
+{{- if .Values.nginx.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-nginxconfig
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+{{- if .Values.nginx.config.default }}
+  default.conf: |-
+    {{- template "default.conf" $ }}
 {{- end }}
 {{- if .Values.nginx.config.custom }}
   zz-custom.conf: |-
