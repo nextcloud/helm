@@ -303,7 +303,7 @@ spec:
         command:
           - "sh"
           - "-c"
-          - {{ printf "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done" }}
+          - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
       {{- end }}
       {{- end }}
     {{- with .Values.affinity }}
