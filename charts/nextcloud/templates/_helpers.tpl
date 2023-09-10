@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -191,14 +190,17 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ .Values.nextcloud.mail.fromAddress | quote }}
 - name: MAIL_DOMAIN
   value: {{ .Values.nextcloud.mail.domain | quote }}
-- name: SMTP_HOST
-  value: {{ .Values.nextcloud.mail.smtp.host | quote }}
 - name: SMTP_SECURE
   value: {{ .Values.nextcloud.mail.smtp.secure | quote }}
 - name: SMTP_PORT
   value: {{ .Values.nextcloud.mail.smtp.port | quote }}
 - name: SMTP_AUTHTYPE
   value: {{ .Values.nextcloud.mail.smtp.authtype | quote }}
+- name: SMTP_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpHostKey | default "smtp-host" }}
 - name: SMTP_NAME
   valueFrom:
     secretKeyRef:
