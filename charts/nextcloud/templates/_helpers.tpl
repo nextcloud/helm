@@ -89,7 +89,7 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
-  value: {{ template "postgresql.primary.fullname" .Subcharts.postgresql }}
+  value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
 - name: POSTGRES_DB
   {{- if .Values.postgresql.auth.database }}
   value: {{ .Values.postgresql.auth.database | quote }}
