@@ -1,7 +1,7 @@
 apiVersion: v2
 name: nextcloud
-version: 3.5.21
-appVersion: 27.0.1
+version: 4.3.1
+appVersion: 27.0.2
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
   - nextcloud
@@ -23,14 +23,14 @@ maintainers:
     email: jeff@billimek.com
 dependencies:
   - name: postgresql
-    version: 11.6.*
-    repository: https://charts.bitnami.com/bitnami
+    version: 12.6.*
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
   - name: mariadb
-    version: 11.0.*
-    repository: https://charts.bitnami.com/bitnami
+    version: 12.2.*
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: mariadb.enabled
   - name: redis
-    version: 16.12.*
-    repository: https://charts.bitnami.com/bitnami
+    version: 17.13.*
+    repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
