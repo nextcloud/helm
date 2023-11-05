@@ -43,6 +43,13 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
+      - name: Run helm unittest
+        id: unittest
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git
+          helm unittest charts/nextcloud
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.8.0
         if: steps.list-changed.outputs.changed == 'true'
