@@ -344,6 +344,11 @@ redis:
     existingSecretPasswordKey: ""
 
 
+systemCron: # run a system cron job inside the nextcloud image
+  # https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
+  enabled: false
+
+
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
 ##
