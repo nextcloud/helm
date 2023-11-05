@@ -470,10 +470,21 @@ metrics:
   replicaCount: 1
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
-  # Use API token if set, otherwise fall back to password authentication
+  # Use API token if set, otherwise fall back to password authentication or use
+  # an existing secret
   # https://github.com/xperimental/nextcloud-exporter#token-authentication
   # Currently you still need to set the token manually in your nextcloud install
   token: ""
+
+  # Instead of the token above you can also use the token from an existing secret
+  existingSecret:
+    # Names of secret to use for Nextcloud Metrics credentials.
+    # The secret keys will be mounted as env-vars:
+    #   * To set the token use `NEXTCLOUD_AUTH_TOKEN`
+    #   * but you can also set `NEXTCLOUD_USERNAME` and `NEXTCLOUD_PASSWORD`
+    # See https://github.com/xperimental/nextcloud-exporter#environment-variables
+    secretName: ""
+
   timeout: 5s
   # if set to true, exporter skips certificate verification of Nextcloud server.
   tlsSkipVerify: false

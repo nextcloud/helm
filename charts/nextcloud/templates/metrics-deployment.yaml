@@ -37,7 +37,13 @@ spec:
       - name: metrics-exporter
         image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
         imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+        {{- if .Values.metrics.existingSecret }}
+        envFrom:
+          - secretRef:
+              name: {{ .Values.metrics.existingSecret.secretName }}
+        {{- end }}
         env:
+        {{- if not .Values.metrics.existingSecret }}
         {{- if .Values.metrics.token }}
         - name: NEXTCLOUD_AUTH_TOKEN
           valueFrom:
@@ -55,6 +61,7 @@ spec:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
               key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
+        {{- end }}
         {{- end }}
         # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
         - name: NEXTCLOUD_SERVER

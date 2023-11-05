@@ -276,7 +276,8 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 |----------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------|
 | `metrics.enabled`                      | Start Prometheus metrics exporter                                            | `false`                                                      |
 | `metrics.https`                        | Defines if https is used to connect to nextcloud                             | `false` (uses http)                                          |
-| `metrics.token`                        | Uses token for auth instead of username/password                             | `""`                                                         |
+| `metrics.token`                        | Uses token for auth instead of username/password or existing secret          | `""`                                                         |
+| `metrics.existingSecret.secretName`    | Name of a secret that contains `NEXTCLOUD_AUTH_TOKEN` or `NEXTCLOUD_USERNAME` and `NEXTCLOUD_PASSWORD`                             | `nil`                                                         |
 | `metrics.timeout`                      | When the scrape times out                                                    | `5s`                                                         |
 | `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                           | `false`                                                      |
 | `metrics.image.repository`             | Nextcloud metrics exporter image name                                        | `xperimental/nextcloud-exporter`                             |
