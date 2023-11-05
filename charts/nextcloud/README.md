@@ -51,7 +51,7 @@ We also package the following helm charts from Bitnami for you to _optionally_ u
 
 - Kubernetes 1.24+
 - Persistent Volume provisioner support in the underlying infrastructure
-- Helm >=3.7.0 ([for subchart scope exposing](nextcloud/helm#152))
+- Helm >=3.7.0 ([for subchart scope exposing](https://github.com/nextcloud/helm/pull/152))
 
 ## Installing the Chart
 
@@ -154,6 +154,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.auth.existingSecret`                                | The name of an existing secret with Redis® credentials                                       | `''`                       |
 | `redis.auth.existingSecretPasswordKey`                     | Password key to be retrieved from existing secret                                            | `''`                       |
 | `cronjob.enabled`                                          | Whether to enable/disable cron jobs sidecar                                                  | `false`                    |
+| `cronjob.asSidecar`                                        | Run cronjob as sidecar `true`or inside the main pod `false`                                  | `true`                     |
 | `cronjob.lifecycle.postStartCommand`                       | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                 | `nil`                      |
 | `cronjob.lifecycle.preStopCommand`                         | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                   | `nil`                      |
 | `cronjob.resources`                                        | CPU/Memory resource requests/limits for the cron jobs sidecar                                | `{}`                       |

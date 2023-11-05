@@ -56,6 +56,12 @@ spec:
       - name: {{ .Chart.Name }}
         image: {{ include "nextcloud.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- if and .Values.cronjob.enabled (not .Values.cronjob.asSidecar) }}
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "busybox crond -l 0 -L /dev/stdout ; /entrypoint.sh apache2-foreground"
+        {{- end }}
         {{- if .Values.lifecycle }}
         lifecycle:
         {{-   if .Values.lifecycle.postStartCommand }}
@@ -131,7 +137,7 @@ spec:
         {{- end }}
         volumeMounts:
         {{- include "nextcloud.volumeMounts" . | trim | nindent 8 }}
-      {{- if .Values.cronjob.enabled }}
+      {{- if and .Values.cronjob.enabled .Values.cronjob.asSidecar }}
       - name: {{ .Chart.Name }}-cron
         image: {{ include "nextcloud.image" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}

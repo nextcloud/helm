@@ -348,7 +348,10 @@ redis:
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
 ##
 cronjob:
-  enabled: false
+  enabled: true
+  # If set to `true` the cron will run inside a side-car container
+  # If set to `false` it will run in the same container as the nextcloud server
+  asSidecar: true
 
   ## Cronjob sidecar resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
