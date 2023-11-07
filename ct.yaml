@@ -1,5 +1,5 @@
 helm-extra-args: --timeout 600s
 chart-dirs:
-  - charts
+- charts
 chart-repos:
-  - bitnami=https://charts.bitnami.com/bitnami
+- bitnami=https://charts.bitnami.com/bitnami
