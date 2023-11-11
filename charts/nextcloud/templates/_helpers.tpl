@@ -28,7 +28,7 @@ Create a default fully qualified redis app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "nextcloud.redis.fullname" -}}
-{{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-redis" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -80,13 +80,13 @@ Create environment variables used to configure the nextcloud container as well a
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
   value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
@@ -99,20 +99,20 @@ Create environment variables used to configure the nextcloud container as well a
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.hostKey }}
   {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
@@ -121,7 +121,7 @@ Create environment variables used to configure the nextcloud container as well a
   {{- if .Values.externalDatabase.existingSecret.databaseKey }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
   {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
@@ -129,19 +129,19 @@ Create environment variables used to configure the nextcloud container as well a
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
   {{- else }}
 - name: MYSQL_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.hostKey }}
   {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
@@ -150,7 +150,7 @@ Create environment variables used to configure the nextcloud container as well a
   {{- if .Values.externalDatabase.existingSecret.databaseKey }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
   {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
@@ -158,13 +158,13 @@ Create environment variables used to configure the nextcloud container as well a
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
   {{- end }}
 {{- end }}
 - name: NEXTCLOUD_ADMIN_USER
