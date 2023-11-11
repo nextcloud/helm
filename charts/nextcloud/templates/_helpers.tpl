@@ -171,12 +171,12 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
+      key: {{ .Values.nextcloud.existingSecret.usernameKey }}
 - name: NEXTCLOUD_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
+      key: {{ .Values.nextcloud.existingSecret.passwordKey }}
 - name: NEXTCLOUD_TRUSTED_DOMAINS
   value: {{ .Values.nextcloud.host }}
 {{- if ne (int .Values.nextcloud.update) 0 }}
@@ -200,17 +200,17 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpHostKey | default "smtp-host" }}
+      key: {{ .Values.nextcloud.existingSecret.smtpHostKey }}
 - name: SMTP_NAME
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey | default "smtp-username" }}
+      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey }}
 - name: SMTP_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey | default "smtp-password" }}
+      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
 {{- end }}
 {{- if .Values.redis.enabled }}
 - name: REDIS_HOST
