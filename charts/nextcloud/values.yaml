@@ -252,7 +252,7 @@ externalDatabase:
   user: nextcloud
 
   ## Database password
-  password:
+  password: ""
 
   ## Database name
   database: nextcloud
