@@ -127,7 +127,7 @@ spec:
             failureThreshold: {{ .failureThreshold }}
           {{- end }}
           {{- end }}
-          {{- end }}{{/* end-if not nginx */}}
+          {{- end }}{{/* end-if not nginx.enabled */}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.nextcloud.securityContext }}
@@ -233,7 +233,7 @@ spec:
             {{- with .Values.nextcloud.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-        {{- end }}
+        {{- end }}{{/* end-if nginx.enabled */}}
         {{- if .Values.cronjob.enabled }}
         - name: {{ .Chart.Name }}-cron
           image: {{ include "nextcloud.image" . }}
@@ -265,7 +265,7 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-        {{- end }}
+        {{- end }}{{/* end-if cronjob.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -311,8 +311,8 @@ spec:
             - "sh"
             - "-c"
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
-        {{- end }}
-      {{- end }}
+        {{- end }}{{/* end-if any database-initContainer */}}
+      {{- end }}{{/* end-if any initContainer */}}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
