@@ -366,6 +366,7 @@ spec:
         # Will mount configuration files as www-data (id: 33) for nextcloud
         fsGroup: 33
         {{- end }}
+        {{- end }}{{/* end-with podSecurityContext */}}
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
       {{- end }}
