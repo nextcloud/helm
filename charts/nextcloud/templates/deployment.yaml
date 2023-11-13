@@ -298,7 +298,7 @@ spec:
                 name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
                 key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
           - name: POSTGRES_HOST
-            value: {{ template "postgresql.primary.fullname" .Subcharts.postgresql }}
+            value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
         command:
           - "sh"
           - "-c"

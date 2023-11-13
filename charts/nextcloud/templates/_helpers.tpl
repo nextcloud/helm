@@ -89,7 +89,7 @@ Create environment variables used to configure the nextcloud container as well a
       key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
-  value: {{ template "postgresql.primary.fullname" .Subcharts.postgresql }}
+  value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
 - name: POSTGRES_DB
   {{- if .Values.postgresql.auth.database }}
   value: {{ .Values.postgresql.auth.database | quote }}
@@ -217,6 +217,7 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ template "nextcloud.redis.fullname" . }}-master
 - name: REDIS_HOST_PORT
   value: {{ .Values.redis.master.service.ports.redis | quote }}
+{{- if .Values.redis.auth.enabled }}
 {{- if and .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey }}
 - name: REDIS_HOST_PASSWORD
   valueFrom:
@@ -226,6 +227,7 @@ Create environment variables used to configure the nextcloud container as well a
 {{- else }}
 - name: REDIS_HOST_PASSWORD
   value: {{ .Values.redis.auth.password }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if .Values.nextcloud.extraEnv }}
