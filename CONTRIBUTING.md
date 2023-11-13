@@ -8,7 +8,7 @@ Before submitting a feature or fix PR, please make sure the following are done:
 
 1. Make sure all your commits are signed off. (Learn more the DCO [here](https://probot.github.io/apps/dco))
 2. Any new or changed values are updated in the [values.yaml](./charts/nextcloud/values.yaml) and the [README.md](./charts/nextcloud/README.md)
-3. Bump the `version` in the [Chart.yaml](./charts/nextcloud/Chart.yaml) according to [Semantic Versioning](https://semver.org/) which uses the format `major.minor.patch`.
+3. Bump the `version` in the [Chart.yaml](./charts/nextcloud/Chart.yaml) according to [Semantic Versioning](https://semver.org) which uses the format `major.minor.patch`.
 
 Then, please make sure you follow the [pull request template](.github/pull_request_template.md), so we can more quickly review.
 
