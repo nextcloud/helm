@@ -1,6 +1,6 @@
 # Welcome
 
-Thanks for considering a contribution to this community run nextcloud repo! Please make sure you review the [Code of Conduct](./CODE_OF_CONDUCT.md) before proceeding, and keep in mind that this repo is run by volunteers.
+Thanks for considering a contribution to this Nextcloud repository run by the community! Please make sure you review the [Code of Conduct](./CODE_OF_CONDUCT.md) before proceeding, and keep in mind that this repository is run by volunteers.
 
 # Pull Requests
 
