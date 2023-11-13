@@ -2,7 +2,7 @@ name: Lint and Test Charts
 
 on:
   pull_request:
-    paths:
+    paths-ignore:
       - '.github/**'
       - 'charts/**/README.md'
       - 'CODE_OF_CONDUCT.md'
