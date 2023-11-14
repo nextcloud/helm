@@ -59,18 +59,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.lifecycle }}
           lifecycle:
-            {{-   with .postStartCommand }}
+            {{- with .postStartCommand }}
             postStart:
               exec:
                 command:
                   {{- toYaml . | nindent 18 -}}
-            {{-   end }}
-            {{-   with .preStopCommand }}
+            {{- end }}
+            {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
                   {{- toYaml . | nindent 18 -}}
-            {{-   end }}
+            {{- end }}
           {{- end }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
@@ -242,18 +242,18 @@ spec:
           - /cron.sh
           {{- with .Values.cronjob.lifecycle }}
           lifecycle:
-            {{-   with .postStartCommand }}
+            {{- with .postStartCommand }}
             postStart:
               exec:
                 command:
                   {{- toYaml . | nindent 18 -}}
-            {{-   end }}
-            {{-   with .preStopCommand }}
+            {{- end }}
+            {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
                   {{- toYaml . | nindent 18 -}}
-            {{-   end }}
+            {{- end }}
           {{- end }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
