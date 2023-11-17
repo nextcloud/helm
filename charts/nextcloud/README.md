@@ -250,6 +250,7 @@ Is there a missing parameter for one of the Bitnami helm charts listed above? Pl
 
 The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at the `/var/www/html` paths of the container.
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
+If the helm chart is uninstalled, nextcloud and it's sub-charts will *not* delete their PVCs. They will need to be manually deleted if desired.
 
 
 | Parameter                                                            | Description                                                                            | Default                                      |
