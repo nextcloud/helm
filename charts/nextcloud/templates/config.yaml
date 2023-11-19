@@ -11,7 +11,7 @@ metadata:
 data:
   {{- range $key, $value := .Values.nextcloud.configs }}
   {{ $key }}: |-
-    {{ $value | nindent 4 }}
+    {{- $value | nindent 4 }}
   {{- end }}
   {{- if .Values.nextcloud.defaultConfigs }}
   {{- if index .Values.nextcloud.defaultConfigs ".htaccess" }}
