@@ -4,11 +4,16 @@ Thanks for considering a contribution to this Nextcloud repository run by the co
 
 # Pull Requests
 
-Before submitting a feature or fix PR, please make sure the following are done:
+Before submitting a feature or fix PR, please make sure your changes are targetted to one feature or fix, and all your commits are signed off. (Learn more the DCO [here](https://probot.github.io/apps/dco))
 
-1. Make sure all your commits are signed off. (Learn more the DCO [here](https://probot.github.io/apps/dco))
-2. Any new or changed values are updated in the [values.yaml](./charts/nextcloud/values.yaml) and the [README.md](./charts/nextcloud/README.md)
-3. Bump the `version` in the [Chart.yaml](./charts/nextcloud/Chart.yaml) according to [Semantic Versioning](https://semver.org) which uses the format `major.minor.patch`.
+If you're making a change to the chart templates or `values.yaml`, please also do the following:
+
+1. Ensure the chart is linted using [`helm lint`](https://helm.sh/docs/helm/helm_lint/)
+2. Test rendering the helm templates from the chart root dir (`charts/nextcloud`) using `helm template .`
+    - If you're making a change to a non-default value, please also test that value change locally. You can pass in a custom values file to `helm template` with `--values mycustomvalues.yaml`
+3. Test installing the chart. A great tool for this is [`ct`](https://github.com/helm/chart-testing/tree/main) using [`ct install`](https://github.com/helm/chart-testing/blob/main/doc/ct_install.md) on a test cluster like [kind](https://kind.sigs.k8s.io/)
+4. Make sure new or changed values are updated in the [values.yaml](./charts/nextcloud/values.yaml) and the [README.md](./charts/nextcloud/README.md)
+5. Bump the `version` in the [Chart.yaml](./charts/nextcloud/Chart.yaml) according to [Semantic Versioning](https://semver.org) which uses the format `major.minor.patch`.
 
 Then, please make sure you follow the [pull request template](.github/pull_request_template.md), so we can more quickly review.
 
