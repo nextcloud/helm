@@ -35,7 +35,7 @@ spec:
         {{ template "nextcloud.redis.fullname" . }}-client: "true"
         {{- end }}
         {{- with .Values.podLabels }}
-        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
         nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
@@ -350,7 +350,7 @@ spec:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
         {{- end }}
         {{- with .Values.nextcloud.extraVolumes }}
-        {{- toYaml . | nindent 6 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       securityContext:
         {{- with .Values.securityContext }}
