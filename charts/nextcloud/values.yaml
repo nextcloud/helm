@@ -232,7 +232,12 @@ nginx:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
+##
+## Internal sqlite database configuration
+##
 internalDatabase:
+  ## Wether to use the sqlite database. This takes precedence on other database settings
+  ## and must be false to use any other database type
   enabled: true
   name: nextcloud
 

@@ -210,7 +210,7 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 
 | Parameter                                                            | Description                                                                            | Default         |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------------|
-| `internalDatabase.enabled`                                           | Whether to use internal sqlite database                                                | `true`          |
+| `internalDatabase.enabled`                                           | Whether to use internal sqlite database. Must be disabled to use any other database    | `true`          |
 | `internalDatabase.database`                                          | Name of the existing database                                                          | `nextcloud`     |
 | `externalDatabase.enabled`                                           | Whether to use external database                                                       | `false`         |
 | `externalDatabase.type`                                              | External database type: `mysql`, `postgresql`                                          | `mysql`         |
@@ -296,8 +296,6 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped                                  | `30s`                                                        |
 | `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                          | ``                                                           |
 | `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                          | `{}                                                          |
-
-
 
 > **Note**:
 >
