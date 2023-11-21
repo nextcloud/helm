@@ -30,6 +30,7 @@ helm install my-release nextcloud/nextcloud
     * [Downloading models for recognize](#downloading-models-for-recognize)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
+* [Troubleshooting](#troubleshooting)
 
 ## Introduction
 
@@ -485,3 +486,53 @@ After an upgrade, you may have missing indices. To fix this, you can run:
 # where NEXTCLOUD_POD is *your* nextcloud pod
 kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-missing-indices"
 ```
+
+# Troubleshooting
+
+## Logging
+The nextcloud instance deployed by this chart doesn't currently create a log file locally inside the container.
+Good situations to change this behavior include:
+ - Triaging mailserver issues
+ - Any time you're confused by server behavior and need more context
+ - Before submitting an Issue (you can include relevant log messages that way!)
+
+### Changing the logging behavior
+To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
+```
+nextcloud:
+  configs:
+    logging.config.php: |-
+      <?php
+      $CONFIG = array (
+        'log_type' => 'file',
+        'logfile' => 'nextcloud.log',
+        'loglevel' => 0,
+        'logdateformat' => 'F d, Y H:i:s'
+        );
+```
+`loglevel` corresponds to the detail of the logs. Valid values are:
+```
+0: DEBUG: All activity; the most detailed logging.
+
+1: INFO: Activity such as user logins and file activities, plus warnings, errors, and fatal errors.
+
+2: WARN: Operations succeed, but with warnings of potential problems, plus errors and fatal errors.
+
+3: ERROR: An operation fails, but other services and operations continue, plus fatal errors.
+
+4: FATAL: The server stops.
+```
+[More information about Nextcloud logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html)
+
+### Viewing the logs
+To view logs after changing the logging behavior, you can exec into the kubernetes pod, or copy them to your local machine.
+
+**Exec into the kubernetes pod:**
+`kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/bash`
+(and then look for the `nextcloud.log` file)
+
+**Copy the log file to your local machine:**
+`kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log`
+
+### Sharing the logs
+Remember to anonymize your logs and snippets from your pod before sharing them with the internet. Kubernetes secrets, even Sealed ones, live in plaintext `env` variables on your running containers, and log messages can include other information that should stay safely with you.
