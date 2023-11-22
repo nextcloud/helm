@@ -1,0 +1,29 @@
+metrics:
+  enabled: true
+  image:
+    pullSecrets:
+      - "registry-pull"
+  podAnnotations:
+    fakeVersion: unreleased
+  podLabels:
+    team: cool
+  resources:
+    requests:
+      memory: 100Mi
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 100.64.0.1
+    annotations:
+      fakeVersion: unreleased
+    labels:
+      team: cool
+  serviceMonitor:
+    enabled: true
+    namespace: "somewhere-else"
+    labels:
+      prometheus: default
+    namespaceSelector:
+      matchNames:
+        - "blub"
+    interval: "20s"
+    scrapeTimeout: "15s"
