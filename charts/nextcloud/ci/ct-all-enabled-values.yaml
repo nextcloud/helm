@@ -1,0 +1,12 @@
+nextcloud:
+  configs:
+    my.config.php: |-
+      <?php
+
+nginx:
+  enabled: true
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true

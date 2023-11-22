@@ -1,0 +1,47 @@
+nextcloud:
+  configs:
+    my.config.php: |-
+      <?php
+
+  phpConfigs:
+    redis.ini: |-
+      session.save_handler = redis
+      session.save_path = "tcp://host1:6379?weight=1, tcp://host2:6379?weight=2&timeout=2.5"
+
+nginx:
+  enabled: true
+  config:
+    default: false
+    custom: |-
+      http {
+      }
+
+metrics:
+  enabled: true
+  image:
+    pullSecrets:
+      - "registry-pull"
+  podAnnotations:
+    fakeVersion: unreleased
+  podLabels:
+    team: cool
+  resources:
+    requests:
+      memory: 100Mi
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 100.64.0.1
+    annotations:
+      fakeVersion: unreleased
+    labels:
+      team: cool
+  serviceMonitor:
+    enabled: true
+    namespace: "somewhere-else"
+    labels:
+      prometheus: default
+    namespaceSelector:
+      matchNames:
+        - "blub"
+    interval: "20s"
+    scrapeTimeout: "15s"
