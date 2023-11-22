@@ -517,6 +517,9 @@ metrics:
     ##
     namespace: ""
 
+    ## @param metrics.serviceMonitor.namespaceSelector where service are to discoverd (default release namespace)
+    namespaceSelector:
+
     ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in prometheus.
     ##
     jobLabel: ""
