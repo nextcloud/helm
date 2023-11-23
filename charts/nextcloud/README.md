@@ -491,10 +491,10 @@ kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-mis
 
 ## Logging
 The nextcloud instance deployed by this chart doesn't currently create a log file locally inside the container.
-Good situations to change this behavior include:
+Examples scenarios to change this behavior include:
  - Triaging mailserver issues
  - Any time you're confused by server behavior and need more context
- - Before submitting an Issue (you can include relevant log messages that way!)
+ - Before submitting a GitHub Issue (you can include relevant log messages that way)
 
 ### Changing the logging behavior
 To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
@@ -525,7 +525,7 @@ nextcloud:
 [More information about Nextcloud logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html)
 
 ### Viewing the logs
-To view logs after changing the logging behavior, you can exec into the kubernetes pod, or copy them to your local machine.
+To view logs after changing the logging behavior, you can exec into the Kubernetes pod, or copy them to your local machine.
 
 **Exec into the kubernetes pod:**
 `kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/bash`
