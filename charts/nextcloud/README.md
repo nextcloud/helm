@@ -498,7 +498,7 @@ Examples scenarios to change this behavior include:
 
 ### Changing the logging behavior
 To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
-```
+```yaml
 nextcloud:
   configs:
     logging.config.php: |-
@@ -527,12 +527,22 @@ nextcloud:
 ### Viewing the logs
 To view logs after changing the logging behavior, you can exec into the Kubernetes pod, or copy them to your local machine.
 
-**Exec into the kubernetes pod:**
-`kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/bash`
-(and then look for the `nextcloud.log` file)
+#### Exec into the kubernetes pod:
+```bash
+kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/sh
+```
 
-**Copy the log file to your local machine:**
-`kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log`
+#### Then look for the `nextcloud.log` file with tail or cat:
+
+```bash
+cat nextcloud.log
+tail -f nextcloud.log
+```
+
+#### Copy the log file to your local machine:
+```bash
+kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log
+```
 
 ### Sharing the logs
 Remember to anonymize your logs and snippets from your pod before sharing them with the internet. Kubernetes secrets, even Sealed ones, live in plaintext `env` variables on your running containers, and log messages can include other information that should stay safely with you.
