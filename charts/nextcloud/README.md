@@ -20,6 +20,7 @@ helm install my-release nextcloud/nextcloud
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
 * [Cron jobs](#cron-jobs)
+* [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
 * [Using nginx](#using-nginx)
 * [Preserving Source IP](#preserving-source-ip)
@@ -31,6 +32,7 @@ helm install my-release nextcloud/nextcloud
 * [Backups](#backups)
 * [Upgrades](#upgrades)
 * [Troubleshooting](#troubleshooting)
+
 
 ## Introduction
 
@@ -129,6 +131,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.defaultConfigs.apps\.config\.php`               | Default configuration for apps                                                                      | `true`                     |
 | `nextcloud.defaultConfigs.autoconfig\.php`                 | Default auto-configuration for databases                                                            | `true`                     |
 | `nextcloud.defaultConfigs.smtp\.config\.php`               | Default configuration for smtp                                                                      | `true`                     |
+| `nextcloud.defaultConfigs.s3\.config\.php`                 | Default configuration for S3 as primary Object Storage                                              | `true`                     |
 | `nextcloud.strategy`                                       | specifies the strategy used to replace old Pods by new ones                                         | `type: Recreate`           |
 | `nextcloud.extraEnv`                                       | specify additional environment variables                                                            | `{}`                       |
 | `nextcloud.extraSidecarContainers`                         | specify additional sidecar containers                                                               | `[]`                       |
@@ -338,31 +341,82 @@ To execute [background tasks](https://docs.nextcloud.com/server/latest/admin_man
 
 Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to ***Cron***.
 
+
+## Using the nextcloud docker image auto-configuration via env vars
+
+The [nextcloud/docker](https://github.com/nextcloud/docker/tree/master) image provides an auto-configuration via environment variables. See [their docs](https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables) for more info.
+
+For example, if you want to enable S3 as your primary object storage, you can set the following environment variables:
+
+```yaml
+# To use an external S3 compatible object store as primary storage, set the following variables:
+
+nextcloud:
+  extraEnv:
+    - name: "OBJECTSTORE_S3_HOST"
+      valueFrom:
+        secretKeyRef:
+          name: my-existing-kubernetes-secret
+          key: S3_HOSTNAME
+
+    - name: "OBJECTSTORE_S3_BUCKET"
+      valueFrom:
+        secretKeyRef:
+          name: my-existing-kubernetes-secret
+          key: S3_BUCKET
+
+    - name: "OBJECTSTORE_S3_KEY"
+      valueFrom:
+        secretKeyRef:
+          name: my-existing-kubernetes-secret
+          key: S3_USER
+
+    - name: "OBJECTSTORE_S3_SECRET"
+      valueFrom:
+        secretKeyRef:
+          name: my-existing-kubernetes-secret
+          key: S3_PASSWORD
+
+    - name: "OBJECTSTORE_S3_PORT"
+      value: "443"
+
+    - name: "OBJECTSTORE_S3_SSL"
+      value: "true"
+
+    - name: "OBJECTSTORE_S3_REGION"
+      value: "eu-west-1"
+
+    - name: "OBJECTSTORE_S3_USEPATH_STYLE"
+      value: "true"
+```
+
 ## Multiple config.php file
 
 Nextcloud supports loading configuration parameters from multiple files.
 You can add arbitrary files ending with `.config.php` in the `config/` directory.
-See [documentation](https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file).
+See [documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file). For example, to enable image and document previews:
 
-For example, following config will configure Nextcloud with [S3 as primary storage](https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3) by creating file `/var/www/html/config/s3.config.php`:
 
 ```yaml
 nextcloud:
   configs:
-    s3.config.php: |-
+    previews.config.php: |-
       <?php
       $CONFIG = array (
-        'objectstore' => array(
-          'class' => '\\OC\\Files\\ObjectStore\\S3',
-          'arguments' => array(
-            'bucket'     => 'my-bucket',
-            'autocreate' => true,
-            'key'        => 'xxx',
-            'secret'     => 'xxx',
-            'region'     => 'us-east-1',
-            'use_ssl'    => true
-          )
-        )
+        'enable_previews' => true,
+        'enabledPreviewProviders' => array (
+          'OC\Preview\Movie',
+          'OC\Preview\PNG',
+          'OC\Preview\JPEG',
+          'OC\Preview\GIF',
+          'OC\Preview\BMP',
+          'OC\Preview\XBitmap',
+          'OC\Preview\MP3',
+          'OC\Preview\MP4',
+          'OC\Preview\TXT',
+          'OC\Preview\MarkDown',
+          'OC\Preview\PDF'
+        ),
       );
 ```
 
