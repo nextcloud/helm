@@ -10,8 +10,15 @@ metadata:
     app.kubernetes.io/component: app
 spec:
   type: {{ .Values.service.type }}
-  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.service.ipFamilies }}
+  ipFamilies: 
+  {{- toYaml .Values.service.ipFamilies | nindent 4 }}
+  {{- end }}
+  {{- if .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   {{- end }}
   ports:
   - port: {{ .Values.service.port }}

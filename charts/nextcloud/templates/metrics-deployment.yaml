@@ -43,21 +43,22 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-              key: {{ .Values.nextcloud.existingSecret.tokenKey | default "nextcloud-token" }}
+              key: {{ .Values.nextcloud.existingSecret.tokenKey }}
         {{- else }}
         - name: NEXTCLOUD_USERNAME
           valueFrom:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-              key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
+              key: {{ .Values.nextcloud.existingSecret.usernameKey }}
         - name: NEXTCLOUD_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-              key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
+              key: {{ .Values.nextcloud.existingSecret.passwordKey }}
         {{- end }}
+        # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
         - name: NEXTCLOUD_SERVER
-          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ .Values.nextcloud.host }}
+          value: http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}
         - name: NEXTCLOUD_TIMEOUT
           value: {{ .Values.metrics.timeout }}
         - name: NEXTCLOUD_TLS_SKIP_VERIFY

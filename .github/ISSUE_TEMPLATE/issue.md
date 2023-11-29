@@ -25,6 +25,7 @@ assignees: ''
 
 - `values.yaml`:
 
+<!-- please keep the ```yaml part here, as it creates syntax highlighting to help with reading the file -->
 ```yaml
 # paste your values.yaml (anonymize any sensitive data)
 ```

@@ -78,11 +78,12 @@ nextcloud:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: nextcloud-username
-    # passwordKey: nextcloud-password
-    # tokenKey: nextcloud-token
-    # smtpUsernameKey: smtp-username
-    # smtpPasswordKey: smtp-password
+    usernameKey: nextcloud-username
+    passwordKey: nextcloud-password
+    tokenKey: nextcloud-token
+    smtpUsernameKey: smtp-username
+    smtpPasswordKey: smtp-password
+    smtpHostKey: smtp-host
   update: 0
   # If web server is not binding default port, you can define it
   containerPort: 80
@@ -218,6 +219,7 @@ nginx:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
+  containerPort: 80
 
   config:
     # This generates the default nginx config as per the nextcloud documentation
@@ -256,7 +258,7 @@ externalDatabase:
   user: nextcloud
 
   ## Database password
-  password:
+  password: ""
 
   ## Database name
   database: nextcloud
@@ -265,8 +267,10 @@ externalDatabase:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: db-username
-    # passwordKey: db-password
+    usernameKey: db-username
+    passwordKey: db-password
+    # hostKey: db-hostname-or-ip
+    # databaseKey: db-name
 
 ##
 ## MariaDB chart configuration
@@ -372,7 +376,7 @@ cronjob:
 service:
   type: ClusterIP
   port: 8080
-  loadBalancerIP: nil
+  loadBalancerIP: ""
   nodePort: nil
 
 ## Enable persistence using Persistent Volume Claims
@@ -482,7 +486,7 @@ metrics:
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: 0.6.0
+    tag: 0.6.1
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName

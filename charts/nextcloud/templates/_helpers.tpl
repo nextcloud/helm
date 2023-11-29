@@ -1,4 +1,3 @@
-{{/* vim: set filetype=mustache: */}}
 {{/*
 Expand the name of the chart.
 */}}
@@ -29,7 +28,7 @@ Create a default fully qualified redis app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "nextcloud.redis.fullname" -}}
-{{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-redis" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -81,16 +80,16 @@ Create environment variables used to configure the nextcloud container as well a
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
-  value: {{ template "postgresql.primary.fullname" .Subcharts.postgresql }}
+  value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
 - name: POSTGRES_DB
   {{- if .Values.postgresql.auth.database }}
   value: {{ .Values.postgresql.auth.database | quote }}
@@ -100,56 +99,84 @@ Create environment variables used to configure the nextcloud container as well a
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: POSTGRES_DB
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: POSTGRES_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
   {{- else }}
 - name: MYSQL_HOST
+  {{- if .Values.externalDatabase.existingSecret.hostKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.hostKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.host | quote }}
+  {{- end }}
 - name: MYSQL_DATABASE
+  {{- if .Values.externalDatabase.existingSecret.databaseKey }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.databaseKey }}
+  {{- else }}
   value: {{ .Values.externalDatabase.database | quote }}
+  {{- end }}
 - name: MYSQL_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-%s" .Release.Name "db") }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
+      name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
   {{- end }}
 {{- end }}
 - name: NEXTCLOUD_ADMIN_USER
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
+      key: {{ .Values.nextcloud.existingSecret.usernameKey }}
 - name: NEXTCLOUD_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
+      key: {{ .Values.nextcloud.existingSecret.passwordKey }}
 - name: NEXTCLOUD_TRUSTED_DOMAINS
   value: {{ .Values.nextcloud.host }}
 {{- if ne (int .Values.nextcloud.update) 0 }}
@@ -163,30 +190,34 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ .Values.nextcloud.mail.fromAddress | quote }}
 - name: MAIL_DOMAIN
   value: {{ .Values.nextcloud.mail.domain | quote }}
-- name: SMTP_HOST
-  value: {{ .Values.nextcloud.mail.smtp.host | quote }}
 - name: SMTP_SECURE
   value: {{ .Values.nextcloud.mail.smtp.secure | quote }}
 - name: SMTP_PORT
   value: {{ .Values.nextcloud.mail.smtp.port | quote }}
 - name: SMTP_AUTHTYPE
   value: {{ .Values.nextcloud.mail.smtp.authtype | quote }}
+- name: SMTP_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpHostKey }}
 - name: SMTP_NAME
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey | default "smtp-username" }}
+      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey }}
 - name: SMTP_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey | default "smtp-password" }}
+      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
 {{- end }}
 {{- if .Values.redis.enabled }}
 - name: REDIS_HOST
   value: {{ template "nextcloud.redis.fullname" . }}-master
 - name: REDIS_HOST_PORT
   value: {{ .Values.redis.master.service.ports.redis | quote }}
+{{- if .Values.redis.auth.enabled }}
 {{- if and .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey }}
 - name: REDIS_HOST_PASSWORD
   valueFrom:
@@ -196,6 +227,7 @@ Create environment variables used to configure the nextcloud container as well a
 {{- else }}
 - name: REDIS_HOST_PASSWORD
   value: {{ .Values.redis.auth.password }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if .Values.nextcloud.extraEnv }}
@@ -210,31 +242,31 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
 {{- define "nextcloud.volumeMounts" -}}
 - name: nextcloud-main
   mountPath: /var/www/
-  subPath: {{ ternary "root" (printf "%s/%s" .Values.nextcloud.persistence.subPath "root") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "root" (printf "%s/root" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 - name: nextcloud-main
   mountPath: /var/www/html
-  subPath: {{ ternary "html" (printf "%s/%s" .Values.nextcloud.persistence.subPath "html") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "html" (printf "%s/html" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
 - name: nextcloud-data
   mountPath: {{ .Values.nextcloud.datadir }}
-  subPath: {{ ternary "data" (printf "%s/%s" .Values.persistence.nextcloudData.subPath "data") (empty .Values.persistence.nextcloudData.subPath) }}
+  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.nextcloudData.subPath) (empty .Values.persistence.nextcloudData.subPath) }}
 {{- else }}
 - name: nextcloud-main
   mountPath: {{ .Values.nextcloud.datadir }}
-  subPath: {{ ternary "data" (printf "%s/%s" .Values.persistence.subPath "data") (empty .Values.persistence.subPath) }}
+  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.subPath) (empty .Values.persistence.subPath) }}
 {{- end }}
 - name: nextcloud-main
   mountPath: /var/www/html/config
-  subPath: {{ ternary "config" (printf "%s/%s" .Values.nextcloud.persistence.subPath "config") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "config" (printf "%s/config" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 - name: nextcloud-main
   mountPath: /var/www/html/custom_apps
-  subPath: {{ ternary "custom_apps" (printf "%s/%s" .Values.nextcloud.persistence.subPath "custom_apps") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "custom_apps" (printf "%s/custom_apps" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 - name: nextcloud-main
   mountPath: /var/www/tmp
-  subPath: {{ ternary "tmp" (printf "%s/%s" .Values.nextcloud.persistence.subPath "tmp") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "tmp" (printf "%s/tmp" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 - name: nextcloud-main
   mountPath: /var/www/html/themes
-  subPath: {{ ternary "themes" (printf "%s/%s" .Values.nextcloud.persistence.subPath "themes") (empty .Values.nextcloud.persistence.subPath) }}
+  subPath: {{ ternary "themes" (printf "%s/themes" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 {{- range $key, $value := .Values.nextcloud.configs }}
 - name: nextcloud-config
   mountPath: /var/www/html/config/{{ $key }}

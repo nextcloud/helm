@@ -9,12 +9,12 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-{{- range $key, $value := .Values.nextcloud.configs }}
+  {{- range $key, $value := .Values.nextcloud.configs }}
   {{ $key }}: |-
-{{ $value | indent 4 }}
-{{- end }}
-{{- if .Values.nextcloud.defaultConfigs }}
-{{- if index .Values.nextcloud.defaultConfigs ".htaccess" }}
+    {{- $value | nindent 4 }}
+  {{- end }}
+  {{- if .Values.nextcloud.defaultConfigs }}
+  {{- if index .Values.nextcloud.defaultConfigs ".htaccess" }}
   .htaccess: |-
     # line below if for Apache 2.4
     <ifModule mod_authz_core.c>
@@ -28,8 +28,8 @@ data:
     <ifModule mod_autoindex.c>
     IndexIgnore *
     </ifModule>
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "redis.config.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "redis.config.php" }}
   redis.config.php: |-
     <?php
     if (getenv('REDIS_HOST')) {
@@ -39,26 +39,28 @@ data:
         'redis' => array(
           'host' => getenv('REDIS_HOST'),
           'port' => getenv('REDIS_HOST_PORT') ?: 6379,
+          {{- if .Values.redis.auth.enabled }}
           'password' => getenv('REDIS_HOST_PASSWORD'),
+          {{- end }}
         ),
       );
     }
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "apache-pretty-urls.config.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "apache-pretty-urls.config.php" }}
   apache-pretty-urls.config.php: |-
     <?php
     $CONFIG = array (
       'htaccess.RewriteBase' => '/',
     );
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "apcu.config.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "apcu.config.php" }}
   apcu.config.php: |-
     <?php
     $CONFIG = array (
       'memcache.local' => '\OC\Memcache\APCu',
     );
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "apps.config.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "apps.config.php" }}
   apps.config.php: |-
     <?php
     $CONFIG = array (
@@ -75,8 +77,8 @@ data:
           ),
       ),
     );
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "autoconfig.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "autoconfig.php" }}
   autoconfig.php: |-
     <?php
     $autoconfig_enabled = false;
@@ -102,8 +104,8 @@ data:
     if ($autoconfig_enabled) {
         $AUTOCONFIG["directory"] = getenv('NEXTCLOUD_DATA_DIR') ?: "/var/www/html/data";
     }
-{{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "smtp.config.php" }}
+  {{- end }}
+  {{- if index .Values.nextcloud.defaultConfigs "smtp.config.php" }}
   smtp.config.php: |-
     <?php
     if (getenv('SMTP_HOST') && getenv('MAIL_FROM_ADDRESS') && getenv('MAIL_DOMAIN')) {
@@ -120,6 +122,6 @@ data:
         'mail_domain' => getenv('MAIL_DOMAIN'),
       );
     }
-{{- end }}
-{{- end }}
-{{- end }}
+  {{- end }}
+  {{- end }}{{/* end-if defaultConfigs */}}
+  {{- end }}{{/* end-if configs */}}
