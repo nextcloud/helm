@@ -192,20 +192,25 @@ nextcloud:
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
-  # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
-  # For example, you may need to define runAsNonRoot directive
+  # Set SecurityContext parameters for the nextcloud CONTAINER only (will not affect nginx container)
+  # ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core
   securityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: false
+    # if using a nextcloud image with alpine as the base image, change 33 to 82 for both runAsUser and runAsGroup
+    # runAsUser: 33
+    # runAsGroup: 33
+    # runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # readOnlyRootFilesystem: false
 
-  # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
-  podSecurityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: false
+  # Set podSecurityContext parameters for all containers in the nextcloud pod, defaults to fsGroup `33`
+  # ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core
+  podSecurityContext:
+    # Change to 82 if you're using an alpine base image for the nextcloud container
+    fsGroup: 33
+    # runAsUser: 33
+    # runAsGroup: 33
+    # runAsNonRoot: true
+    # readOnlyRootFilesystem: false
 
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
@@ -225,8 +230,9 @@ nginx:
   resources: {}
 
   # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # ref: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core
   securityContext: {}
-  # the nginx alpine container default user is 82
+  # the nginx:alpine container www-data user is 82
   #   runAsUser: 82
   #   runAsGroup: 33
   #   runAsNonRoot: true
@@ -533,7 +539,6 @@ metrics:
     ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
     ##
     labels: {}
-
 
 rbac:
   enabled: false

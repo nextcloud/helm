@@ -2,6 +2,8 @@
 
 [Nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
 
+> **Warning**: Please see [Breaking Changes](#breaking-changes) before upgrading this helm chart!
+
 ## TL;DR;
 
 ```console
@@ -136,7 +138,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraVolumes`                                   | specify additional volumes for the NextCloud pod                                                    | `{}`                       |
 | `nextcloud.extraVolumeMounts`                              | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
 | `nextcloud.securityContext`                                | Optional security context for the NextCloud container                                               | `nil`                      |
-| `nextcloud.podSecurityContext`                             | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
+| `nextcloud.podSecurityContext`                             | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `{fsgroup: 33}`            |
+| `nextcloud.podSecurityContext.fsGroup`                     | special supplemental group that applies to all containers in the NextCloud pod                      | `33`                       |
 | `nginx.enabled`                                            | Enable nginx (requires you use php-fpm image)                                                       | `false`                    |
 | `nginx.image.repository`                                   | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                    |
 | `nginx.image.tag`                                          | nginx Image tag                                                                                     | `alpine`                   |
@@ -445,6 +448,21 @@ persistence:
   accessMode: ReadWriteMany
 ```
 
+## Security Contexts
+
+These are all the [SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#securitycontext-v1-core) objects you can configure for this helm chart:
+
+| config option               | Description                                                           |
+|:---------------------------:|:----------------------------------------------------------------------|
+| `nextcloud.securityContext` | Optional SecurityContext for the NextCloud container                  |
+| `cronjob.securityContext`   | Optional SecurityContext for cronjob                                  |
+| `nginx.securityContext`     | Optional SecurityContext for the nginx container in the nextcloud pod |
+
+You can also set the [PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#podsecuritycontext-v1-core) for the nextcloud pod.
+By default, `nextcloud.podSecurityContext.fsGroup` is set to `33` (the `www-data` user's GID). Set this to `82` if you're using an alpine nextcloud image.
+
+### Breaking Changes from `4.5.x` -> `4.6.0`
+By default, `nextcloud.podSecurityContext.fsGroup` is now set to `33` (the `www-data` user's GID). Set this to `82` if you're using an nextcloud alpine image.
 
 ## Running `occ` commands
 Sometimes you need to run an [occ](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html) command on the Nextcloud container directly. You can do that by running commands as the user `www-data` via the `kubectl exec` command.
