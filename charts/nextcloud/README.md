@@ -384,6 +384,40 @@ nginx
   enabled: true
 ```
 
+### Service discovery with nginx and ingress
+
+For service discovery (CalDAV, CardDAV, webfinger, nodeinfo) to work you need to add redirects to your ingress.  
+If you use the [ingress-nginx](https://github.com/kubernetes/ingress-nginx) you can use the following server snippet annotation:
+
+<!-- Keep this in sync with the values.yaml -->
+```yaml
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |-
+      server_tokens off;
+      proxy_hide_header X-Powered-By;
+      rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+      rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
+      rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+      rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+      location = /.well-known/carddav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /.well-known/caldav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+      }
+      location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+        deny all;
+      }
+      location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+        deny all;
+      }
+```
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.

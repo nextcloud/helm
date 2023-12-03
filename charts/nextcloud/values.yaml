@@ -27,6 +27,7 @@ ingress:
   #  nginx.ingress.kubernetes.io/proxy-body-size: 4G
   #  kubernetes.io/tls-acme: "true"
   #  cert-manager.io/cluster-issuer: letsencrypt-prod
+  #  # Keep this in sync with the README.md:
   #  nginx.ingress.kubernetes.io/server-snippet: |-
   #    server_tokens off;
   #    proxy_hide_header X-Powered-By;
