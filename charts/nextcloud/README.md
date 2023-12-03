@@ -30,6 +30,7 @@ helm install my-release nextcloud/nextcloud
     * [Downloading models for recognize](#downloading-models-for-recognize)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
+* [Two or more replicas with traefik](https://github.com/nextcloud/helm/tree/main/charts/nextcloud#Two-or-more-replicas-with-traefik)
 * [Troubleshooting](#troubleshooting)
 
 ## Introduction
@@ -519,6 +520,28 @@ After an upgrade, you may have missing indices. To fix this, you can run:
 ```bash
 # where NEXTCLOUD_POD is *your* nextcloud pod
 kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-missing-indices"
+```
+
+# Two or more replicas with traefik
+With two or more replicas, it could happen that the users can't login. If you use traefik as reverse proxy you can set "sticky sessions" in the "ingressRoute" definition:
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nextcloud-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`nextcloud.yourdomain.org`)
+    kind: Rule
+    services:                       
+      - kind: Service
+        name: nextcloud
+        port: 8080
+        sticky:
+          cookie: {}
 ```
 
 # Troubleshooting
