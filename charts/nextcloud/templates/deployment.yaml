@@ -228,8 +228,7 @@ spec:
               mountPath: /var/www/html/themes
               subPath: {{ ternary "themes" (printf "%s/themes" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
             - name: nextcloud-nginx-config
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
+              mountPath: /etc/nginx/conf.d/
             {{- with .Values.nextcloud.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
