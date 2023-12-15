@@ -209,40 +209,46 @@ For convenience, we packages the following Bitnami charts for databases (feel fr
 If you choose to use one of the prepackaged Bitnami helm charts, you must configure both the `externalDatabase` parameters, and the parameters for the chart you choose. For instance, if you choose to use the Bitnami PostgreSQL chart that we've prepackaged, you need to also configure all the parameters for `postgresql`. You do not need to use the Bitnami helm charts. If you want to use an already configured database that you have externally, just set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
 
 
-| Parameter                                                            | Description                                                                            | Default         |
-|----------------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------------|
-| `internalDatabase.enabled`                                           | Whether to use internal sqlite database                                                | `true`          |
-| `internalDatabase.database`                                          | Name of the existing database                                                          | `nextcloud`     |
-| `externalDatabase.enabled`                                           | Whether to use external database                                                       | `false`         |
-| `externalDatabase.type`                                              | External database type: `mysql`, `postgresql`                                          | `mysql`         |
-| `externalDatabase.host`                                              | Host of the external database in form of `host:port`                                   | `nil`           |
-| `externalDatabase.database`                                          | Name of the existing database                                                          | `nextcloud`     |
-| `externalDatabase.user`                                              | Existing username in the external db                                                   | `nextcloud`     |
-| `externalDatabase.password`                                          | Password for the above username                                                        | `nil`           |
-| `externalDatabase.existingSecret.enabled`                            | Whether to use a existing secret or not                                                | `false`         |
-| `externalDatabase.existingSecret.secretName`                         | Name of the existing secret                                                            | `nil`           |
-| `externalDatabase.existingSecret.usernameKey`                        | Name of the key that contains the username                                             | `nil`           |
-| `externalDatabase.existingSecret.passwordKey`                        | Name of the key that contains the password                                             | `nil`           |
-| `externalDatabase.existingSecret.hostKey`                            | Name of the key that contains the database hostname or IP address                      | `nil`           |
-| `externalDatabase.existingSecret.databaseKey`                        | Name of the key that contains the database name                                        | `nil`           |
-| `mariadb.enabled`                                                    | Whether to use the MariaDB chart                                                       | `false`         |
-| `mariadb.auth.database`                                              | Database name to create                                                                | `nextcloud`     |
-| `mariadb.auth.username`                                              | Database user to create                                                                | `nextcloud`     |
-| `mariadb.auth.password`                                              | Password for the database                                                              | `changeme`      |
-| `mariadb.auth.rootPassword`                                          | MariaDB admin password                                                                 | `nil`           |
-| `mariadb.auth.existingSecret`                                        | Use existing secret for MariaDB password details; see values.yaml for more detail      | `''`            |
-| `mariadb.primary.persistence.enabled`                                | Whether or not to Use a PVC on MariaDB primary                                         | `false`         |
-| `mariadb.primary.persistence.existingClaim`                          | Use an existing PVC for MariaDB primary                                                | `nil`           |
-| `postgresql.enabled`                                                 | Whether to use the PostgreSQL chart                                                    | `false`         |
-| `postgresql.global.postgresql.auth.database`                         | Database name to create                                                                | `nextcloud`     |
-| `postgresql.global.postgresql.auth.username`                         | Database user to create                                                                | `nextcloud`     |
-| `postgresql.global.postgresql.auth.password`                         | Password for the database                                                              | `changeme`      |
-| `postgresql.global.postgresql.auth.existingSecret`                   | Name of existing secret to use for PostgreSQL credentials                              | `''`            |
-| `postgresql.global.postgresql.auth.secretKeys.adminPasswordKey`      | Name of key in existing secret to use for PostgreSQL admin password                    | `''`            |
-| `postgresql.global.postgresql.auth.secretKeys.userPasswordKey`       | Name of key in existing secret to use for PostgreSQL user password                     | `''`            |
-| `postgresql.global.postgresql.auth.secretKeys.replicationPasswordKey`| Name of key in existing secret to use for PostgreSQL replication password              | `''`            |
-| `postgresql.primary.persistence.enabled`                             | Whether or not to use PVC on PostgreSQL primary                                        | `false`         |
-| `postgresql.primary.persistence.existingClaim`                       | Use an existing PVC for PostgreSQL primary                                             | `nil`           |
+| Parameter                                                            | Description                                                                            | Default               |
+|----------------------------------------------------------------------|----------------------------------------------------------------------------------------|-----------------------|
+| `internalDatabase.enabled`                                           | Whether to use internal sqlite database                                                | `true`                |
+| `internalDatabase.database`                                          | Name of the existing database                                                          | `nextcloud`           |
+| `externalDatabase.enabled`                                           | Whether to use external database                                                       | `false`               |
+| `externalDatabase.type`                                              | External database type: `mysql`, `postgresql`                                          | `mysql`               |
+| `externalDatabase.host`                                              | Host of the external database in form of `host:port`                                   | `nil`                 |
+| `externalDatabase.database`                                          | Name of the existing database                                                          | `nextcloud`           |
+| `externalDatabase.user`                                              | Existing username in the external db                                                   | `nextcloud`           |
+| `externalDatabase.password`                                          | Password for the above username                                                        | `nil`                 |
+| `externalDatabase.existingSecret.enabled`                            | Whether to use a existing secret or not                                                | `false`               |
+| `externalDatabase.existingSecret.secretName`                         | Name of the existing secret                                                            | `nil`                 |
+| `externalDatabase.existingSecret.usernameKey`                        | Name of the key that contains the username                                             | `nil`                 |
+| `externalDatabase.existingSecret.passwordKey`                        | Name of the key that contains the password                                             | `nil`                 |
+| `externalDatabase.existingSecret.hostKey`                            | Name of the key that contains the database hostname or IP address                      | `nil`                 |
+| `externalDatabase.existingSecret.databaseKey`                        | Name of the key that contains the database name                                        | `nil`                 |
+| `mariadb.enabled`                                                    | Whether to use the MariaDB chart                                                       | `false`               |
+| `mariadb.auth.database`                                              | Database name to create                                                                | `nextcloud`           |
+| `mariadb.auth.username`                                              | Database user to create                                                                | `nextcloud`           |
+| `mariadb.auth.password`                                              | Password for the database                                                              | `changeme`            |
+| `mariadb.auth.rootPassword`                                          | MariaDB admin password                                                                 | `nil`                 |
+| `mariadb.auth.existingSecret`                                        | Use existing secret for MariaDB password details; see values.yaml for more detail      | `''`                  |
+| `mariadb.image.registry`                                             | MariaDB image registry                                                                 | `docker.io`           |
+| `mariadb.image.repository`                                           | MariaDB image repository                                                               | `bitnami/mariadb`     |
+| `mariadb.image.tag`                                                  | MariaDB image tag                                                                      | ``                    |
+| `mariadb.primary.persistence.enabled`                                | Whether or not to Use a PVC on MariaDB primary                                         | `false`               |
+| `mariadb.primary.persistence.existingClaim`                          | Use an existing PVC for MariaDB primary                                                | `nil`                 |
+| `postgresql.enabled`                                                 | Whether to use the PostgreSQL chart                                                    | `false`               |
+| `postgresql.image.registry`                                          | PostgreSQL image registry                                                              | `docker.io`           |
+| `postgresql.image.repository`                                        | PostgreSQL image repository                                                            | `bitnami/postgresql`  |
+| `postgresql.image.tag`                                               | PostgreSQL image tag                                                                   | `15.4.0-debian-11-r10`|
+| `postgresql.global.postgresql.auth.database`                         | Database name to create                                                                | `nextcloud`           |
+| `postgresql.global.postgresql.auth.username`                         | Database user to create                                                                | `nextcloud`           |
+| `postgresql.global.postgresql.auth.password`                         | Password for the database                                                              | `changeme`            |
+| `postgresql.global.postgresql.auth.existingSecret`                   | Name of existing secret to use for PostgreSQL credentials                              | `''`                  |
+| `postgresql.global.postgresql.auth.secretKeys.adminPasswordKey`      | Name of key in existing secret to use for PostgreSQL admin password                    | `''`                  |
+| `postgresql.global.postgresql.auth.secretKeys.userPasswordKey`       | Name of key in existing secret to use for PostgreSQL user password                     | `''`                  |
+| `postgresql.global.postgresql.auth.secretKeys.replicationPasswordKey`| Name of key in existing secret to use for PostgreSQL replication password              | `''`                  |
+| `postgresql.primary.persistence.enabled`                             | Whether or not to use PVC on PostgreSQL primary                                        | `false`               |
+| `postgresql.primary.persistence.existingClaim`                       | Use an existing PVC for PostgreSQL primary                                             | `nil`                 |
 
 Is there a missing parameter for one of the Bitnami helm charts listed above? Please feel free to submit a PR to add that parameter in our values.yaml, but be sure to also update this README file :)
 
@@ -384,6 +390,40 @@ nginx
   enabled: true
 ```
 
+### Service discovery with nginx and ingress
+
+For service discovery (CalDAV, CardDAV, webfinger, nodeinfo) to work you need to add redirects to your ingress.  
+If you use the [ingress-nginx](https://github.com/kubernetes/ingress-nginx) you can use the following server snippet annotation:
+
+<!-- Keep this in sync with the values.yaml -->
+```yaml
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |-
+      server_tokens off;
+      proxy_hide_header X-Powered-By;
+      rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
+      rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
+      rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+      rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
+      location = /.well-known/carddav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /.well-known/caldav {
+        return 301 $scheme://$host/remote.php/dav;
+      }
+      location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+      }
+      location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+        deny all;
+      }
+      location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
+        deny all;
+      }
+```
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.

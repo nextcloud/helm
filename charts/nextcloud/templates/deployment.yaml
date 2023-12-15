@@ -228,8 +228,7 @@ spec:
               mountPath: /var/www/html/themes
               subPath: {{ ternary "themes" (printf "%s/themes" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
             - name: nextcloud-nginx-config
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
+              mountPath: /etc/nginx/conf.d/
             {{- with .Values.nextcloud.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -280,7 +279,7 @@ spec:
         {{- end }}
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
-          image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
           env:
             - name: MYSQL_USER
               valueFrom:
@@ -298,7 +297,7 @@ spec:
             - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
-          image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
           env:
             - name: POSTGRES_USER
               valueFrom:
