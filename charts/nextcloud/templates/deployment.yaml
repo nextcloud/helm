@@ -279,7 +279,7 @@ spec:
         {{- end }}
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
-          image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
           env:
             - name: MYSQL_USER
               valueFrom:
