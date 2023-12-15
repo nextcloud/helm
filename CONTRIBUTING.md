@@ -15,7 +15,10 @@ If you're making a change to the chart templates or `values.yaml`, please also d
 4. Make sure new or changed values are updated in the [values.yaml](./charts/nextcloud/values.yaml) and the [README.md](./charts/nextcloud/README.md)
 5. Bump the `version` in the [Chart.yaml](./charts/nextcloud/Chart.yaml) according to [Semantic Versioning](https://semver.org) which uses the format `major.minor.patch`.
 
-Then, please make sure you follow the [pull request template](.github/pull_request_template.md), so we can more quickly review.
+Then, please make sure you follow the [pull request template](.github/pull_request_template.md), so we can more quickly review. In order to move your PR forward faster (for instance, bumping the helm chart version for you), please also check the "Allow edits and access to secrets by maintainers" box next to the "Create pull request" button:
+
+![screenshot of the allow edits by maintainers check box to the left of the Create pull request button on GitHub](https://github.com/nextcloud/helm/assets/2389292/3a8044a9-583d-496a-b3d2-4dd699c56ed4)
+
 
 # Issues
 
