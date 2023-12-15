@@ -231,6 +231,9 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `mariadb.auth.password`                                              | Password for the database                                                              | `changeme`            |
 | `mariadb.auth.rootPassword`                                          | MariaDB admin password                                                                 | `nil`                 |
 | `mariadb.auth.existingSecret`                                        | Use existing secret for MariaDB password details; see values.yaml for more detail      | `''`                  |
+| `mariadb.image.registry`                                             | MariaDB image registry                                                                 | `docker.io`           |
+| `mariadb.image.repository`                                           | MariaDB image repository                                                               | `bitnami/mariadb`     |
+| `mariadb.image.tag`                                                  | MariaDB image tag                                                                      | `15.4.0-debian-11-r10`|
 | `mariadb.primary.persistence.enabled`                                | Whether or not to Use a PVC on MariaDB primary                                         | `false`               |
 | `mariadb.primary.persistence.existingClaim`                          | Use an existing PVC for MariaDB primary                                                | `nil`                 |
 | `postgresql.enabled`                                                 | Whether to use the PostgreSQL chart                                                    | `false`               |
