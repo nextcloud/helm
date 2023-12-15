@@ -27,6 +27,7 @@ ingress:
   #  nginx.ingress.kubernetes.io/proxy-body-size: 4G
   #  kubernetes.io/tls-acme: "true"
   #  cert-manager.io/cluster-issuer: letsencrypt-prod
+  #  # Keep this in sync with the README.md:
   #  nginx.ingress.kubernetes.io/server-snippet: |-
   #    server_tokens off;
   #    proxy_hide_header X-Powered-By;
@@ -78,12 +79,12 @@ nextcloud:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: nextcloud-username
-    # passwordKey: nextcloud-password
-    # tokenKey: nextcloud-token
-    # smtpUsernameKey: smtp-username
-    # smtpPasswordKey: smtp-password
-    # smtpHostKey: smtp-host
+    usernameKey: nextcloud-username
+    passwordKey: nextcloud-password
+    tokenKey: nextcloud-token
+    smtpUsernameKey: smtp-username
+    smtpPasswordKey: smtp-password
+    smtpHostKey: smtp-host
   update: 0
   # If web server is not binding default port, you can define it
   containerPort: 80
@@ -252,7 +253,7 @@ externalDatabase:
   user: nextcloud
 
   ## Database password
-  password:
+  password: ""
 
   ## Database name
   database: nextcloud
@@ -261,8 +262,8 @@ externalDatabase:
   existingSecret:
     enabled: false
     # secretName: nameofsecret
-    # usernameKey: db-username
-    # passwordKey: db-password
+    usernameKey: db-username
+    passwordKey: db-password
     # hostKey: db-hostname-or-ip
     # databaseKey: db-name
 
