@@ -380,6 +380,7 @@ service:
 persistence:
   # Nextcloud Data (/var/www/html)
   enabled: false
+  immutableImage: false
   annotations: {}
   ## nextcloud data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
