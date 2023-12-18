@@ -262,6 +262,7 @@ Persistent Volume Claims are used to keep the data across deployments. This is k
 | Parameter                                                            | Description                                                                            | Default                                      |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------|----------------------------------------------|
 | `persistence.enabled`                                                | Enable persistence using PVC                                                           | `false`                                      |
+| `persistence.immutableImage`                                         | Does not mount the `/var/www` and `/var/www/html` directories                          | `false`                                      |
 | `persistence.annotations`                                            | PVC annotations                                                                        | `{}`                                         |
 | `persistence.storageClass`                                           | PVC Storage Class for nextcloud volume                                                 | `nil` (uses alpha storage class annotation)  |
 | `persistence.existingClaim`                                          | An Existing PVC name for nextcloud volume                                              | `nil` (uses alpha storage class annotation)  |
