@@ -8,11 +8,8 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - '.github/**'
-      - 'charts/**/README.md'
-      - 'LICENSE'
-      - 'README.md'
+    paths:
+      - 'charts/**'
 
 jobs:
   release:
