@@ -463,16 +463,16 @@ nextcloud:
   extraVolumeMounts:
     - name: hugepages
       mountPath: /dev/hugepages
-  resources:
-    requests:
-      hugepages-2Mi: 500Mi
-      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-      memory: 500Mi
-    limits:
-      # limit and request must be the same for hugepages. They are a fixed resource.
-      hugepages-2Mi: 500Mi
-      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-      memory: 1Gi
+resources:
+  requests:
+    hugepages-2Mi: 500Mi
+    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+    memory: 500Mi
+  limits:
+    # limit and request must be the same for hugepages. They are a fixed resource.
+    hugepages-2Mi: 500Mi
+    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+    memory: 1Gi
 ```
 
 ## HPA (Clustering)
