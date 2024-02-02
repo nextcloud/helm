@@ -144,12 +144,12 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-{{- if .Values.nginx.config.default }}
+  {{- if .Values.nginx.config.default }}
   default.conf: |-
     {{- template "default.conf" $ }}
-{{- end }}
-{{- if .Values.nginx.config.custom }}
+  {{- end }}
+  {{- if .Values.nginx.config.custom }}
   zz-custom.conf: |-
 {{ .Values.nginx.config.custom | indent 4 }}
-{{- end }}
+  {{- end }}
 {{- end }}

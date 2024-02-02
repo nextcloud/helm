@@ -9,37 +9,37 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
-{{- if .Values.ingress.labels }}
+    {{- if .Values.ingress.labels }}
 {{ toYaml .Values.ingress.labels | indent 4 }}
-{{- end }}
-{{- if .Values.ingress.annotations }}
+    {{- end }}
+  {{- if .Values.ingress.annotations }}
   annotations:
 {{ toYaml .Values.ingress.annotations | indent 4 }}
-{{- end }}
+  {{- end }}
 spec:
   {{- if .Values.ingress.className }}
   ingressClassName: {{ .Values.ingress.className }}
   {{- end }}
   rules:
-  - host: {{ .Values.nextcloud.host }}
-    http:
-      paths:
-      - path: {{ .Values.ingress.path }}
-        {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
-        pathType: {{ .Values.ingress.pathType }}
-        {{- end }}
-        backend:
-          {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
-          service:
-            name: {{ template "nextcloud.fullname" . }}
-            port:
-              number: {{ .Values.service.port }}
-          {{- else }}
-          serviceName: {{ template "nextcloud.fullname" . }}
-          servicePort: {{ .Values.service.port }}
-          {{- end }}
-{{- if .Values.ingress.tls }}
+    - host: {{ .Values.nextcloud.host }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}
+            {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+            pathType: {{ .Values.ingress.pathType }}
+            {{- end }}
+            backend:
+              {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+              service:
+                name: {{ template "nextcloud.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+              {{- else }}
+              serviceName: {{ template "nextcloud.fullname" . }}
+              servicePort: {{ .Values.service.port }}
+              {{- end }}
+  {{- if .Values.ingress.tls }}
   tls:
 {{ toYaml .Values.ingress.tls | indent 4 }}
-{{- end -}}
+  {{- end }}
 {{- end }}

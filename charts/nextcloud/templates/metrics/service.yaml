@@ -22,9 +22,9 @@ spec:
   {{ end -}}
   {{- end -}}
   ports:
-  - name: metrics
-    port: 9205
-    targetPort: metrics
+    - name: metrics
+      port: 9205
+      targetPort: metrics
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

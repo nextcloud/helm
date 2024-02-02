@@ -151,8 +151,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -167,8 +167,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -183,8 +183,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -238,7 +238,7 @@ spec:
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-          - /cron.sh
+            - /cron.sh
           {{- with .Values.cronjob.lifecycle }}
           lifecycle:
             {{- with .postStartCommand }}
