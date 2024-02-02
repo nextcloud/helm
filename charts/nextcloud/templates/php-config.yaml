@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-{{- range $key, $value := .Values.nextcloud.phpConfigs }}
+  {{- range $key, $value := .Values.nextcloud.phpConfigs }}
   {{ $key }}: |-
 {{ $value | indent 4 }}
-{{- end }}
+  {{- end }}
 {{- end }}

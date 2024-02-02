@@ -5,14 +5,14 @@ metadata:
   name: {{ template "nextcloud.fullname" . }}-privileged
   namespace: {{ .Release.Namespace }}
 rules:
-- apiGroups:
-  - extensions
-  resourceNames:
-  - privileged
-  resources:
-  - podsecuritypolicies
-  verbs:
-  - use
+  - apiGroups:
+      - extensions
+    resourceNames:
+      - privileged
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -24,7 +24,7 @@ roleRef:
   kind: Role
   name: {{ template "nextcloud.fullname" . }}-privileged
 subjects:
-- kind: ServiceAccount
-  name: {{ .Values.rbac.serviceaccount.name }}
-  namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: {{ .Values.rbac.serviceaccount.name }}
+    namespace: {{ .Release.Namespace }}
 {{- end }}

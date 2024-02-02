@@ -21,13 +21,13 @@ spec:
   ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
   {{- end }}
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: {{ .Values.nextcloud.containerPort }}
-    protocol: TCP
-    name: http
-    {{- if eq .Values.service.type "NodePort" }}
-    nodePort: {{ default "" .Values.service.nodePort}}
-    {{- end }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.nextcloud.containerPort }}
+      protocol: TCP
+      name: http
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ default "" .Values.service.nodePort}}
+      {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
