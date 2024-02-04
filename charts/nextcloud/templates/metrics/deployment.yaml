@@ -38,38 +38,38 @@ spec:
           image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           env:
-          {{- if .Values.metrics.token }}
-          - name: NEXTCLOUD_AUTH_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-                key: {{ .Values.nextcloud.existingSecret.tokenKey }}
-          {{- else }}
-          - name: NEXTCLOUD_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-                key: {{ .Values.nextcloud.existingSecret.usernameKey }}
-          - name: NEXTCLOUD_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-                key: {{ .Values.nextcloud.existingSecret.passwordKey }}
+            {{- if .Values.metrics.token }}
+            - name: NEXTCLOUD_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.tokenKey }}
+            {{- else }}
+            - name: NEXTCLOUD_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.usernameKey }}
+            - name: NEXTCLOUD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.passwordKey }}
+            {{- end }}
+            # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
+            - name: NEXTCLOUD_SERVER # deployment.namespace.svc.cluster.local
+              value: "http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            - name: NEXTCLOUD_TIMEOUT
+              value: {{ .Values.metrics.timeout }}
+            - name: NEXTCLOUD_TLS_SKIP_VERIFY
+              value: {{ .Values.metrics.tlsSkipVerify | quote }}
+          ports:
+            - name: metrics
+              containerPort: 9205
+          {{- if .Values.metrics.resources }}
+          resources: {{- toYaml .Values.metrics.resources | nindent 10 }}
           {{- end }}
-          # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
-          - name: NEXTCLOUD_SERVER # deployment.namespace.svc.cluster.local
-            value: "http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
-          - name: NEXTCLOUD_TIMEOUT
-            value: {{ .Values.metrics.timeout }}
-          - name: NEXTCLOUD_TLS_SKIP_VERIFY
-            value: {{ .Values.metrics.tlsSkipVerify | quote }}
-        ports:
-          - name: metrics
-            containerPort: 9205
-        {{- if .Values.metrics.resources }}
-        resources: {{- toYaml .Values.metrics.resources | nindent 10 }}
-        {{- end }}
-        securityContext:
-          runAsUser: 1000
-          runAsNonRoot: true
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
 {{- end }}
