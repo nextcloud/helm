@@ -9,18 +9,20 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: metrics
-    {{- if .Values.metrics.service.labels -}}
-    {{ toYaml .Values.metrics.service.labels | nindent 4 }}
+    {{- with .Values.metrics.service.labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end -}}
-  {{- if .Values.metrics.service.annotations }}
-  annotations: {{ toYaml .Values.metrics.service.annotations | nindent 4 }}
+  {{- with .Values.metrics.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   type: {{ .Values.metrics.service.type }}
-  {{ if eq .Values.metrics.service.type "LoadBalancer" -}} {{ if .Values.metrics.service.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.metrics.service.loadBalancerIP }}
-  {{ end -}}
-  {{- end -}}
+  {{- if eq .Values.metrics.service.type "LoadBalancer" }}
+  {{- with .Values.metrics.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- end }}
   ports:
     - name: metrics
       port: 9205
