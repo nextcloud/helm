@@ -23,13 +23,13 @@ spec:
         app.kubernetes.io/name: {{ include "nextcloud.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: metrics
-      {{- if .Values.metrics.podLabels }}
-{{ toYaml .Values.metrics.podLabels | indent 8 }}
-      {{- end }}
+        {{- with .Values.metrics.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
-      {{- if .Values.metrics.image.pullSecrets }}
+      {{- with .Values.metrics.image.pullSecrets }}
       imagePullSecrets:
-        {{- range .Values.metrics.image.pullSecrets }}
+        {{- range . }}
         - name: {{ . }}
         {{- end}}
       {{- end }}

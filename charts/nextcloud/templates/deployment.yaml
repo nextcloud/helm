@@ -63,13 +63,13 @@ spec:
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:
@@ -245,13 +245,13 @@ spec:
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:

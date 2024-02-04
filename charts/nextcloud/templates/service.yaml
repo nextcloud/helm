@@ -11,14 +11,14 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
-  loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP | default "" }}
   {{- end }}
-  {{- if .Values.service.ipFamilies }}
+  {{- with .Values.service.ipFamilies }}
   ipFamilies: 
-  {{- toYaml .Values.service.ipFamilies | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- if .Values.service.ipFamilyPolicy }}
-  ipFamilyPolicy: {{ .Values.service.ipFamilyPolicy }}
+  {{- with .Values.service.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ . }}
   {{- end }}
   ports:
     - port: {{ .Values.service.port }}
@@ -26,7 +26,7 @@ spec:
       protocol: TCP
       name: http
       {{- if eq .Values.service.type "NodePort" }}
-      nodePort: {{ default "" .Values.service.nodePort}}
+      nodePort: {{ .Values.service.nodePort | default "" }}
       {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}

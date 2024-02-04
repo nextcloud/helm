@@ -9,16 +9,16 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
-    {{- if .Values.ingress.labels }}
-{{ toYaml .Values.ingress.labels | indent 4 }}
+    {{- with .Values.ingress.labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- if .Values.ingress.annotations }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-{{ toYaml .Values.ingress.annotations | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
   {{- end }}
   rules:
     - host: {{ .Values.nextcloud.host }}
@@ -38,8 +38,8 @@ spec:
               serviceName: {{ template "nextcloud.fullname" . }}
               servicePort: {{ .Values.service.port }}
               {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- with .Values.ingress.tls }}
   tls:
-{{ toYaml .Values.ingress.tls | indent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
