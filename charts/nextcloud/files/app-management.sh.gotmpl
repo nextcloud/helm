@@ -1,0 +1,24 @@
+#!/bin/sh
+
+{{- range $app,$appConfig := .Values.nextcloud.appManagement.apps }}
+echo "== manage app: {{ $app }} ==";
+
+{{- if $appConfig.enabled }}
+echo "enable:"
+/var/www/html/occ app:install {{ $app }}
+/var/www/html/occ app:enable {{ $app }}
+
+# config of app
+echo "config:"
+{{- range $key, $value := $appConfig.config }}
+/var/www/html/occ config:app:set -n {{ $app }} {{ $key }} --value="{{ $value }}"
+{{- end}}
+
+{{- else }}
+echo "disable:"
+/var/www/html/occ app:disable {{ $app }}
+{{- end }}
+{{- end }}{{/* end-range appManagement.apps */}}
+
+# TODO autoDisable and autoRemove use occ app:list
+

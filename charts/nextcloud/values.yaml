@@ -157,6 +157,21 @@ nextcloud:
     post-upgrade:
     before-starting:
 
+  appManagement:
+    enabled: false
+    # -- if app not listed under apps it will be disabled
+    autoDisable: true
+    # -- if app not listed under apps it will be uninstalled
+    autoRemove: true
+    apps:
+       deck:
+         enabled: false
+       drawio:
+          enabled: false
+          config:
+            DrawioUrl: "https://embed.diagrams.net"
+            DrawioOffline: "yes"
+
   ## Strategy used to replace old pods
   ## IMPORTANT: use with care, it is suggested to leave as that for upgrade purposes
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy

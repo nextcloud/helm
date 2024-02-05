@@ -44,6 +44,9 @@ spec:
         nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
         {{- end }}
         hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
+        {{- if .Values.nextcloud.appManagement.enabled }}
+        app-management-hash: {{ toYaml .Values.nextcloud.appManagement | sha256sum }}
+        {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -145,6 +148,12 @@ spec:
               readOnly: true
             {{- end }}
             {{- end }}
+            {{- if .Values.nextcloud.appManagement.enabled }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/before-starting/app-management.sh
+              subPath: app-management.sh
+              readOnly: true
+            {{- end }}{{/* end-if .appManagement.enabled */}}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
@@ -357,7 +366,10 @@ spec:
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
         {{- end }}
-        {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+        {{- if or
+          (not (values .Values.nextcloud.hooks | compact | empty))
+          .Values.nextcloud.appManagement.enabled
+        }}
         - name: nextcloud-hooks
           configMap:
             name: {{ template "nextcloud.fullname" . }}-hooks
