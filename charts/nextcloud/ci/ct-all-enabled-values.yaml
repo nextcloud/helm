@@ -1,5 +1,7 @@
 metrics:
   enabled: true
+  serviceMonitor:
+    enabled: true
 
 nextcloud:
   configs:

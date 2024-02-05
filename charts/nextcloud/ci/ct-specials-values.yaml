@@ -17,6 +17,15 @@ metrics:
       fakeVersion: unreleased
     labels:
       team: cool
+  serviceMonitor:
+    enabled: true
+    namespace: "somewhere-else"
+    labels:
+      prometheus: default
+    interval: "20s"
+    scrapeTimeout: "15s"
+    namespaceSelector:
+      - "default"
 
 nextcloud:
   configs:
