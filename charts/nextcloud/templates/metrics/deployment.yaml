@@ -66,8 +66,9 @@ spec:
           ports:
             - name: metrics
               containerPort: 9205
-          {{- if .Values.metrics.resources }}
-          resources: {{- toYaml .Values.metrics.resources | nindent 10 }}
+          {{- with .Values.metrics.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           securityContext:
             runAsUser: 1000
