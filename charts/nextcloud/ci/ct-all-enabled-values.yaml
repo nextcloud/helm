@@ -1,0 +1,19 @@
+metrics:
+  enabled: true
+
+nextcloud:
+  configs:
+    my.config.php: |-
+      <?php
+
+image:
+  flavor: fpm
+nginx:
+  enabled: true
+  config:
+    custom: |-
+      server {
+        listen 8080;
+        server_name tmp-server;
+        root /tmp;
+      }
