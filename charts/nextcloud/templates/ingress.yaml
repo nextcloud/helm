@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled }}
+---
 apiVersion: {{ include "nextcloud.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
@@ -25,11 +26,11 @@ spec:
       http:
         paths:
           - path: {{ .Values.ingress.path }}
-            {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+            {{- if (eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1") }}
             pathType: {{ .Values.ingress.pathType }}
             {{- end }}
             backend:
-              {{- if eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1" }}
+              {{- if (eq (include "nextcloud.ingress.apiVersion" $) "networking.k8s.io/v1") }}
               service:
                 name: {{ template "nextcloud.fullname" . }}
                 port:

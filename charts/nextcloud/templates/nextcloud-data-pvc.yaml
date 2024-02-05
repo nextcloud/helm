@@ -1,4 +1,5 @@
 {{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled (not .Values.persistence.nextcloudData.existingClaim) }}
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
