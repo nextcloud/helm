@@ -147,6 +147,16 @@ nextcloud:
   #        )
   #      );
 
+  # Hooks for auto configuration
+  # Here you could write small scripts which are placed in `/docker-entrypoint-hooks.d/<hook-name>/helm.sh`
+  # ref: https://github.com/nextcloud/docker?tab=readme-ov-file#auto-configuration-via-hook-folders
+  hooks:
+    pre-installation:
+    post-installation:
+    pre-upgrade:
+    post-upgrade:
+    before-starting:
+
   ## Strategy used to replace old pods
   ## IMPORTANT: use with care, it is suggested to leave as that for upgrade purposes
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
