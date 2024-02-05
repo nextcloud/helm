@@ -21,8 +21,12 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/component: metrics
   namespaceSelector:
+    {{- with .Values.metrics.serviceMonitor.namespaceSelector }}
+    {{- toYaml . | nindent 4 }}
+    {{- else }}
     matchNames:
       - {{ .Release.Namespace | quote }}
+    {{- end }}
   endpoints:
     - port: metrics
       path: "/"
