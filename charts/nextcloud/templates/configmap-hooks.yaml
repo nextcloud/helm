@@ -1,0 +1,18 @@
+{{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-hooks
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  {{- range $hook, $shell := .Values.nextcloud.hooks }}
+  {{- if $shell }}
+  {{ $hook }}.sh: {{ $shell | b64enc }}
+  {{- end }}
+  {{- end }}
+{{- end }}
