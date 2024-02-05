@@ -16,6 +16,7 @@ helm install my-release nextcloud/nextcloud
 * [Installing the Chart](#installing-the-chart)
 * [Uninstalling the Chart](#uninstalling-the-chart)
 * [Configuration](#configuration)
+    * [Ingress-Controller](#ingress)
     * [Database Configurations](#database-configurations)
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
@@ -206,6 +207,38 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                    |
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                    |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
+
+### Ingress
+#### Ingress Sticky-Sessions
+
+For loadbalance over multiple Pods, it is useful to configure sticky session.
+
+##### NGINX Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#session-affinity)
+```yaml
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+```
+
+##### Traefik Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service)
+```yaml
+service:
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+```
+
+##### HAProxy Ingress-Controller (Community-Version)
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more infromation take a look in the  [ingress-controller documentation](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity)
+```yaml
+ingress:
+  annotations:
+    haproxy-ingress.github.io/affinity: cookie
+```
 
 ### Database Configurations
 By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.

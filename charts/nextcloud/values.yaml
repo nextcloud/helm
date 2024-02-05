@@ -522,9 +522,8 @@ service:
   port: 8080
   loadBalancerIP: ""
   nodePort:
+  # -- use additional annotation on service for nextcloud
   annotations: {}
-    ## Insert your annotations such as below
-    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
