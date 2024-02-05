@@ -12,7 +12,7 @@ metadata:
 data:
   {{- range $hook, $shell := .Values.nextcloud.hooks }}
   {{- if $shell }}
-  {{ $hook }}.sh: {{ $shell | b64enc }}
+  {{ $hook }}.sh: {{ $shell | quote }}
   {{- end }}
   {{- end }}
 {{- end }}
