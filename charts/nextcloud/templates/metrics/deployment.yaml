@@ -1,4 +1,5 @@
 {{- if .Values.metrics.enabled }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,7 +19,8 @@ spec:
       app.kubernetes.io/component: metrics
   template:
     metadata:
-      annotations: {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
+      annotations:
+        {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
       labels:
         app.kubernetes.io/name: {{ include "nextcloud.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
