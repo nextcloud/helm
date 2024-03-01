@@ -62,10 +62,10 @@ ingress:
   path: /
   pathType: Prefix
 
-
 # Allow configuration of lifecycle hooks
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-lifecycle: {}
+lifecycle:
+  {}
   # postStartCommand: []
   # preStopCommand: []
 
@@ -350,12 +350,11 @@ redis:
   enabled: false
   auth:
     enabled: true
-    password: 'changeme'
+    password: "changeme"
     # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
     existingSecret: ""
     # Password key to be retrieved from existing secret
     existingSecretPasswordKey: ""
-
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
@@ -370,7 +369,8 @@ cronjob:
 
   # Allow configuration of lifecycle hooks
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-  lifecycle: {}
+  lifecycle:
+    {}
     # postStartCommand: []
     # preStopCommand: []
   # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
@@ -421,7 +421,8 @@ persistence:
     accessMode: ReadWriteOnce
     size: 8Gi
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -458,7 +459,6 @@ startupProbe:
   failureThreshold: 30
   successThreshold: 1
 
-
 ## Enable pod autoscaling using HorizontalPodAutoscaler
 ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
 ##
@@ -473,7 +473,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
 
 ## Prometheus Exporter / Metrics
 ##
@@ -507,6 +506,12 @@ metrics:
   # podAnnotations: {}
 
   # podLabels: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
 
   service:
     type: ClusterIP
@@ -550,14 +555,12 @@ metrics:
     ##
     labels: {}
 
-
 rbac:
   enabled: false
   serviceaccount:
     create: true
     name: nextcloud-serviceaccount
     annotations: {}
-
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
