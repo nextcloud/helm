@@ -11,38 +11,38 @@ helm install my-release nextcloud/nextcloud
 
 ## Quick Links
 
-* [Introduction](#introduction)
-* [Prerequisites](#prerequisites)
-* [Installing the Chart](#installing-the-chart)
-* [Uninstalling the Chart](#uninstalling-the-chart)
-* [Configuration](#configuration)
-    * [Database Configurations](#database-configurations)
-    * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
-    * [Persistence Configurations](#persistence-configurations)
-    * [Metrics Configurations](#metrics-configurations)
-    * [Probes Configurations](#probes-configurations)
-* [Cron jobs](#cron-jobs)
-* [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
-* [Multiple config.php file](#multiple-configphp-file)
-* [Using nginx](#using-nginx)
-    * [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
-* [Preserving Source IP](#preserving-source-ip)
-* [Hugepages](#hugepages)
-* [HPA (Clustering)](#hpa-clustering)
-* [Adjusting PHP ini values](#adjusting-php-ini-values)
-* [Running `occ` commands](#running-occ-commands)
-    * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
-    * [Downloading models for recognize](#downloading-models-for-recognize)
-* [Backups](#backups)
-* [Upgrades](#upgrades)
-* [Troubleshooting](#troubleshooting)
-    * [Logging](#logging)
-        * [Changing the logging behavior](#changing-the-logging-behavior)
-        * [Viewing the logs](#viewing-the-logs)
-            * [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
-            * [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
-            * [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
-        * [Sharing the logs](#sharing-the-logs)
+- [TL;DR;](#tldr)
+- [Quick Links](#quick-links)
+- [Introduction](#introduction)
+- [Prerequisites](#prerequisites)
+- [Installing the Chart](#installing-the-chart)
+- [Uninstalling the Chart](#uninstalling-the-chart)
+- [Configuration](#configuration)
+  - [Database Configurations](#database-configurations)
+  - [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
+  - [Persistence Configurations](#persistence-configurations)
+  - [Metrics Configurations](#metrics-configurations)
+  - [Probes Configurations](#probes-configurations)
+- [Cron jobs](#cron-jobs)
+- [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
+- [Multiple config.php file](#multiple-configphp-file)
+- [Using nginx](#using-nginx)
+  - [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
+- [Preserving Source IP](#preserving-source-ip)
+- [Hugepages](#hugepages)
+- [HPA (Clustering)](#hpa-clustering)
+- [Adjusting PHP ini values](#adjusting-php-ini-values)
+- [Running `occ` commands](#running-occ-commands)
+  - [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
+  - [Downloading models for recognize](#downloading-models-for-recognize)
+- [Backup Cronjobs](#backup-cronjobs)
+- [Logging](#logging)
+  - [Changing the logging behavior](#changing-the-logging-behavior)
+  - [Viewing the logs](#viewing-the-logs)
+    - [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
+    - [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
+    - [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
+  - [Sharing the logs](#sharing-the-logs)
 
 ## Introduction
 
@@ -154,6 +154,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraVolumeMounts`                               | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
 | `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                      |
 | `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
+| `nextcloud.backupCronjobs`                                  | specify data volume backup cronjobs ([see below](#backup-cronjobs))                                 | `[]`                       |
 | `nginx.enabled`                                             | Enable nginx (requires you use php-fpm image)                                                       | `false`                    |
 | `nginx.image.repository`                                    | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                    |
 | `nginx.image.tag`                                           | nginx Image tag                                                                                     | `alpine`                   |
@@ -621,6 +622,75 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:down
 
 # Backups
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).
+
+## Backup Cronjobs
+
+Configure `.nextcloud.backupCronjobs` to install Kubernetes Cronjobs
+to backup the Nextcloud data volume. The Helm chart automatically
+adds `volumes` and `volumeMounts` to the Cronjobs to make the
+Nextcloud data folder accessible at the same paths as the Nextcloud
+containers. The Cronjobs also include all `extraVolumes` and
+`extraVolumeMounts`.
+
+Example:
+
+```yaml
+  backupCronjobs:
+    - name: backup
+      schedule: "15 * * * *"
+      concurrencyPolicy: Forbid
+      startingDeadlineSeconds: 300
+      successfulJobsHistoryLimit: 3
+      suspend: false
+      jobTemplate:
+        spec:
+          backoffLimit: 1
+          ttlSecondsAfterFinished: 300
+          template:
+            spec:
+              restartPolicy: Never
+              containers:
+                - name: restic
+                  image: restic/restic:0.16.4
+                  imagePullPolicy: IfNotPresent
+                  command:
+                    - /bin/sh
+                    - -c
+                    - "restic --quiet --json --host nextcloud-data --tag cron backup /var/www/html/data"
+                  env:
+                    - name: RESTIC_CACHE_DIR
+                      value: /run/restic/cache
+                    - name: RESTIC_CACERT
+                      value: /run/secrets/ca-cert/ca.crt
+                    - name: RESTIC_REPOSITORY
+                      valueFrom:
+                        secretKeyRef:
+                          name: nextcloud-restic-repository
+                          key: repository
+                    - name: RESTIC_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: nextcloud-restic-repository
+                          key: password
+                  volumeMounts:
+                    - name: ca-cert
+                      mountPath: /run/secrets/ca-cert
+                      readOnly: true
+                    - name: restic-cache
+                      mountPath: /run/restic/cache
+                      readOnly: false
+              terminationGracePeriodSeconds: 1
+              volumes:
+                - name: ca-cert
+                  secret:
+                    secretName: restic-ca-cert
+                - name: restic-cache
+                  emptyDir: {}
+```
+
+⚠️ *Please note that the Helm chart does not provide additional infrastructure (e.g., Kubernetes Secrets) to support backups.*
+
+See the [Kubernetes Cronjobs documentation](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) for more information.
 
 # Upgrades
 Since this chart utilizes the [nextcloud/docker](https://github.com/nextcloud/docker) image, provided you are using persistent volumes, [upgrades of your Nextcloud server are handled automatically](https://github.com/nextcloud/docker#update-to-a-newer-version) from one version to the next, however, you can only upgrade one major version at a time. For example, if you want to upgrade from version `25` to `27`, you will have to upgrade from version `25` to `26`, then from `26` to `27`. Since our docker tag is set via the [`appVersion` in `Chart.yaml`](https://github.com/nextcloud/helm/blob/main/charts/nextcloud/Chart.yaml#L4), you'll need to make sure you gradually upgrade the helm chart if you have missed serveral app versions.
