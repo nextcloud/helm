@@ -398,3 +398,23 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end -}}
+
+{{- define "nextcloud.backupCronJobVolumes" -}}
+{{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+- name: nextcloud-data
+  persistentVolumeClaim:
+    claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+{{- end }}
+{{- end -}}
+
+{{- define "nextcloud.backupCronJobVolumeMounts" -}}
+{{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+- name: nextcloud-data
+  mountPath: {{ .Values.nextcloud.datadir }}
+  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.nextcloudData.subPath) (empty .Values.persistence.nextcloudData.subPath) }}
+{{- else }}
+- name: nextcloud-main
+  mountPath: {{ .Values.nextcloud.datadir }}
+  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.subPath) (empty .Values.persistence.subPath) }}
+{{- end }}
+{{- end -}}

@@ -276,15 +276,48 @@ nextcloud:
   #    - name: nextcloud-data
   #      mountPath: /run/nextcloud/data
 
+  # Nextcloud data backup Cronjobs
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+  backupCronjobs: []
+    # - name: backup
+    #   schedule: "15 * * * *"
+    #   concurrencyPolicy: Forbid
+    #   startingDeadlineSeconds: 300
+    #   successfulJobsHistoryLimit: 3
+    #   suspend: true
+    #   jobTemplate:
+    #     spec:
+    #       backoffLimit: 1
+    #       ttlSecondsAfterFinished: 300
+    #       template:
+    #         spec:
+    #           restartPolicy: OnFailure
+    #           initContainers: []
+    #           containers:
+    #             - name: restic
+    #               image: restic/restic:0.16.4
+    #               imagePullPolicy: IfNotPresent
+    #               command:
+    #                 - /bin/sh
+    #                 - -c
+    #                 - restic backup
+    #           #     volumeMounts:
+    #           #       - name: privatedir
+    #           #         mountPath: /srv/private
+    #           #         readOnly: false
+    #           # volumes:
+    #           #   - name: privatedir
+    #           #     emptyDir: {}
+
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
-  extraVolumes:
+  extraVolumes: []
   #  - name: nfs
   #    nfs:
   #      server: "10.0.0.1"
   #      path: "/nextcloud_data"
   #      readOnly: false
-  extraVolumeMounts:
+  extraVolumeMounts: []
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
