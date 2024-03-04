@@ -16,12 +16,13 @@ spec:
     {{- $volumes := dict "spec" (dict "template" (dict "spec" (dict "volumes" $volumeList))) -}}
     {{- $jobTemplate := merge $volumes .jobTemplate -}}
 
-    {{/* Add the volumeMounts to every container */}}
+    {{/* Add the volumeMounts and environment variables to every container */}}
     {{- $containers := list -}}
     {{- range .jobTemplate.spec.template.spec.containers -}}
-    {{-   $vm := concat (default list .volumeMounts) (include "nextcloud.backupCronJobVolumeMounts" $ | fromYamlArray) -}}
-    {{-   $this := dict "volumeMounts" $vm -}}
-    {{-   $containers = append $containers (merge $this .) -}}
+    {{-   $vm := dict "volumeMounts" (concat (default list .volumeMounts) (include "nextcloud.backupCronJobVolumeMounts" $ | fromYamlArray)) -}}
+    {{-   $containers = append $containers (merge $vm .) -}}
+    {{-   $env := concat (default list .env) (include "nextcloud.backupCronJobEnv" $ | fromYamlArray) -}}
+    {{-   $containers = append $containers (merge (dict "env" $env) .) -}}
     {{- end -}}
 
     {{- $newContainers := dict "spec" (dict "template" (dict "spec" (dict "containers" $containers))) -}}

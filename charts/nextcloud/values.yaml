@@ -299,7 +299,7 @@ nextcloud:
   #                 command:
   #                   - /bin/sh
   #                   - -c
-  #                   - "restic --quiet --json --host nextcloud-data --tag cron backup /var/www/html/data"
+  #                   - "restic --quiet --json --host nextcloud-data --tag cron backup ${NEXTCLOUD_DATA_DIR}"
   #                 env:
   #                   - name: TZ
   #                     value: "Europe/Berlin"

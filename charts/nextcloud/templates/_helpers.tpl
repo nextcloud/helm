@@ -399,6 +399,11 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
 {{- end }}
 {{- end -}}
 
+{{- define "nextcloud.backupCronJobEnv" -}}
+- name: NEXTCLOUD_DATA_DIR
+  value: {{ .Values.nextcloud.datadir | quote }}
+{{- end -}}
+
 {{- define "nextcloud.backupCronJobVolumes" -}}
 {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
 - name: nextcloud-data
