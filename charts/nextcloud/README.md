@@ -629,8 +629,7 @@ Configure `.nextcloud.backupCronjobs` to install Kubernetes Cronjobs
 to backup the Nextcloud data volume. The Helm chart automatically
 adds `volumes` and `volumeMounts` to the Cronjobs to make the
 Nextcloud data folder accessible at the same paths as the Nextcloud
-containers. The Cronjobs also include all `extraVolumes` and
-`extraVolumeMounts`.
+containers.
 
 Example:
 
