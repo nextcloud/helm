@@ -528,9 +528,9 @@ Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server
 
 Configure `.nextcloud.backupCronjobs` to install Kubernetes Cronjobs
 to backup the Nextcloud data volume. The Helm chart automatically
-adds `volumes` and `volumeMounts` to the Cronjobs to make the
-Nextcloud data folder accessible at the same paths as the Nextcloud
-containers.
+shares the Nextcloud data folder to (`volumes`, `volumeMounts`) on the
+same path. Additionally, it provides the environment variable
+`NEXTCLOUD_DATA_DIR`.
 
 Example:
 
@@ -556,7 +556,7 @@ Example:
                   command:
                     - /bin/sh
                     - -c
-                    - "restic --quiet --json --host nextcloud-data --tag cron backup /var/www/html/data"
+                    - "restic --quiet --json --host nextcloud-data --tag cron backup ${NEXTCLOUD_DATA_DIR}"
                   env:
                     - name: RESTIC_CACHE_DIR
                       value: /run/restic/cache
