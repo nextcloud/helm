@@ -19,10 +19,10 @@ spec:
     {{/* Add the volumeMounts and environment variables to every container */}}
     {{- $containers := list -}}
     {{- range .jobTemplate.spec.template.spec.containers -}}
-    {{-   $vm := dict "volumeMounts" (concat (include "nextcloud.backupCronJobVolumeMounts" $ | fromYamlArray) (default list .volumeMounts)) -}}
-    {{    $c := merge $vm . }}
-    {{-   $env := dict "env" (concat (include "nextcloud.backupCronJobEnv" $ | fromYamlArray) (default list .env)) -}}
-    {{    $c = merge $env $c }}
+    {{-    $vm := dict "volumeMounts" (concat (include "nextcloud.backupCronJobVolumeMounts" $ | fromYamlArray) (default list .volumeMounts)) -}}
+    {{-    $c := merge $vm . -}}
+    {{-    $env := dict "env" (concat (include "nextcloud.backupCronJobEnv" $ | fromYamlArray) (default list .env)) -}}
+    {{-    $c = merge $env $c -}}
     {{-   $containers = append $containers $c -}}
     {{- end -}}
 
