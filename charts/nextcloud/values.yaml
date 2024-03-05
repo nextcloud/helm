@@ -201,7 +201,7 @@ nextcloud:
   #     concurrencyPolicy: Forbid
   #     startingDeadlineSeconds: 300
   #     successfulJobsHistoryLimit: 3
-  #     suspend: true
+  #     suspend: false
   #     jobTemplate:
   #       spec:
   #         backoffLimit: 1
