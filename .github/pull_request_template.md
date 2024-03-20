@@ -1,3 +1,5 @@
+<!-- Please do not bump the Chart version! -->
+
 # Pull Request
 
 ## Description of the change
@@ -24,5 +26,4 @@
 ## Checklist <!-- [Place an '[X]' (no spaces) in all applicable fields. Please remove unrelated fields.] -->
 
 - [ ] DCO has been [signed off on the commit](https://docs.github.com/en/github/authenticating-to-github/signing-commits).
-- [ ] Chart version bumped in `Chart.yaml` according to [semver](http://semver.org/).
 - [ ] (optional) Variables are documented in the README.md
