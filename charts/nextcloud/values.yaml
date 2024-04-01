@@ -355,6 +355,15 @@ redis:
     existingSecret: ""
     # Password key to be retrieved from existing secret
     existingSecretPasswordKey: ""
+  # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
+  global:
+    storageClass: ""
+  master:
+    persistence:
+      enabled: true
+  replica:
+    persistence:
+      enabled: true
 
 
 ## Cronjob to execute Nextcloud background tasks
