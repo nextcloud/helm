@@ -75,4 +75,12 @@ spec:
           securityContext:
             runAsUser: 1000
             runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
 {{- end }}
