@@ -9,8 +9,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
-  {{- with .Values.persistence.annotations }}
   annotations:
+    helm.sh/resource-policy: keep
+  {{- with .Values.persistence.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
