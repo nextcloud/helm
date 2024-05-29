@@ -3,12 +3,27 @@ name: Lint and Test Charts
 on:
   pull_request:
     paths:
-      - 'charts/nextcloud/Chart.yaml'
-      - 'charts/nextcloud/values.yaml'
-      - 'charts/nextcloud/templates/**'
 jobs:
+  changes:
+    runs-on: ubuntu-latest-low
+
+    outputs:
+      src: ${{ steps.changes.outputs.src}}
+
+    steps:
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: changes
+        continue-on-error: true
+        with:
+          filters: |
+            src:
+              - 'charts/nextcloud/Chart.yaml'
+              - 'charts/nextcloud/values.yaml'
+              - 'charts/nextcloud/templates/**'
+
   lint-test:
     runs-on: ubuntu-22.04
+    if: needs.changes.outputs.src != 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,3 +63,17 @@ jobs:
         id: install
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }}
+
+  summary:
+    permissions:
+      contents: none
+    runs-on: ubuntu-latest-low
+    if: always()
+    needs: [changes]
+
+    # This is the summary, we just avoid to rename it so that branch protection rules still match
+    name: Lint and Test Charts
+
+    steps:
+      - name: Summary status
+        run: if ${{ needs.changes.outputs.src != 'false' }}; then exit 1; fi
