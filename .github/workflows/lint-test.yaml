@@ -1,8 +1,6 @@
 name: Lint and Test Charts
 
-on:
-  pull_request:
-    paths:
+on: [pull_request]
 jobs:
   changes:
     runs-on: ubuntu-latest-low
@@ -20,6 +18,7 @@ jobs:
               - 'charts/nextcloud/Chart.yaml'
               - 'charts/nextcloud/values.yaml'
               - 'charts/nextcloud/templates/**'
+              - 'charts/nextcloud/tests/**'
 
   lint-test:
     runs-on: ubuntu-22.04
