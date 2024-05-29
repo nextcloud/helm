@@ -64,17 +64,3 @@ jobs:
         id: install
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }}
-
-  summary:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest-low
-    if: always()
-    needs: [changes]
-
-    # This is the summary, we just avoid to rename it so that branch protection rules still match
-    name: Lint and Test Charts
-
-    steps:
-      - name: Summary status
-        run: if ${{ needs.changes.outputs.src != 'false' }}; then exit 1; fi
