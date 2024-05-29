@@ -17,10 +17,12 @@ jobs:
     steps:
       - name: Get token
         id: get_token
-        uses: tibdex/github-app-token@v2.1.0
+        uses: actions/create-github-app-token@v1
         with:
-          private_key: ${{ secrets.PRIVATE_KEY }}
-          app_id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.private_key }}
+          app-id: ${{ secrets.app_id }}
+          owner: ${{ github.repository_owner }}
+          repositories: 'helm'
 
       - name: Checkout
         uses: actions/checkout@v4.1.6
