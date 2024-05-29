@@ -2,14 +2,10 @@ name: Lint and Test Charts
 
 on:
   pull_request:
-    paths-ignore:
-      - '.github/**'
-      - 'charts/**/README.md'
-      - 'CODE_OF_CONDUCT.md'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'README.md'
-
+    paths:
+      - 'charts/nextcloud/Chart.yaml'
+      - 'charts/nextcloud/values.yaml'
+      - 'charts/nextcloud/templates/**'
 jobs:
   lint-test:
     runs-on: ubuntu-22.04
