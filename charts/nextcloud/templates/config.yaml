@@ -123,7 +123,7 @@ data:
       );
     }
 {{- end }}
-{{- if index .Values.nextcloud.defaultConfigs "smtp.config.php" }}
+{{- if index .Values.nextcloud.defaultConfigs "s3.config.php" }}
   s3.config.php: |-
       <?php
       if (getenv('OBJECTSTORE_S3_BUCKET')) {
