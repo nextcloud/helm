@@ -1,5 +1,5 @@
-{{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled -}}
-{{- if not .Values.persistence.nextcloudData.existingClaim -}}
+{{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled (not .Values.persistence.nextcloudData.existingClaim) }}
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -10,22 +10,22 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
-{{- if .Values.persistence.nextcloudData.annotations }}
   annotations:
-{{ toYaml .Values.persistence.nextcloudData.annotations | indent 4 }}
-{{- end }}
+    helm.sh/resource-policy: keep
+  {{- with .Values.persistence.nextcloudData.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   accessModes:
     - {{ .Values.persistence.nextcloudData.accessMode | quote }}
   resources:
     requests:
       storage: {{ .Values.persistence.nextcloudData.size | quote }}
-{{- if .Values.persistence.nextcloudData.storageClass }}
-{{- if (eq "-" .Values.persistence.nextcloudData.storageClass) }}
+  {{- with .Values.persistence.nextcloudData.storageClass }}
+  {{- if (eq "-" .) }}
   storageClassName: ""
-{{- else }}
-  storageClassName: "{{ .Values.persistence.nextcloudData.storageClass }}"
+  {{- else }}
+  storageClassName: "{{ . }}"
+  {{- end }}
+  {{- end }}
 {{- end }}
-{{- end }}
-{{- end -}}
-{{- end -}}

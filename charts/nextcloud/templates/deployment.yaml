@@ -43,6 +43,7 @@ spec:
         {{- if .Values.nginx.enabled }}
         nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
         {{- end }}
+        hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -63,13 +64,13 @@ spec:
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:
@@ -136,6 +137,14 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
+            {{- end }}
+            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
@@ -151,8 +160,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -167,8 +176,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -183,8 +192,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -238,20 +247,20 @@ spec:
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-          - /cron.sh
+            - /cron.sh
           {{- with .Values.cronjob.lifecycle }}
           lifecycle:
             {{- with .postStartCommand }}
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:
@@ -347,6 +356,12 @@ spec:
         - name: nextcloud-nginx-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
+        {{- end }}
+        {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+        - name: nextcloud-hooks
+          configMap:
+            name: {{ template "nextcloud.fullname" . }}-hooks
+            defaultMode: 0o755
         {{- end }}
         {{- with .Values.nextcloud.extraVolumes }}
         {{- toYaml . | nindent 8 }}

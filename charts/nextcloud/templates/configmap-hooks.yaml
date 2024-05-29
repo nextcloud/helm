@@ -1,16 +1,18 @@
-{{- if .Values.nextcloud.phpConfigs -}}
+{{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "nextcloud.fullname" . }}-phpconfig
+  name: {{ template "nextcloud.fullname" . }}-hooks
   labels:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
     helm.sh/chart: {{ include "nextcloud.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
-  {{- range $key, $value := .Values.nextcloud.phpConfigs }}
-  {{ $key }}: |-
-{{ $value | indent 4 }}
+  {{- range $hook, $shell := .Values.nextcloud.hooks }}
+  {{- if $shell }}
+  {{ $hook }}.sh: {{ $shell | quote }}
+  {{- end }}
   {{- end }}
 {{- end }}
