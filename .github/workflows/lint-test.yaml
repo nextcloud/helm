@@ -23,6 +23,7 @@ jobs:
 
   lint-test:
     runs-on: ubuntu-22.04
+    needs: changes
     if: needs.changes.outputs.src != 'false'
     steps:
       - name: Checkout
