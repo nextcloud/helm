@@ -22,6 +22,7 @@ defaults:
       template:
         metadata:
           annotations:
+            hooks-hash: 9525c2748a6c7cd0e28ec740623d0b3fa5a75c83b51ccfd136bc89c76737b204
             nextcloud-config-hash: a5aae02b1b8278a9c8a2dc143e82d3737fc295f62c34afd617207f37d1b2b438
             php-config-hash: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
           labels:
@@ -110,7 +111,6 @@ defaults:
     apiVersion: v1
     data:
       nextcloud-password: Y2hhbmdlbWU=
-      nextcloud-token: YWJjZA==
       nextcloud-username: YWRtaW4=
     kind: Secret
     metadata:
