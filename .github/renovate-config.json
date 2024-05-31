@@ -6,5 +6,6 @@
     "platform": "github",
     "repositories": [
         "nextcloud/helm"
-    ]
+    ],
+    "allowedPostUpgradeCommands": ["^scripts"]
 }
