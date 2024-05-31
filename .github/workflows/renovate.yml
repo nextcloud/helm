@@ -1,7 +1,7 @@
 name: Renovate
 on:
   schedule:
-    # run hourly
+    # This should be every hour
     - cron: '0 * * * *'
   push:
     branches:
@@ -16,13 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get token
-        id: get_token
+        id: app-token
         uses: actions/create-github-app-token@v1
         with:
-          private-key: ${{ secrets.private_key }}
-          app-id: ${{ secrets.app_id }}
-          owner: ${{ github.repository_owner }}
-          repositories: 'helm'
+          private-key: ${{ secrets.PRIVATE_KEY }}
+          app-id: ${{ secrets.APP_ID }}
 
       - name: Checkout
         uses: actions/checkout@v4.1.6
@@ -30,5 +28,4 @@ jobs:
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v40.1.11
         with:
-          token: '${{ steps.get_token.outputs.token }}'
           configurationFile: .github/renovate-config.json
