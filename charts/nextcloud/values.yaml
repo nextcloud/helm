@@ -245,6 +245,11 @@ nginx:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
+  ## Extra environment variables
+  extraEnv: []
+  #  - name: SOME_ENV
+  #    value: ENV_VALUE
+
 internalDatabase:
   enabled: true
   name: nextcloud

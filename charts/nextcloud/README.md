@@ -147,6 +147,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nginx.config.custom`                                      | Specify a custom config for nginx                                                                   | `{}`                       |
 | `nginx.resources`                                          | nginx resources                                                                                     | `{}`                       |
 | `nginx.securityContext`                                    | Optional security context for the nginx container                                                   | `nil`                      |
+| `nginx.extraEnv`                                           | Optional environment variables for the nginx container                                              | `nil`                      |
 | `lifecycle.postStartCommand`                               | Specify deployment lifecycle hook postStartCommand                                                  | `nil`                      |
 | `lifecycle.preStopCommand`                                 | Specify deployment lifecycle hook preStopCommand                                                    | `nil`                      |
 | `redis.enabled`                                            | Whether to install/use redis for locking                                                            | `false`                    |
