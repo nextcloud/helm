@@ -1,0 +1,50 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "customManagers": [
+        {
+          "customType": "regex",
+          "datasourceTemplate": "docker",
+          "fileMatch": [
+            "(^|/)Chart\\.yaml$"
+          ],
+          "matchStrings": [
+            "#\\s*renovate: image=(?<depName>.*?)\\s+appVersion:\\s*[\"']?(?<currentValue>[\\w+\\.\\-]*)"
+          ]
+        }
+    ],
+    "packageRules": [
+      {
+        "description": "Fix subchart archives for helm chart",
+        "matchManagers": ["helmv3"],
+        "postUpdateOptions": ["helmUpdateSubChartArchives"]
+      },
+      {
+        "description": "Fix version in Chart.yaml after helmv3 dep patch updates",
+        "matchManagers": ["helmv3"],
+        "matchUpdateTypes": ["patch"],
+        "bumpVersion": "patch"
+      },
+      {
+        "description": "Fix version in Chart.yaml after helmv3 dep minor updates",
+        "matchManagers": ["helmv3"],
+        "matchUpdateTypes": ["minor"],
+        "bumpVersion": "minor"
+      },
+      {
+        "description": "Fix version in Chart.yaml after helmv3 dep major updates",
+        "matchManagers": ["helmv3"],
+        "matchUpdateTypes": ["major"],
+        "bumpVersion": "major"
+      },
+      {
+        "description": "Bump helm chart versions by a patch when updating values files. Digests, pins, rollbacks, replacements and pinDigest updates are deliberately ignored since in our use case, these need a manual decision about the version bump for the chart. This can be removed when https://github.com/renovatebot/renovate/issues/8231 is implemented and enabled.",
+        "matchManagers": ["helm-values", "regex"],
+        "postUpgradeTasks": {
+          "commands": [
+            "bash scripts/bump-chart-version.sh '{{{updateType}}}'"
+          ],
+          "fileFilters": ["**/Chart.yaml"]
+        }
+      }
+    ]
+}

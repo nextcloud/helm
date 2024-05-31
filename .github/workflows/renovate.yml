@@ -1,0 +1,34 @@
+name: Renovate
+on:
+  schedule:
+    # run hourly
+    - cron: '0 * * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/renovate-config.json"
+      - ".github/workflows/renovate.yml"
+      - "renovate.json"
+      - "scripts/**"
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get token
+        id: get_token
+        uses: actions/create-github-app-token@v1
+        with:
+          private-key: ${{ secrets.private_key }}
+          app-id: ${{ secrets.app_id }}
+          owner: ${{ github.repository_owner }}
+          repositories: 'helm'
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v40.1.11
+        with:
+          token: '${{ steps.get_token.outputs.token }}'
+          configurationFile: .github/renovate-config.json
