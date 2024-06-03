@@ -61,6 +61,18 @@ jobs:
     needs: [changes, lint]
     if: needs.changes.outputs.src != 'false'
     steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Add dependency chart repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
 
@@ -73,6 +85,18 @@ jobs:
     needs: [changes, lint]
     if: needs.changes.outputs.src != 'false'
     steps:
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Add dependency chart repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
 
