@@ -61,6 +61,11 @@ jobs:
     needs: [changes, lint]
     if: needs.changes.outputs.src != 'false'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
@@ -95,6 +100,11 @@ jobs:
     needs: [changes, lint]
     if: needs.changes.outputs.src != 'false'
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Install Helm
         uses: azure/setup-helm@v4
         with:
