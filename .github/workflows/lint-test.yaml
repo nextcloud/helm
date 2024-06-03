@@ -73,11 +73,21 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
+        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
         id: install
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }}
 
   test-postgresql-database:
@@ -97,11 +107,21 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
+        if: steps.list-changed.outputs.changed == 'true'
 
       - name: Run chart-testing (install)
         id: install
+        if: steps.list-changed.outputs.changed == 'true'
         run: |
             ct install --target-branch ${{ github.event.repository.default_branch }} \
             --helm-extra-set-args "--set=postgresql.enabled=true --set=postgresql.global.postgresql.auth.password=testing123456 --set=internalDatabase.enabled=false --set=externalDatabase.enabled=True --set=externalDatabase.type=postgresql --set=externalDatabase.password=testing123456"
