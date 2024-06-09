@@ -1,0 +1,15 @@
+{{- if and .Values.notifyPush.enabled .Values.notifyPush.autoSetup }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-notify-push
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+data:
+  hook.sh: |-
+    {{- tpl (.Files.Get "files/notify_push.sh.tpl" ) . | nindent 4 }}
+{{- end }}
