@@ -77,6 +77,12 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- if and .Values.notifyPush.enabled .Values.notifyPush.autoSetup }}
+            - name: nextcloud-notify-hooks
+              mountPath: /docker-entrypoint-hooks.d/before-starting/notify_push.sh
+              subPath: notify_push.sh
+              readOnly: true
+            {{- end }}
             {{- range $hook, $shell := .Values.nextcloud.hooks }}
             {{- if $shell }}
             - name: nextcloud-hooks
@@ -299,20 +305,11 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
           {{- end }}
           env:
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-                  key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-                  key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+            {{- include "nextcloud.env.database" . | nindent 12 }} 
           command:
             - "sh"
             - "-c"
-            - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
+            - {{ printf "until mysql --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" }}
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
           image: {{ coalesce .Values.global.image.registry .Values.postgresql.image.registry "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
@@ -323,13 +320,7 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
           {{- end }}
           env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-                  key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
-            - name: POSTGRES_HOST
-              value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
+            {{- include "nextcloud.env.database" . | nindent 12 }} 
           command:
             - "sh"
             - "-c"
@@ -387,6 +378,15 @@ spec:
         - name: nextcloud-nginx-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
+        {{- end }}
+        {{- if and .Values.notifyPush.enabled .Values.notifyPush.autoSetup }}
+        - name: nextcloud-notify-hooks
+          configMap:
+            name: {{ template "nextcloud.fullname" . }}-notify-push
+            defaultMode: 0o755
+            items:
+              - key: hook.sh
+                path: notify_push.sh
         {{- end }}
         {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
         - name: nextcloud-hooks
