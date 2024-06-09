@@ -127,8 +127,9 @@ nextcloud:
     smtp.config.php: true
   # Extra config files created in /var/www/html/config/
   # ref: https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
-  configs: {}
-    # defaultMode: 420
+  configs:
+    # set defaultMode for mounted configMaps (e.g. defaultMode: 420)
+    defaultMode: 420
 
   # For example, to use S3 as primary storage
   # ref: https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
