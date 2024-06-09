@@ -1,29 +1,32 @@
 {{- if .Values.metrics.enabled }}
+{{- with .Values.metrics.service }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "nextcloud.fullname" . }}-metrics
+  name: {{ template "nextcloud.fullname" $ }}-metrics
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
-    {{- with .Values.metrics.service.labels }}
+    app.kubernetes.io/monitor: enabled
+    {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.metrics.service.annotations }}
+  {{- with .annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.metrics.service.type }}
-  {{- if eq .Values.metrics.service.type "LoadBalancer" }}
-  {{- with .Values.metrics.service.loadBalancerIP }}
+  type: {{ .type }}
+  {{- if eq .type "LoadBalancer" }}
+  {{- with .loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
   {{- end }}
-  ports:
-    - name: metrics
-      port: 9205
-      targetPort: metrics
   selector:
     {{- include "nextcloud.selectorLabels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
+  ports:
+    - name: http
+      port: 9100
+      targetPort: metrics
+{{- end }}
 {{- end }}
