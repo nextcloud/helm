@@ -1,0 +1,10 @@
+redis:
+  enabled: true
+
+internalDatabase:
+  enabled: false
+mariadb:
+  enabled: true
+
+notifyPush:
+  enabled: true
