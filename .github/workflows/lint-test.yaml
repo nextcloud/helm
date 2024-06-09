@@ -83,6 +83,10 @@ jobs:
           - name: Horizontal Pod Autoscaling Enabled
             helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/hpa.yaml"'
 
+          # test the helm chart with notify push enabled
+          - name: Notify Push Enabled
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/notify_push.yaml"'
+
           # test the helm chart with s3 as the primary storage
           - name: S3 Enabled as Primary Storage
             # we need to skip the clean up so we can test adding a file
