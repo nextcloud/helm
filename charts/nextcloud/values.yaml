@@ -400,11 +400,16 @@ externalDatabase:
   ## Use a existing secret
   existingSecret:
     enabled: false
-    # secretName: nameofsecret
+    # -- e.g. nameofsecret
+    secretName:
     usernameKey: db-username
     passwordKey: db-password
-    # hostKey: db-hostname-or-ip
-    # databaseKey: db-name
+    # -- e.g. db-hostname-or-ip
+    hostKey:
+    # -- e.g. db-name
+    databaseKey:
+    # -- complete URL with type, username and password (current only for notify_push used)
+    databaseURLKey: db-url
 
 ##
 ## MariaDB chart configuration
@@ -675,12 +680,52 @@ tolerations: []
 
 affinity: {}
 
-dnsConfig: {}
-# Custom dns config for Nextcloud containers.
-# You can for example configure ndots. This may be needed in some clusters with alpine images.
-# options:
-#   - name: ndots
-#     value: "1"
+dnsConfig:
+  # -- Custom dns config for Nextcloud containers.
+  # You can for example configure ndots. This may be needed in some clusters with alpine images.
+  # options:
+  #   - name: ndots
+  #     value: "1"
+  options: []
+
+
+# Notify Push (Clientpush)
+notifyPush:
+  # -- enable another deployment to handle notify_push (sometimes called ClientPush)
+  enabled: false
+  autoSetup: false
+
+  replicaCount: 1
+
+  image:
+    registry: docker.io
+    # -- image of notify_push (there is no official image yet: https://github.com/nextcloud/notify_push/issues/106)
+    repository: miles170/notify_push
+    # -- notify-push image tag
+    # @section -- Notify Push (Clientpush)
+    tag: v1.0.0
+    # -- notify-push image pull policy
+    # @section -- Notify Push (Clientpush)
+    pullPolicy: IfNotPresent
+    pullSecrets:
+    #   - myRegistrKeySecretName
+
+  resources: {}
+
+  podAnnotations: {}
+  podLabels: {}
+
+  service:
+    type: ClusterIP
+    # -- Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
+    loadBalancerIP:
+    annotations: {}
+    labels: {}
+
+  ingress:
+    # -- patch default ingress to forward following path to notify_push service
+    path: /push
+    pathType: Prefix
 
 imaginary:
   # -- Start Imgaginary
@@ -827,8 +872,9 @@ metrics:
   # seccompProfile:
   #   type: RuntimeDefault
 
+prometheus:
   ## Prometheus Operator ServiceMonitor configuration
-  ##
+  ## collects data from nextcloud metrics and notify_push if enabled
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
