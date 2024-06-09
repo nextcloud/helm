@@ -147,6 +147,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nginx.config.custom`                                      | Specify a custom config for nginx                                                                   | `{}`                       |
 | `nginx.resources`                                          | nginx resources                                                                                     | `{}`                       |
 | `nginx.securityContext`                                    | Optional security context for the nginx container                                                   | `nil`                      |
+| `nginx.extraEnv`                                           | Optional environment variables for the nginx container                                              | `nil`                      |
 | `lifecycle.postStartCommand`                               | Specify deployment lifecycle hook postStartCommand                                                  | `nil`                      |
 | `lifecycle.preStopCommand`                                 | Specify deployment lifecycle hook preStopCommand                                                    | `nil`                      |
 | `redis.enabled`                                            | Whether to install/use redis for locking                                                            | `false`                    |
@@ -257,6 +258,7 @@ Is there a missing parameter for one of the Bitnami helm charts listed above? Pl
 
 The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at the `/var/www/html` paths of the container.
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
+Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
 
 | Parameter                                                            | Description                                                                            | Default                                      |
@@ -287,7 +289,7 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.timeout`                      | When the scrape times out                                                    | `5s`                                                         |
 | `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                           | `false`                                                      |
 | `metrics.image.repository`             | Nextcloud metrics exporter image name                                        | `xperimental/nextcloud-exporter`                             |
-| `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                         | `0.6.0`                                                      |
+| `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                         | `0.6.2`                                                      |
 | `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                 | `IfNotPresent`                                               |
 | `metrics.image.pullSecrets`            | Nextcloud metrics exporter image pull secrets                                | `nil`                                                        |
 | `metrics.podAnnotations`               | Additional annotations for metrics exporter                                  | not set                                                      |
@@ -463,16 +465,16 @@ nextcloud:
   extraVolumeMounts:
     - name: hugepages
       mountPath: /dev/hugepages
-  resources:
-    requests:
-      hugepages-2Mi: 500Mi
-      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-      memory: 500Mi
-    limits:
-      # limit and request must be the same for hugepages. They are a fixed resource.
-      hugepages-2Mi: 500Mi
-      # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-      memory: 1Gi
+resources:
+  requests:
+    hugepages-2Mi: 500Mi
+    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+    memory: 500Mi
+  limits:
+    # limit and request must be the same for hugepages. They are a fixed resource.
+    hugepages-2Mi: 500Mi
+    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
+    memory: 1Gi
 ```
 
 ## HPA (Clustering)
