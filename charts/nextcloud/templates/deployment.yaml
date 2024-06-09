@@ -139,6 +139,12 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- if and .Values.notifyPush.enabled .Values.notifyPush.autoSetup }}
+            - name: nextcloud-notify-hooks
+              mountPath: /docker-entrypoint-hooks.d/before-starting/notify_push.sh
+              subPath: notify_push.sh
+              readOnly: true
+            {{- end }}
             {{- range $hook, $shell := .Values.nextcloud.hooks }}
             {{- if $shell }}
             - name: nextcloud-hooks
@@ -370,6 +376,15 @@ spec:
         - name: nextcloud-nginx-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
+        {{- end }}
+        {{- if and .Values.notifyPush.enabled .Values.notifyPush.autoSetup }}
+        - name: nextcloud-notify-hooks
+          configMap:
+            name: {{ template "nextcloud.fullname" . }}-notify-push
+            defaultMode: 0o755
+            items:
+              - key: hook.sh
+                path: notify_push.sh
         {{- end }}
         {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
         - name: nextcloud-hooks
