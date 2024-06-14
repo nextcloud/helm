@@ -487,6 +487,7 @@ affinity: {}
 # Notify Push (Clientpush)
 notifyPush:
   enabled: false
+  autoSetup: false
 
   replicaCount: 1
 
