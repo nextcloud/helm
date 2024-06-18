@@ -52,7 +52,7 @@ spec:
                   name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
                   key: {{ .Values.externalDatabase.existingSecret.databaseURLKey }}
             - name: REDIS_URL
-              value: "redis://{{ template "nextcloud.redis.fullname" . }}-master:{{ .Values.redis.master.service.ports.redis }}"
+              value: "redis://{{ if .Values.redis.auth.enabled }}:{{ .Values.redis.auth.password }}@{{ end }}{{ template "nextcloud.redis.fullname" . }}-master:{{ .Values.redis.master.service.ports.redis }}"
             - name: NEXTCLOUD_URL # deployment.namespace.svc.cluster.local
               value: "http{{ if .Values.notifyPush.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
           ports:
