@@ -38,10 +38,9 @@ spec:
       containers:
         - name: notify-push
           {{- with .Values.notifyPush.image }}
-          image: "{{ coalesce $.Values.global.image.registry .registry }}/{{ .repository }}:{{ .tag }}"
-          imagePullPolicy: {{ coalesce $.Values.global.image.pullPolicy .pullPolicy }}
+          image: "{{ .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
-          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           env:
             - name: PORT
               value: "7867"
