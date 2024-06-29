@@ -295,7 +295,7 @@ spec:
           image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
           {{- with .Values.nextcloud.mariadbInitContainerSecurityContext }}
           securityContext:
-              {{- toYaml . | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
             - name: MYSQL_USER
@@ -317,7 +317,7 @@ spec:
           image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
           {{- with .Values.nextcloud.postgresqlInitContainerSecurityContext }}
           securityContext:
-              {{- toYaml . | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
             - name: POSTGRES_USER
