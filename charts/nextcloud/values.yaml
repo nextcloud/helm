@@ -213,6 +213,12 @@ nextcloud:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: false
 
+  # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+  mariadbInitContainerSecurityContext: {}
+
+  # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+  postgresqlInitContainerSecurityContext: {}
+
   # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
   podSecurityContext: {}
   #   runAsUser: 33
