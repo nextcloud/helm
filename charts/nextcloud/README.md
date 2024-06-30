@@ -291,6 +291,8 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.image.repository`             | Nextcloud metrics exporter image name                                        | `xperimental/nextcloud-exporter`                             |
 | `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                         | `0.6.2`                                                      |
 | `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                 | `IfNotPresent`                                               |
+| `metrics.nginx.enabled`                | Start NGINX metrics configuration                                            | `false`                                                      |
+| `metrics.nginx.allow`                  | NGINX metrics configuration allow list                                       | not set                                                      |
 | `metrics.image.pullSecrets`            | Nextcloud metrics exporter image pull secrets                                | `nil`                                                        |
 | `metrics.podAnnotations`               | Additional annotations for metrics exporter                                  | not set                                                      |
 | `metrics.podLabels`                    | Additional labels for metrics exporter                                       | not set                                                      |
