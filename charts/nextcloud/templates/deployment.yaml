@@ -293,7 +293,7 @@ spec:
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
           image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
-          {{- with .Values.nextcloud.mariadbInitContainerSecurityContext }}
+          {{- with .Values.nextcloud.mariaDbInitContainer.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -315,7 +315,7 @@ spec:
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
           image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
-          {{- with .Values.nextcloud.postgresqlInitContainerSecurityContext }}
+          {{- with .Values.nextcloud.postgreSqlInitContainer.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
