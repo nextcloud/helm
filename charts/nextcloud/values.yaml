@@ -220,6 +220,17 @@ nextcloud:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: false
 
+  # Settings for the MariaDB init container
+  mariaDbInitContainer:
+    # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+  # Settings for the PostgreSQL init container
+  postgreSqlInitContainer:
+    # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
