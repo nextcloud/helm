@@ -497,6 +497,9 @@ metrics:
   enabled: false
 
   replicaCount: 1
+  # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
+  # Without it, we will use the full name of the nextcloud service
+  server: ""
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
   # Use API token if set, otherwise fall back to password authentication
@@ -506,6 +509,10 @@ metrics:
   timeout: 5s
   # if set to true, exporter skips certificate verification of Nextcloud server.
   tlsSkipVerify: false
+  info:
+    # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
+    # Enables gathering of apps-related metrics. Defaults to false
+    apps: false
 
   image:
     repository: xperimental/nextcloud-exporter
