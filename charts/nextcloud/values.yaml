@@ -581,6 +581,9 @@ rbac:
     name: nextcloud-serviceaccount
     annotations: {}
 
+clientPush:
+  enabled: true
+
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
