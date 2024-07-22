@@ -149,6 +149,10 @@ spec:
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          {{- with .Values.nginx.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               protocol: TCP
@@ -289,6 +293,10 @@ spec:
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
           image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          {{- with .Values.nextcloud.mariaDbInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: MYSQL_USER
               valueFrom:
@@ -307,6 +315,10 @@ spec:
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
           image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          {{- with .Values.nextcloud.postgreSqlInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: POSTGRES_USER
               valueFrom:

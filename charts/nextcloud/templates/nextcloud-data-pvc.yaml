@@ -10,8 +10,9 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/component: app
-  {{- with .Values.persistence.nextcloudData.annotations }}
   annotations:
+    helm.sh/resource-policy: keep
+  {{- with .Values.persistence.nextcloudData.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
