@@ -220,6 +220,17 @@ nextcloud:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: false
 
+  # Settings for the MariaDB init container
+  mariaDbInitContainer:
+    # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+  # Settings for the PostgreSQL init container
+  postgreSqlInitContainer:
+    # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
@@ -244,6 +255,11 @@ nginx:
   #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
+
+  ## Extra environment variables
+  extraEnv: []
+  #  - name: SOME_ENV
+  #    value: ENV_VALUE
 
 internalDatabase:
   enabled: true
@@ -490,6 +506,9 @@ metrics:
   enabled: false
 
   replicaCount: 1
+  # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
+  # Without it, we will use the full name of the nextcloud service
+  server: ""
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
   # Use API token if set, otherwise fall back to password authentication
@@ -499,6 +518,10 @@ metrics:
   timeout: 5s
   # if set to true, exporter skips certificate verification of Nextcloud server.
   tlsSkipVerify: false
+  info:
+    # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
+    # Enables gathering of apps-related metrics. Defaults to false
+    apps: false
 
   image:
     repository: xperimental/nextcloud-exporter
