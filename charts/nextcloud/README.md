@@ -175,33 +175,33 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `rbac.enabled`                                             | Enable Role and rolebinding for priveledged PSP                                                     | `false`                    |
 | `rbac.serviceaccount.create`                               | Wether to create a serviceaccount or use an existing one (requires rbac)                            | `true`                     |
 | `rbac.serviceaccount.name`                                 | The name of the sevice account that the deployment will use (requires rbac)                         | `nextcloud-serviceaccount` |
-| `rbac.serviceaccount.annotations`                          | Serviceaccount annotations                                                                          | `{}`                      |
-| `livenessProbe.enabled`                                    | Turn on and off liveness probe                                                                      | `true`                    |
-| `livenessProbe.initialDelaySeconds`                        | Delay before liveness probe is initiated                                                            | `10`                      |
-| `livenessProbe.periodSeconds`                              | How often to perform the probe                                                                      | `10`                      |
-| `livenessProbe.timeoutSeconds`                             | When the probe times out                                                                            | `5`                       |
-| `livenessProbe.failureThreshold`                           | Minimum consecutive failures for the probe                                                          | `3`                       |
-| `livenessProbe.successThreshold`                           | Minimum consecutive successes for the probe                                                         | `1`                       |
-| `readinessProbe.enabled`                                   | Turn on and off readiness probe                                                                     | `true`                    |
-| `readinessProbe.initialDelaySeconds`                       | Delay before readiness probe is initiated                                                           | `10`                      |
-| `readinessProbe.periodSeconds`                             | How often to perform the probe                                                                      | `10`                      |
-| `readinessProbe.timeoutSeconds`                            | When the probe times out                                                                            | `5`                       |
-| `readinessProbe.failureThreshold`                          | Minimum consecutive failures for the probe                                                          | `3`                       |
-| `readinessProbe.successThreshold`                          | Minimum consecutive successes for the probe                                                         | `1`                       |
-| `startupProbe.enabled`                                     | Turn on and off startup probe                                                                       | `false`                   |
-| `startupProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated                                                           | `30`                      |
-| `startupProbe.periodSeconds`                               | How often to perform the probe                                                                      | `10`                      |
-| `startupProbe.timeoutSeconds`                              | When the probe times out                                                                            | `5`                       |
-| `startupProbe.failureThreshold`                            | Minimum consecutive failures for the probe                                                          | `30`                      |
-| `startupProbe.successThreshold`                            | Minimum consecutive successes for the probe                                                         | `1`                       |
-| `hpa.enabled`                                              | Boolean to create a HorizontalPodAutoscaler                                                         | `false`                   |
-| `hpa.cputhreshold`                                         | CPU threshold percent for the HorizontalPodAutoscale                                                | `60`                      |
-| `hpa.minPods`                                              | Min. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `1`                       |
-| `hpa.maxPods`                                              | Max. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `10`                      |
-| `deploymentLabels`                                         | Labels to be added at 'deployment' level                                                            | not set                   |
-| `deploymentAnnotations`                                    | Annotations to be added at 'deployment' level                                                       | not set                   |
-| `podLabels`                                                | Labels to be added at 'pod' level                                                                   | not set                   |
-| `podAnnotations`                                           | Annotations to be added at 'pod' level                                                              | not set                   |
+| `rbac.serviceaccount.annotations`                          | Serviceaccount annotations                                                                          | `{}`                       |
+| `livenessProbe.enabled`                                    | Turn on and off liveness probe                                                                      | `true`                     |
+| `livenessProbe.initialDelaySeconds`                        | Delay before liveness probe is initiated                                                            | `10`                       |
+| `livenessProbe.periodSeconds`                              | How often to perform the probe                                                                      | `10`                       |
+| `livenessProbe.timeoutSeconds`                             | When the probe times out                                                                            | `5`                        |
+| `livenessProbe.failureThreshold`                           | Minimum consecutive failures for the probe                                                          | `3`                        |
+| `livenessProbe.successThreshold`                           | Minimum consecutive successes for the probe                                                         | `1`                        |
+| `readinessProbe.enabled`                                   | Turn on and off readiness probe                                                                     | `true`                     |
+| `readinessProbe.initialDelaySeconds`                       | Delay before readiness probe is initiated                                                           | `10`                       |
+| `readinessProbe.periodSeconds`                             | How often to perform the probe                                                                      | `10`                       |
+| `readinessProbe.timeoutSeconds`                            | When the probe times out                                                                            | `5`                        |
+| `readinessProbe.failureThreshold`                          | Minimum consecutive failures for the probe                                                          | `3`                        |
+| `readinessProbe.successThreshold`                          | Minimum consecutive successes for the probe                                                         | `1`                        |
+| `startupProbe.enabled`                                     | Turn on and off startup probe                                                                       | `false`                    |
+| `startupProbe.initialDelaySeconds`                         | Delay before readiness probe is initiated                                                           | `30`                       |
+| `startupProbe.periodSeconds`                               | How often to perform the probe                                                                      | `10`                       |
+| `startupProbe.timeoutSeconds`                              | When the probe times out                                                                            | `5`                        |
+| `startupProbe.failureThreshold`                            | Minimum consecutive failures for the probe                                                          | `30`                       |
+| `startupProbe.successThreshold`                            | Minimum consecutive successes for the probe                                                         | `1`                        |
+| `hpa.enabled`                                              | Boolean to create a HorizontalPodAutoscaler                                                         | `false`                    |
+| `hpa.cputhreshold`                                         | CPU threshold percent for the HorizontalPodAutoscale                                                | `60`                       |
+| `hpa.minPods`                                              | Min. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `1`                        |
+| `hpa.maxPods`                                              | Max. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `10`                       |
+| `deploymentLabels`                                         | Labels to be added at 'deployment' level                                                            | not set                    |
+| `deploymentAnnotations`                                    | Annotations to be added at 'deployment' level                                                       | not set                    |
+| `podLabels`                                                | Labels to be added at 'pod' level                                                                   | not set                    |
+| `podAnnotations`                                           | Annotations to be added at 'pod' level                                                              | not set                    |
 
 
 ### Database Configurations
