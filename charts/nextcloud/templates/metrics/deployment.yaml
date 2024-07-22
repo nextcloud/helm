@@ -59,12 +59,19 @@ spec:
                   key: {{ .Values.nextcloud.existingSecret.passwordKey }}
             {{- end }}
             # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
+            {{- if not .Values.metrics.server }}
             - name: NEXTCLOUD_SERVER # deployment.namespace.svc.cluster.local
               value: "http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            {{- else }}
+            - name: NEXTCLOUD_SERVER
+              value: {{ .Values.metrics.server }}
+            {{- end }}
             - name: NEXTCLOUD_TIMEOUT
               value: {{ .Values.metrics.timeout }}
             - name: NEXTCLOUD_TLS_SKIP_VERIFY
               value: {{ .Values.metrics.tlsSkipVerify | quote }}
+            - name: NEXTCLOUD_INFO_APPS
+              value: {{ .Values.metrics.info.apps | quote }}
           ports:
             - name: metrics
               containerPort: 9205
