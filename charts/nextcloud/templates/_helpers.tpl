@@ -178,7 +178,7 @@ Create environment variables used to configure the nextcloud container as well a
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
       key: {{ .Values.nextcloud.existingSecret.passwordKey }}
 - name: NEXTCLOUD_TRUSTED_DOMAINS
-  value: {{ .Values.nextcloud.host }}
+  value: {{ .Values.nextcloud.host }}{{ if .Values.metrics.enabled }} {{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ end }}
 {{- if ne (int .Values.nextcloud.update) 0 }}
 - name: NEXTCLOUD_UPDATE
   value: {{ .Values.nextcloud.update | quote }}
