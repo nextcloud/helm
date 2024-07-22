@@ -155,6 +155,9 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.auth.password`                                      | The password redis uses                                                                             | `''`                       |
 | `redis.auth.existingSecret`                                | The name of an existing secret with Redis® credentials                                              | `''`                       |
 | `redis.auth.existingSecretPasswordKey`                     | Password key to be retrieved from existing secret                                                   | `''`                       |
+| `redis.global.storageClass`                                | PVC Storage Class  for both Redis&reg; master and replica Persistent Volumes                        | `''`                       |
+| `redis.master.persistence.enabled`                         | Enable persistence on Redis&reg; master nodes using Persistent Volume Claims                        | `true`                     |
+| `redis.replica.persistence.enabled`                        | Enable persistence on Redis&reg; replica nodes using Persistent Volume Claims                       | `true`                     |
 | `cronjob.enabled`                                          | Whether to enable/disable cron jobs sidecar                                                         | `false`                    |
 | `cronjob.lifecycle.postStartCommand`                       | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                      |
 | `cronjob.lifecycle.preStopCommand`                         | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                          | `nil`                      |
@@ -162,6 +165,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.securityContext`                                  | Optional security context for cron jobs sidecar                                                     | `nil`                      |
 | `service.type`                                             | Kubernetes Service type                                                                             | `ClusterIP`                |
 | `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer                                                        | `""`                       |
+| `service.annotations`                                      | Annotations for service type                                                                        | `{}`                       |
 | `service.nodePort`                                         | NodePort for service type NodePort                                                                  | `nil`                      |
 | `service.ipFamilies`                                       | Set ipFamilies as in k8s service objects                                                            | `nil`                      |
 | `service.ipFamyPolicy`                                     | define IP protocol bindings as in k8s service objects                                               | `nil`                      |
