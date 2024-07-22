@@ -165,6 +165,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.securityContext`                                  | Optional security context for cron jobs sidecar                                                     | `nil`                      |
 | `service.type`                                             | Kubernetes Service type                                                                             | `ClusterIP`                |
 | `service.loadBalancerIP`                                   | LoadBalancerIp for service type LoadBalancer                                                        | `""`                       |
+| `service.annotations`                                      | Annotations for service type                                                                        | `{}`                       |
 | `service.nodePort`                                         | NodePort for service type NodePort                                                                  | `nil`                      |
 | `service.ipFamilies`                                       | Set ipFamilies as in k8s service objects                                                            | `nil`                      |
 | `service.ipFamyPolicy`                                     | define IP protocol bindings as in k8s service objects                                               | `nil`                      |
