@@ -374,6 +374,15 @@ redis:
     existingSecret: ""
     # Password key to be retrieved from existing secret
     existingSecretPasswordKey: ""
+  # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
+  global:
+    storageClass: ""
+  master:
+    persistence:
+      enabled: true
+  replica:
+    persistence:
+      enabled: true
 
 
 ## Cronjob to execute Nextcloud background tasks
@@ -404,6 +413,9 @@ service:
   port: 8080
   loadBalancerIP: ""
   nodePort: nil
+  annotations: {}
+    ## Insert your annotations such as below
+    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
