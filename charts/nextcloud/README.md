@@ -22,15 +22,24 @@ helm install my-release nextcloud/nextcloud
 * [Cron jobs](#cron-jobs)
 * [Multiple config.php file](#multiple-configphp-file)
 * [Using nginx](#using-nginx)
+    * [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
 * [Preserving Source IP](#preserving-source-ip)
 * [Hugepages](#hugepages)
 * [HPA (Clustering)](#hpa-clustering)
+* [Adjusting PHP ini values](#adjusting-php-ini-values)
 * [Running `occ` commands](#running-occ-commands)
     * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
     * [Downloading models for recognize](#downloading-models-for-recognize)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
 * [Troubleshooting](#troubleshooting)
+    * [Logging](#logging)
+        * [Changing the logging behavior](#changing-the-logging-behavior)
+        * [Viewing the logs](#viewing-the-logs)
+            * [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
+            * [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
+            * [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
+        * [Sharing the logs](#sharing-the-logs)
 
 ## Introduction
 
@@ -494,6 +503,20 @@ persistence:
   enabled: true
   accessMode: ReadWriteMany
 ```
+
+## Adjusting PHP ini values
+
+Sometimes you may need special [`php.ini`](https://www.php.net/manual/en/ini.list.php) values. For instance, perhaps your setup requires a bit more memory. You can add additional `php.ini` files in the values.yaml by providing `nextcloud.phpConfigs.NAME_OF_FILE`. Here's an examples:
+
+```yaml
+nextcloud:
+  phpConfigs:
+    zz-memory_limit.ini: |-
+      memory_limit=512M
+```
+
+> [!Note]
+> Be sure to prefix your file name with `zz` to ensure it is loaded at the end.
 
 
 ## Running `occ` commands
