@@ -202,6 +202,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `deploymentAnnotations`                                    | Annotations to be added at 'deployment' level                                                       | not set                    |
 | `podLabels`                                                | Labels to be added at 'pod' level                                                                   | not set                    |
 | `podAnnotations`                                           | Annotations to be added at 'pod' level                                                              | not set                    |
+| `dnsConfig`                                                | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
 
 
 ### Database Configurations
