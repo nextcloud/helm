@@ -30,7 +30,7 @@ helm install my-release nextcloud/nextcloud
     * [Downloading models for recognize](#downloading-models-for-recognize)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
-* [Two or more replicas with traefik](https://github.com/nextcloud/helm/tree/main/charts/nextcloud#Two-or-more-replicas-with-traefik)
+* [Two or more replicas with traefik](#Two-or-more-replicas-with-traefik)
 * [Troubleshooting](#troubleshooting)
 
 ## Introduction
