@@ -80,7 +80,7 @@ jobs:
 
           # test the helm chart with horizontal pod autoscaling enabled
           - name: Horizontal Pod Autoscaling Enabled
-            helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=1 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
+            helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=2 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
 
     steps:
       - name: Checkout
