@@ -17,7 +17,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   strategy:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
@@ -395,4 +397,8 @@ spec:
         {{- end }}{{/* end-with podSecurityContext */}}
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
       {{- end }}

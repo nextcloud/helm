@@ -203,7 +203,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `startupProbe.timeoutSeconds`                              | When the probe times out                                                                            | `5`                        |
 | `startupProbe.failureThreshold`                            | Minimum consecutive failures for the probe                                                          | `30`                       |
 | `startupProbe.successThreshold`                            | Minimum consecutive successes for the probe                                                         | `1`                        |
-| `hpa.enabled`                                              | Boolean to create a HorizontalPodAutoscaler                                                         | `false`                    |
+| `hpa.enabled`                                              | Boolean to create a HorizontalPodAutoscaler. If set to `true`, ignores `replicaCount`.              | `false`                    |
 | `hpa.cputhreshold`                                         | CPU threshold percent for the HorizontalPodAutoscale                                                | `60`                       |
 | `hpa.minPods`                                              | Min. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `1`                        |
 | `hpa.maxPods`                                              | Max. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `10`                       |
@@ -211,6 +211,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `deploymentAnnotations`                                    | Annotations to be added at 'deployment' level                                                       | not set                    |
 | `podLabels`                                                | Labels to be added at 'pod' level                                                                   | not set                    |
 | `podAnnotations`                                           | Annotations to be added at 'pod' level                                                              | not set                    |
+| `dnsConfig`                                                | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
 
 
 ### Database Configurations

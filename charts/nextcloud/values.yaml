@@ -505,6 +505,12 @@ tolerations: []
 
 affinity: {}
 
+dnsConfig: {}
+# Custom dns config for Nextcloud containers.
+# You can for example configure ndots. This may be needed in some clusters with alpine images.
+# options:
+#   - name: ndots
+#     value: "1"
 
 ## Prometheus Exporter / Metrics
 ##
