@@ -17,7 +17,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   strategy:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
@@ -293,6 +295,10 @@ spec:
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
           image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          {{- with .Values.nextcloud.mariaDbInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: MYSQL_USER
               valueFrom:
@@ -311,6 +317,10 @@ spec:
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
           image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          {{- with .Values.nextcloud.postgreSqlInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -396,4 +406,8 @@ spec:
         {{- end }}{{/* end-with podSecurityContext */}}
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
       {{- end }}
