@@ -234,15 +234,18 @@ nextcloud:
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
+
   image:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
+
   containerPort: 80
 
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    custom:
     # custom: |-
     #     worker_processes  1;..
 
