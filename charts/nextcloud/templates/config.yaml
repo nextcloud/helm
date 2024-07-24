@@ -16,7 +16,7 @@ data:
   {{- range $filename, $enabled := .Values.nextcloud.defaultConfigs }}
   {{- if $enabled }}
   {{ $filename }}: |-
-    {{- tpl ($.Files.Get (printf "files/defaultConfigs/%s.gotmpl" $filename)) $ | nindent 4 }}
+    {{- tpl ($.Files.Get (printf "files/defaultConfigs/%s.tpl" $filename)) $ | nindent 4 }}
   {{- end }}
   {{- end }}
 {{- end }}{{/* end-if configs */}}

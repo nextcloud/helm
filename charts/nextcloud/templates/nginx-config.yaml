@@ -12,7 +12,7 @@ metadata:
 data:
   {{- if .Values.nginx.config.default }}
   default.conf: |-
-    {{- tpl (.Files.Get "files/nginx.config.gotmpl") . | nindent 4 }}
+    {{- tpl (.Files.Get "files/nginx.config.tpl") . | nindent 4 }}
   {{- end }}
   {{- with .Values.nginx.config.custom }}
   zz-custom.conf: |-
