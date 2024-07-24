@@ -17,7 +17,9 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   strategy:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
@@ -43,6 +45,7 @@ spec:
         {{- if .Values.nginx.enabled }}
         nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
         {{- end }}
+        hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -63,13 +66,13 @@ spec:
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:
@@ -136,10 +139,22 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
+            {{- end }}
+            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          {{- with .Values.nginx.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               protocol: TCP
@@ -151,8 +166,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -167,8 +182,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -183,8 +198,8 @@ spec:
               path: /status.php
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -238,20 +253,20 @@ spec:
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-          - /cron.sh
+            - /cron.sh
           {{- with .Values.cronjob.lifecycle }}
           lifecycle:
             {{- with .postStartCommand }}
             postStart:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
             {{- with .preStopCommand }}
             preStop:
               exec:
                 command:
-                  {{- toYaml . | nindent 18 -}}
+                  {{- toYaml . | nindent 18 }}
             {{- end }}
           {{- end }}
           env:
@@ -279,7 +294,11 @@ spec:
         {{- end }}
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
-          image: {{ .Values.mariadb.image.registry }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          {{- with .Values.nextcloud.mariaDbInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: MYSQL_USER
               valueFrom:
@@ -297,7 +316,11 @@ spec:
             - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
-          image: {{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          {{- with .Values.nextcloud.postgreSqlInitContainer.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -348,6 +371,12 @@ spec:
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
         {{- end }}
+        {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+        - name: nextcloud-hooks
+          configMap:
+            name: {{ template "nextcloud.fullname" . }}-hooks
+            defaultMode: 0o755
+        {{- end }}
         {{- with .Values.nextcloud.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -368,4 +397,8 @@ spec:
         {{- end }}{{/* end-with podSecurityContext */}}
       {{- if .Values.rbac.enabled }}
       serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+      {{- end }}
+      {{- with .Values.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
       {{- end }}

@@ -2,17 +2,29 @@ name: Lint and Test Charts
 
 on:
   pull_request:
-    paths-ignore:
-      - '.github/**'
-      - 'charts/**/README.md'
-      - 'CODE_OF_CONDUCT.md'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'README.md'
-
+    paths:
 jobs:
-  lint-test:
-    runs-on: ubuntu-22.04
+  changes:
+    runs-on: ubuntu-latest-low
+
+    outputs:
+      src: ${{ steps.changes.outputs.src}}
+
+    steps:
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: changes
+        continue-on-error: true
+        with:
+          filters: |
+            src:
+              - 'charts/nextcloud/Chart.yaml'
+              - 'charts/nextcloud/values.yaml'
+              - 'charts/nextcloud/templates/**'
+
+  lint:
+    runs-on: ubuntu-latest-low
+    needs: changes
+    if: needs.changes.outputs.src != 'false'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,9 +32,9 @@ jobs:
           fetch-depth: 0
 
       - name: Install Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
         with:
-          version: v3.11.1
+          version: v3.14.4
 
       - name: Add dependency chart repos
         run: |
@@ -44,11 +56,71 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
+  run-tests:
+    runs-on: ubuntu-22.04
+    needs: [changes, lint]
+    # only run this job if there are helm chart file changes
+    if: needs.changes.outputs.src != 'false'
+    strategy:
+      # continue with all the other jobs even if one fails
+      fail-fast: false
+      matrix:
+        # each item in this list is a job with an isolated test VM
+        test_cases:
+          # test the plain helm chart with nothing changed
+          - name: 'Default - no custom values'
+
+          # test the helm chart with postgresql subchart enabled
+          - name: PostgreSQL Enabled
+            helm_args: '--helm-extra-set-args "--set=postgresql.enabled=true --set=postgresql.global.postgresql.auth.password=testing123456 --set=internalDatabase.enabled=false --set=externalDatabase.enabled=True --set=externalDatabase.type=postgresql --set=externalDatabase.password=testing12345"'
+
+          # test the helm chart with nginx container enabled
+          - name: Nginx Enabled
+            helm_args: '--helm-extra-set-args "--set=image.flavor=fpm --set=nginx.enabled=true"'
+
+          # test the helm chart with horizontal pod autoscaling enabled
+          - name: Horizontal Pod Autoscaling Enabled
+            helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=2 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Add dependency chart repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create kind cluster
-        uses: helm/kind-action@v1.8.0
+        uses: helm/kind-action@v1.10.0
         if: steps.list-changed.outputs.changed == 'true'
 
-      - name: Run chart-testing (install)
+      - name: Run chart-testing (install ${{ matrix.test_cases.name }})
         id: install
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --target-branch ${{ github.event.repository.default_branch }}
+        run: ct install --target-branch ${{ github.event.repository.default_branch }} ${{ matrix.test_cases.helm_args }}
+
+  summary:
+    runs-on: ubuntu-latest-low
+    needs: [changes, run-tests]
+    if: always()
+    steps:
+      - name: Summary
+        run: if ${{ needs.changes.outputs.src != 'false' && needs.run-tests.result != 'success' }}; then exit 1; fi

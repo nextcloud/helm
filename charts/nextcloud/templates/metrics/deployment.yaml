@@ -1,0 +1,85 @@
+{{- if .Values.metrics.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-metrics
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: metrics
+spec:
+  replicas: {{ .Values.metrics.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: metrics
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: metrics
+        {{- with .Values.metrics.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.metrics.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end}}
+      {{- end }}
+      containers:
+        - name: metrics-exporter
+          image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
+          imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
+          env:
+            {{- if .Values.metrics.token }}
+            - name: NEXTCLOUD_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.tokenKey }}
+            {{- else }}
+            - name: NEXTCLOUD_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.usernameKey }}
+            - name: NEXTCLOUD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+                  key: {{ .Values.nextcloud.existingSecret.passwordKey }}
+            {{- end }}
+            # NEXTCLOUD_SERVER is used by metrics-exporter to reach the Nextcloud (K8s-)Service to grab the serverinfo api endpoint
+            {{- if not .Values.metrics.server }}
+            - name: NEXTCLOUD_SERVER # deployment.namespace.svc.cluster.local
+              value: "http{{ if .Values.metrics.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            {{- else }}
+            - name: NEXTCLOUD_SERVER
+              value: {{ .Values.metrics.server }}
+            {{- end }}
+            - name: NEXTCLOUD_TIMEOUT
+              value: {{ .Values.metrics.timeout }}
+            - name: NEXTCLOUD_TLS_SKIP_VERIFY
+              value: {{ .Values.metrics.tlsSkipVerify | quote }}
+            - name: NEXTCLOUD_INFO_APPS
+              value: {{ .Values.metrics.info.apps | quote }}
+          ports:
+            - name: metrics
+              containerPort: 9205
+          {{- with .Values.metrics.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
+{{- end }}
