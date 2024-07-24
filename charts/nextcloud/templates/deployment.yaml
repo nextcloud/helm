@@ -87,10 +87,10 @@ spec:
           livenessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -103,10 +103,10 @@ spec:
           readinessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -119,10 +119,10 @@ spec:
           startupProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
-              - name: Host
-                value: {{ $.Values.nextcloud.host | quote }}
+                - name: Host
+                  value: {{ $.Values.nextcloud.host | quote }}
             initialDelaySeconds: {{ .initialDelaySeconds }}
             periodSeconds: {{ .periodSeconds }}
             timeoutSeconds: {{ .timeoutSeconds }}
@@ -164,7 +164,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}
@@ -180,7 +180,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}
@@ -196,7 +196,7 @@ spec:
           startupProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port: {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}
@@ -280,6 +280,25 @@ spec:
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
         {{- end }}{{/* end-if cronjob.enabled */}}
+        {{ if .Values.clientPush.enabled }}
+        - name: {{ .Chart.Name }}-client-push
+          image: {{ include "nextcloud.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - custom_apps/notify_push/bin/x86_64/notify_push
+          args:
+            - config/config.php
+          env:
+            - name: NEXTCLOUD_URL
+              value: http://localhost:80
+          volumeMounts:
+            - name: nextcloud-main
+              mountPath: /var/www/html/custom_apps
+              subPath: {{ ternary "custom_apps" (printf "%s/custom_apps" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
+            - name: nextcloud-main
+              mountPath: /var/www/html/config
+              subPath: {{ ternary "config" (printf "%s/config" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
+        {{- end }}{{/* end-if clientPush.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -349,7 +368,7 @@ spec:
           persistentVolumeClaim:
             claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
           {{- else }}
-          emptyDir: {}
+          emptyDir: { }
           {{- end }}
         {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
         - name: nextcloud-data
