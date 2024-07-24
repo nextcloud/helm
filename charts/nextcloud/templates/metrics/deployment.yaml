@@ -79,7 +79,8 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.metrics.securityContext }}
           securityContext:
-            runAsUser: 1000
-            runAsNonRoot: true
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 {{- end }}

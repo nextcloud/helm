@@ -360,16 +360,25 @@ spec:
         - name: nextcloud-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-config
+            {{- with .Values.nextcloud.configs.defaultMode }}
+            defaultMode: {{ . }}
+            {{- end }}
         {{- end }}
         {{- if .Values.nextcloud.phpConfigs }}
         - name: nextcloud-phpconfig
           configMap:
             name: {{ template "nextcloud.fullname" . }}-phpconfig
+            {{- with .Values.nextcloud.configs.defaultMode }}
+            defaultMode: {{ . }}
+            {{- end }}
         {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: nextcloud-nginx-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
+            {{- with .Values.nextcloud.configs.defaultMode }}
+            defaultMode: {{ . }}
+            {{- end }}
         {{- end }}
         {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
         - name: nextcloud-hooks

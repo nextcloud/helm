@@ -127,7 +127,9 @@ nextcloud:
     smtp.config.php: true
   # Extra config files created in /var/www/html/config/
   # ref: https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
-  configs: {}
+  configs:
+    # set defaultMode for mounted configMaps (e.g. defaultMode: 420)
+    defaultMode: 420
 
   # For example, to use S3 as primary storage
   # ref: https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
@@ -208,10 +210,15 @@ nextcloud:
   # Set securityContext parameters for the nextcloud CONTAINER only (will not affect nginx container).
   # For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: false
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+    # privileged: false
+    # readOnlyRootFilesystem: true
+    # runAsGroup: 33
+    # runAsNonRoot: true
+    # runAsUser: 33
 
   # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
   podSecurityContext: {}
@@ -250,11 +257,18 @@ nginx:
 
   # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
   securityContext: {}
-  # the nginx alpine container default user is 82
-  #   runAsUser: 82
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+    # the nginx alpine container default user is 82
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   add:
+    #   - NET_BIND_SERVICE
+    #   drop:
+    #     - ALL
+    # privileged: false
+    # readOnlyRootFilesystem: true
+    # runAsGroup: 33
+    # runAsNonRoot: true
+    # runAsUser: 82
 
   ## Extra environment variables
   extraEnv: []
@@ -548,6 +562,26 @@ metrics:
   # podAnnotations: {}
 
   # podLabels: {}
+
+  nginx:
+    enabled: false
+    allow: []
+    # Example
+    # - 10.233.105.0/24
+    # - 10.43.0.0/16
+    service:
+      port: 9205
+  
+  # Set metrics container securityContext parameters.
+  securityContext: {}
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+    # privileged: false
+    # readOnlyRootFilesystem: true
+    # runAsUser: 1000
+    # runAsNonRoot: true
 
   service:
     type: ClusterIP

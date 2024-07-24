@@ -305,6 +305,8 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.timeout`                      | When the scrape times out                                                           | `5s`                                                         |
 | `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
 | `metrics.info.apps`                    | Enable gathering of apps-related metrics.                                           | `false`                                                      |
+| `metrics.nginx.enabled`                | Start NGINX metrics configuration                                                   | `false`                                                      |
+| `metrics.nginx.allow`                  | NGINX metrics configuration allow list                                              | not set   
 | `metrics.image.repository`             | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
 | `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                                | `0.6.2`                                                      |
 | `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
@@ -322,7 +324,6 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped                                         | `30s`                                                        |
 | `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                                 | ``                                                           |
 | `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                                 | `{}                                                          |
-
 
 
 > **Note**:
