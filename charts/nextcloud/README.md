@@ -120,6 +120,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpHostKey`                      | Name of the key that contains the SMTP hostname                                                     | `nil`                      |
 | `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                        |
 | `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                       |
+| `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                       |
 | `nextcloud.datadir`                                         | nextcloud data dir location                                                                         | `/var/www/html/data`       |
 | `nextcloud.mail.enabled`                                    | Whether to enable/disable email settings                                                            | `false`                    |
 | `nextcloud.mail.fromAddress`                                | nextcloud mail send from field                                                                      | `nil`                      |
