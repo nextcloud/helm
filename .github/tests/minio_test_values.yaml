@@ -1,0 +1,23 @@
+## minio helm chart values for use in ci tests:
+# https://github.com/minio/minio/blob/master/helm/minio/values.yaml
+
+# make service name predictable
+fullnameOverride: minio
+
+## minio mode, i.e. standalone or distributed
+mode: standalone
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    memory: 1Gi
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+persistence:
+  enabled: false
+
+# default credentials
+rootUser: nextcloud
+rootPassword: rootpass123

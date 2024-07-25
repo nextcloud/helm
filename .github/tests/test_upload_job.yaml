@@ -1,0 +1,26 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-nextcloud-file
+  namespace: nextcloud
+spec:
+  template:
+    metadata:
+      name: create-nextcloud-file
+    spec:
+      containers:
+        - name: create-nextcloud-file
+          image: curlimages/curl
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "testing123" > test_upload.txt && \
+              curl \
+                -w "%{http_code}" \
+                -u admin:changeme \
+                -T test_upload.txt \
+              "http://nextcloud.nextcloud.svc.cluster.local:8080/remote.php/dav/files/admin/test_upload.txt" && \
+              echo -e "\nTried to uploaded a file, test_upload.txt, to Nextcloud."
+      restartPolicy: Never
