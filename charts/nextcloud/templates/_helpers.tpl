@@ -212,6 +212,9 @@ Create environment variables used to configure the nextcloud container as well a
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
       key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
 {{- end }}
+{{/*
+Redis env vars
+*/}}
 {{- if .Values.redis.enabled }}
 - name: REDIS_HOST
   value: {{ template "nextcloud.redis.fullname" . }}-master
@@ -229,7 +232,107 @@ Create environment variables used to configure the nextcloud container as well a
   value: {{ .Values.redis.auth.password }}
 {{- end }}
 {{- end }}
+{{- end }}{{/* end if redis.enabled */}}
+{{/*
+S3 as primary object store env vars
+*/}}
+{{- if .Values.nextcloud.objectStore.s3.enabled }}
+- name: OBJECTSTORE_S3_SSL
+  value: {{ .Values.nextcloud.objectStore.s3.ssl | quote }}
+- name: OBJECTSTORE_S3_USEPATH_STYLE
+  value: {{ .Values.nextcloud.objectStore.s3.usePathStyle | quote }}
+{{- with .Values.nextcloud.objectStore.s3.legacyAuth }}
+- name: OBJECTSTORE_S3_LEGACYAUTH
+  value: {{ . }}
 {{- end }}
+- name: OBJECTSTORE_S3_AUTOCREATE
+  value: {{ .Values.nextcloud.objectStore.s3.autoCreate | quote }}
+- name: OBJECTSTORE_S3_REGION
+  value: {{ .Values.nextcloud.objectStore.s3.region | quote }}
+- name: OBJECTSTORE_S3_PORT
+  value: {{ .Values.nextcloud.objectStore.s3.port | quote }}
+- name: OBJECTSTORE_S3_STORAGE_CLASS
+  value: {{ .Values.nextcloud.objectStore.s3.storageClass | quote }}
+{{- with .Values.nextcloud.objectStore.s3.prefix }}
+- name: OBJECTSTORE_S3_OBJECT_PREFIX
+  value: {{ . | quote }}
+{{- end }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.host }}
+- name: OBJECTSTORE_S3_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
+      key: {{ .Values.nextcloud.objectStore.s3.secretKeys.host }}
+{{- else }}
+- name: OBJECTSTORE_S3_HOST
+  value: {{ .Values.nextcloud.objectStore.s3.host | quote }}
+{{- end }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.bucket }}
+- name: OBJECTSTORE_S3_BUCKET
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
+      key: {{ .Values.nextcloud.objectStore.s3.secretKeys.bucket }}
+{{- else }}
+- name: OBJECTSTORE_S3_BUCKET
+  value: {{ .Values.nextcloud.objectStore.s3.bucket | quote }}
+{{- end }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.accessKey }}
+- name: OBJECTSTORE_S3_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
+      key: {{ .Values.nextcloud.objectStore.s3.secretKeys.accessKey }}
+{{- else }}
+- name: OBJECTSTORE_S3_KEY
+  value: {{ .Values.nextcloud.objectStore.s3.accessKey | quote }}
+{{- end }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.secretKey }}
+- name: OBJECTSTORE_S3_SECRET
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
+      key: {{ .Values.nextcloud.objectStore.s3.secretKeys.secretKey }}
+{{- else }}
+- name: OBJECTSTORE_S3_SECRET
+  value: {{ .Values.nextcloud.objectStore.s3.secretKey | quote }}
+{{- end }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.bucket }}
+- name: OBJECTSTORE_S3_SSE_C_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
+      key: {{ .Values.nextcloud.objectStore.s3.secretKeys.sse_c_key }}
+{{- else }}
+- name: OBJECTSTORE_S3_SSE_C_KEY
+  value: {{ .Values.nextcloud.objectStore.s3.sse_c_key | quote }}
+{{- end }}
+{{- end }}{{/* end if nextcloud.objectStore.s3.enabled */}}
+{{/*
+Swift as primary object store env vars
+*/}}
+{{- if .Values.nextcloud.objectStore.swift.enabled }}
+- name: OBJECTSTORE_SWIFT_AUTOCREATE
+  value: {{ .Values.nextcloud.objectStore.swift.autoCreate | quote }}
+- name: OBJECTSTORE_SWIFT_USER_NAME
+  value: {{ .Values.nextcloud.objectStore.swift.user.name | quote }}
+- name: OBJECTSTORE_SWIFT_USER_PASSWORD
+  value: {{ .Values.nextcloud.objectStore.swift.user.password | quote }}
+- name: OBJECTSTORE_SWIFT_USER_DOMAIN
+  value: {{ .Values.nextcloud.objectStore.swift.user.domain | quote }}
+- name: OBJECTSTORE_SWIFT_PROJECT_NAME
+  value: {{ .Values.nextcloud.objectStore.swift.project.name | quote }}
+- name: OBJECTSTORE_SWIFT_PROJECT_DOMAIN
+  value: {{ .Values.nextcloud.objectStore.swift.project.domain | quote }}
+- name: OBJECTSTORE_SWIFT_SERVICE_NAME
+  value: {{ .Values.nextcloud.objectStore.swift.service | quote }}
+- name: OBJECTSTORE_SWIFT_REGION
+  value: {{ .Values.nextcloud.objectStore.swift.region | quote }}
+- name: OBJECTSTORE_SWIFT_URL
+  value: {{ .Values.nextcloud.objectStore.swift.url | quote }}
+- name: OBJECTSTORE_SWIFT_CONTAINER_NAME
+  value: {{ .Values.nextcloud.objectStore.swift.container | quote }}
+{{- end }}{{/* end if nextcloud.objectStore.s3.enabled */}}
 {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv }}
 {{- end }}
