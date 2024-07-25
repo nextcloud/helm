@@ -93,6 +93,8 @@ nextcloud:
   datadir: /var/www/html/data
   persistence:
     subPath:
+  # if set, we'll template this list to the NEXTCLOUD_TRUSTED_DOMAINS env var
+  trustedDomains: []
   ## SMTP configuration
   mail:
     enabled: false
