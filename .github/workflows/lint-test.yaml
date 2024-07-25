@@ -56,7 +56,7 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
-  run-tests:
+  test:
     runs-on: ubuntu-22.04
     needs: [changes, lint]
     # only run this job if there are helm chart file changes
@@ -81,6 +81,12 @@ jobs:
           # test the helm chart with horizontal pod autoscaling enabled
           - name: Horizontal Pod Autoscaling Enabled
             helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=2 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
+
+          # test the helm chart with s3 as the primary storage
+          - name: S3 Enabled as Primary Storage
+            # we need to skip the clean up so we can test adding a file
+            helm_args: |
+                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--set=fullnameOverride=nextcloud --set=nextcloud.objectStore.s3.enabled=true --set=nextcloud.objectStore.s3.accessKey=nextcloud --set=nextcloud.objectStore.s3.secretKey=rootpass123 --set=nextcloud.objectStore.s3.host=minio.nextcloud.svc.cluster.local --set=nextcloud.objectStore.s3.port=9000 --set=nextcloud.objectStore.s3.ssl=false --set=nextcloud.objectStore.s3.bucket=nextcloud --set=nextcloud.objectStore.s3.usePathStyle=true --set=image.flavor=fpm --set=nginx.enabled=true --set=nextcloud.host=nextcloud --set=nextcloud.trustedDomains[0]='*'"
 
     steps:
       - name: Checkout
@@ -112,15 +118,43 @@ jobs:
         uses: helm/kind-action@v1.10.0
         if: steps.list-changed.outputs.changed == 'true'
 
+      - name: Install MinIO for testing S3 as Primary Storage
+        if: matrix.test_cases.name == 'S3 Enabled as Primary Storage'
+        # installs minio community helm chart here:
+        # https://github.com/minio/minio/tree/master/helm/minio
+        run: |
+          helm repo add minio https://charts.min.io/ && \
+          helm install minio \
+             --namespace nextcloud \
+             --create-namespace \
+             --wait \
+             --wait-for-jobs \
+             --timeout 2m0s \
+             --values .github/tests/minio_test_values.yaml \
+             minio/minio
+
       - name: Run chart-testing (install ${{ matrix.test_cases.name }})
         id: install
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }} ${{ matrix.test_cases.helm_args }}
 
+      - name: Try adding a file to Nextcloud
+        if: matrix.test_cases.name == 'S3 Enabled as Primary Storage'
+        # applies a kubernetes job that uploads a file and then checks log of finished pod
+        run: |
+            kubectl config set-context --current --namespace=nextcloud && \
+            kubectl apply -f ./.github/tests/test_upload_job.yaml --wait=true && \
+            sleep 2 && \
+            kubectl wait --for=condition=Complete --timeout=2m job/create-nextcloud-file && \
+            echo "Here's the logs from the job:" && \
+            kubectl logs --tail=-1 -f -l batch.kubernetes.io/job-name=create-nextcloud-file && \
+            echo "Here's the logs from the nextcloud pod:" && \
+            kubectl logs -l app.kubernetes.io/name=nextcloud
+
   summary:
     runs-on: ubuntu-latest-low
-    needs: [changes, run-tests]
+    needs: [changes, test]
     if: always()
     steps:
       - name: Summary
-        run: if ${{ needs.changes.outputs.src != 'false' && needs.run-tests.result != 'success' }}; then exit 1; fi
+        run: if ${{ needs.changes.outputs.src != 'false' && needs.test.result != 'success' }}; then exit 1; fi
