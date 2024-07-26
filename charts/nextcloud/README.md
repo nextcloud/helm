@@ -20,6 +20,7 @@ helm install my-release nextcloud/nextcloud
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
+    * [Probes Configurations](#probes-configurations)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
@@ -192,24 +193,6 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `rbac.serviceaccount.create`                                | Wether to create a serviceaccount or use an existing one (requires rbac)                            | `true`                     |
 | `rbac.serviceaccount.name`                                  | The name of the sevice account that the deployment will use (requires rbac)                         | `nextcloud-serviceaccount` |
 | `rbac.serviceaccount.annotations`                           | Serviceaccount annotations                                                                          | `{}`                       |
-| `livenessProbe.enabled`                                     | Turn on and off liveness probe                                                                      | `true`                     |
-| `livenessProbe.initialDelaySeconds`                         | Delay before liveness probe is initiated                                                            | `10`                       |
-| `livenessProbe.periodSeconds`                               | How often to perform the probe                                                                      | `10`                       |
-| `livenessProbe.timeoutSeconds`                              | When the probe times out                                                                            | `5`                        |
-| `livenessProbe.failureThreshold`                            | Minimum consecutive failures for the probe                                                          | `3`                        |
-| `livenessProbe.successThreshold`                            | Minimum consecutive successes for the probe                                                         | `1`                        |
-| `readinessProbe.enabled`                                    | Turn on and off readiness probe                                                                     | `true`                     |
-| `readinessProbe.initialDelaySeconds`                        | Delay before readiness probe is initiated                                                           | `10`                       |
-| `readinessProbe.periodSeconds`                              | How often to perform the probe                                                                      | `10`                       |
-| `readinessProbe.timeoutSeconds`                             | When the probe times out                                                                            | `5`                        |
-| `readinessProbe.failureThreshold`                           | Minimum consecutive failures for the probe                                                          | `3`                        |
-| `readinessProbe.successThreshold`                           | Minimum consecutive successes for the probe                                                         | `1`                        |
-| `startupProbe.enabled`                                      | Turn on and off startup probe                                                                       | `false`                    |
-| `startupProbe.initialDelaySeconds`                          | Delay before readiness probe is initiated                                                           | `30`                       |
-| `startupProbe.periodSeconds`                                | How often to perform the probe                                                                      | `10`                       |
-| `startupProbe.timeoutSeconds`                               | When the probe times out                                                                            | `5`                        |
-| `startupProbe.failureThreshold`                             | Minimum consecutive failures for the probe                                                          | `30`                       |
-| `startupProbe.successThreshold`                             | Minimum consecutive successes for the probe                                                         | `1`                        |
 | `hpa.enabled`                                               | Boolean to create a HorizontalPodAutoscaler. If set to `true`, ignores `replicaCount`.              | `false`                    |
 | `hpa.cputhreshold`                                          | CPU threshold percent for the HorizontalPodAutoscale                                                | `60`                       |
 | `hpa.minPods`                                               | Min. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `1`                        |
@@ -409,6 +392,36 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
+
+
+### Probes Configurations
+
+The nextcloud deployment includes a series of different probes you can use to determine if a pod is ready or not. You can learn more in the [Configure Liveness, Readiness and Startup Probes Kubernetes docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
+
+
+| Parameter                            | Description                                 | Default |
+|--------------------------------------|---------------------------------------------|---------|
+| `livenessProbe.enabled`              | Turn on and off liveness probe              | `true`  |
+| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated    | `10`    |
+| `livenessProbe.periodSeconds`        | How often to perform the probe              | `10`    |
+| `livenessProbe.timeoutSeconds`       | When the probe times out                    | `5`     |
+| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe  | `3`     |
+| `livenessProbe.successThreshold`     | Minimum consecutive successes for the probe | `1`     |
+| `readinessProbe.enabled`             | Turn on and off readiness probe             | `true`  |
+| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated   | `10`    |
+| `readinessProbe.periodSeconds`       | How often to perform the probe              | `10`    |
+| `readinessProbe.timeoutSeconds`      | When the probe times out                    | `5`     |
+| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe  | `3`     |
+| `readinessProbe.successThreshold`    | Minimum consecutive successes for the probe | `1`     |
+| `startupProbe.enabled`               | Turn on and off startup probe               | `false` |
+| `startupProbe.initialDelaySeconds`   | Delay before readiness probe is initiated   | `30`    |
+| `startupProbe.periodSeconds`         | How often to perform the probe              | `10`    |
+| `startupProbe.timeoutSeconds`        | When the probe times out                    | `5`     |
+| `startupProbe.failureThreshold`      | Minimum consecutive failures for the probe  | `30`    |
+| `startupProbe.successThreshold`      | Minimum consecutive successes for the probe | `1`     |
+
+> [!Note]
+> If you are getting errors on initialization (such as `Fatal error: require_once(): Failed opening required '/var/www/html/lib/versioncheck.php'`, but you can get other errors as well), a good first step is to try and enable the startupProbe and/or increase the `initialDelaySeconds` for the `livenessProbe` and `readinessProbe` to something much greater (consider using `120` seconds instead of `10`. This is an especially good idea if your cluster is running on older hardware, has a slow internet connection, or you're using a slower storage class, such as NFS that's running with older disks or a slow connection.
 
 ## Cron jobs
 
