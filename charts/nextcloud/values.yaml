@@ -234,15 +234,18 @@ nextcloud:
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
+
   image:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
+
   containerPort: 80
 
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    custom:
     # custom: |-
     #     worker_processes  1;..
 
@@ -538,6 +541,12 @@ notifyPush:
     path: /push
     pathType: Prefix
 
+dnsConfig: {}
+# Custom dns config for Nextcloud containers.
+# You can for example configure ndots. This may be needed in some clusters with alpine images.
+# options:
+#   - name: ndots
+#     value: "1"
 
 ## Prometheus Exporter / Metrics
 ##
