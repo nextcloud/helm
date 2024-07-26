@@ -645,6 +645,21 @@ metrics:
       prometheus.io/port: "9205"
     labels: {}
 
+  # security context for the metrics CONTAINER in the pod
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # security context for the metrics POD
+  podSecurityContext: {}
+  # runAsNonRoot: true
+  # seccompProfile:
+  #   type: RuntimeDefault
+
   ## Prometheus Operator ServiceMonitor configuration
   ##
   serviceMonitor:
