@@ -139,14 +139,6 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-            {{- range $hook, $shell := .Values.nextcloud.hooks }}
-            {{- if $shell }}
-            - name: nextcloud-hooks
-              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
-              subPath: {{ $hook }}.sh
-              readOnly: true
-            {{- end }}
-            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
@@ -287,7 +279,6 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
         {{- toYaml . | nindent 8 }}
@@ -334,7 +325,33 @@ spec:
             - "-c"
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
         {{- end }}{{/* end-if any database-initContainer */}}
-      {{- end }}{{/* end-if any initContainer */}}
+        - name: {{ .Chart.Name }}-upgrade
+          image: {{ include "nextcloud.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            # Do upgrade then exit
+            # This avoids doing it in the container, which could get killed by failed liveness probes
+            - "true"
+          env:
+            - name: NEXTCLOUD_UPDATE
+              value: "1"
+            {{- include "nextcloud.env" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.nextcloud.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
+            {{- end }}
+            {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}

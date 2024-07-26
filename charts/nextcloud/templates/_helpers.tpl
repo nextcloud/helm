@@ -183,10 +183,6 @@ Create environment variables used to configure the nextcloud container as well a
   {{- else }}
   value: {{ .Values.nextcloud.host }}{{ if .Values.metrics.enabled }} {{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ end }}
   {{- end }}
-{{- if ne (int .Values.nextcloud.update) 0 }}
-- name: NEXTCLOUD_UPDATE
-  value: {{ .Values.nextcloud.update | quote }}
-{{- end }}
 - name: NEXTCLOUD_DATA_DIR
   value: {{ .Values.nextcloud.datadir | quote }}
 {{- if .Values.nextcloud.mail.enabled }}
