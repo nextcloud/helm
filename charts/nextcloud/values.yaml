@@ -93,9 +93,14 @@ nextcloud:
   datadir: /var/www/html/data
   persistence:
     subPath:
+  # if set, we'll template this list to the NEXTCLOUD_TRUSTED_DOMAINS env var
+  trustedDomains: []
+  ## SMTP configuration
   mail:
     enabled: false
+    # the user we send email as
     fromAddress: user
+    # the domain we send email from
     domain: domain.com
     smtp:
       host: domain.com
@@ -104,17 +109,85 @@ nextcloud:
       authtype: LOGIN
       name: user
       password: pass
-  # PHP Configuration files
+  ## Primary ObjectStore options
+  # see: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage
+  objectStore:
+    # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
+    s3:
+      enabled: false
+      # ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      accessKey: ""
+      # ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      secretKey: ""
+      # use legacy auth method
+      legacyAuth: false
+      # s3 endpoint to use; only required if you're not using AWS
+      host: ""
+      # use TLS/SSL for S3 connections
+      ssl: true
+      # default port that can be changed based on your object store, e.g. for minio, you can use 9000
+      port: "443"
+      # this is the default in the nextcloud docs
+      region: "eu-west-1"
+      # required if using s3, the name of the bucket you'd like to use
+      bucket: ""
+      # object prefix in bucket
+      prefix: ""
+      # set to true if you are not using DNS for your buckets.
+      usePathStyle: false
+      # autocreate the bucket
+      autoCreate: false
+      # optonal parameter: you probably want to keep this as default
+      storageClass: "STANDARD"
+      # server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support
+      sse_c_key: ""
+      # use an existingSecret for S3 credentials. If set, we ignore the following under nextcloud.objectStore.s3
+      # endpoint, accessKey, secretKey
+      existingSecret: ""
+      secretKeys:
+        # key in nextcloud.objectStore.s3.existingSecret to use for s3 endpoint
+        host: ""
+        # key in nextcloud.objectStore.s3.existingSecret to use for s3 accessKeyID
+        accessKey: ""
+        # key in nextcloud.objectStore.s3.existingSecret to use for s3 secretAccessKey
+        secretKey: ""
+        # key in nextcloud.objectStore.s3.existingSecret to use for the s3 bucket
+        bucket: ""
+        # key in nextcloud.objectStore.s3.existingSecret to use for the s3 sse_c_key
+        sse_c_key: ""
+    ## options related to using Swift as a primary object storage
+    # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#openstack-swift
+    swift:
+      enabled: false
+      # swift user info
+      user:
+        domain: "Default"
+        name: ""
+        password: ""
+      # swift project info
+      project:
+        name: ""
+        domain: "Default"
+      # The Identity / Keystone endpoint
+      url: ""
+      region: ""
+      # optional on some swift implementations
+      service: "swift"
+      # the container to store the data in
+      container: ""
+      # autocreate container
+      autoCreate: false
+
+  ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
   phpConfigs: {}
-  # Default config files
+  ## Default config files that utilize environment variables:
+  # see: https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables
   # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself
-  # Default confgurations can be found here: https://github.com/nextcloud/docker/tree/master/16.0/apache/config
+  # Default confgurations can be found here: https://github.com/nextcloud/docker/tree/master/.config
   defaultConfigs:
     # To protect /var/www/html/config
     .htaccess: true
-    # Redis default configuration
-    redis.config.php: true
     # Apache configuration for rewrite urls
     apache-pretty-urls.config.php: true
     # Define APCu as local cache
@@ -123,31 +196,41 @@ nextcloud:
     apps.config.php: true
     # Used for auto configure database
     autoconfig.php: true
-    # SMTP default configuration
+    # Redis default configuration
+    redis.config.php: true
+    # Reverse proxy default configuration
+    reverse-proxy.config.php: true
+    # S3 Object Storage as primary storage
+    s3.config.php: true
+    # SMTP default configuration via environment variables
     smtp.config.php: true
-  # Extra config files created in /var/www/html/config/
-  # ref: https://docs.nextcloud.com/server/15/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
-  configs: {}
+    # Swift Object Storage as primary storage
+    swift.config.php: true
+    # disables the web based updater as the default nextcloud docker image does not support it
+    upgrade-disable-web.config.php: true
 
-  # For example, to use S3 as primary storage
-  # ref: https://docs.nextcloud.com/server/13/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
-  #
-  #  configs:
-  #    s3.config.php: |-
-  #      <?php
-  #      $CONFIG = array (
-  #        'objectstore' => array(
-  #          'class' => '\\OC\\Files\\ObjectStore\\S3',
-  #          'arguments' => array(
-  #            'bucket'     => 'my-bucket',
-  #            'autocreate' => true,
-  #            'key'        => 'xxx',
-  #            'secret'     => 'xxx',
-  #            'region'     => 'us-east-1',
-  #            'use_ssl'    => true
-  #          )
-  #        )
-  #      );
+  # Extra config files created in /var/www/html/config/
+  # ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
+  configs: {}
+  # For example, to enable image and text file previews:
+  #  previews.config.php: |-
+  #    <?php
+  #    $CONFIG = array (
+  #      'enable_previews' => true,
+  #      'enabledPreviewProviders' => array (
+  #        'OC\Preview\Movie',
+  #        'OC\Preview\PNG',
+  #        'OC\Preview\JPEG',
+  #        'OC\Preview\GIF',
+  #        'OC\Preview\BMP',
+  #        'OC\Preview\XBitmap',
+  #        'OC\Preview\MP3',
+  #        'OC\Preview\MP4',
+  #        'OC\Preview\TXT',
+  #        'OC\Preview\MarkDown',
+  #        'OC\Preview\PDF'
+  #      ),
+  #    );
 
   # Hooks for auto configuration
   # Here you could write small scripts which are placed in `/docker-entrypoint-hooks.d/<hook-name>/helm.sh`
@@ -220,18 +303,32 @@ nextcloud:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: false
 
+  # Settings for the MariaDB init container
+  mariaDbInitContainer:
+    # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+  # Settings for the PostgreSQL init container
+  postgreSqlInitContainer:
+    # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+
+
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
+
   image:
     repository: nginx
     tag: alpine
     pullPolicy: IfNotPresent
+
   containerPort: 80
 
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    custom:
     # custom: |-
     #     worker_processes  1;..
 
@@ -360,6 +457,15 @@ redis:
     existingSecret: ""
     # Password key to be retrieved from existing secret
     existingSecretPasswordKey: ""
+  # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
+  global:
+    storageClass: ""
+  master:
+    persistence:
+      enabled: true
+  replica:
+    persistence:
+      enabled: true
 
 
 ## Cronjob to execute Nextcloud background tasks
@@ -390,6 +496,9 @@ service:
   port: 8080
   loadBalancerIP: ""
   nodePort: nil
+  annotations: {}
+    ## Insert your annotations such as below
+    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
@@ -479,6 +588,12 @@ tolerations: []
 
 affinity: {}
 
+dnsConfig: {}
+# Custom dns config for Nextcloud containers.
+# You can for example configure ndots. This may be needed in some clusters with alpine images.
+# options:
+#   - name: ndots
+#     value: "1"
 
 ## Prometheus Exporter / Metrics
 ##
@@ -486,6 +601,9 @@ metrics:
   enabled: false
 
   replicaCount: 1
+  # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
+  # Without it, we will use the full name of the nextcloud service
+  server: ""
   # The metrics exporter needs to know how you serve Nextcloud either http or https
   https: false
   # Use API token if set, otherwise fall back to password authentication
@@ -495,6 +613,10 @@ metrics:
   timeout: 5s
   # if set to true, exporter skips certificate verification of Nextcloud server.
   tlsSkipVerify: false
+  info:
+    # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
+    # Enables gathering of apps-related metrics. Defaults to false
+    apps: false
 
   image:
     repository: xperimental/nextcloud-exporter
