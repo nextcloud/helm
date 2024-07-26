@@ -19,6 +19,13 @@ Then, please make sure you follow the [pull request template](.github/pull_reque
 
 ![screenshot of the allow edits by maintainers check box to the left of the Create pull request button on GitHub](https://github.com/nextcloud/helm/assets/2389292/3a8044a9-583d-496a-b3d2-4dd699c56ed4)
 
+## Upgrades
+
+If upgrading a subchart, such as PostgreSQL or MariaDB, or upgrading the `appVersion` in `./charts/nextcloud/Chart.yaml`, please never upgrade more than one major version at a time and please bump the helm chart `version` in `./charts/nextcloud/Chart.yaml` in line with semver. For example, if you bump the `appVersion` from `29.0.4` to `29.1.0`, you need to also bump the `version` from `5.3.0` to `5.4.0`.
+
+Additionally, when upgrading Nextcloud versions, upgrade to the latest minor version of the major version first, before upgrading to the next major version. Learn more about upgrading Nexcloud via the [upgrade docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/upgrade.html#approaching-upgrades).
+
+If upgrading a subchart, please also provide documentation in the PR for how users can upgrade an external service locally.
 
 # Issues
 
