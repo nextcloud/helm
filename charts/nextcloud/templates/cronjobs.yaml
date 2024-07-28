@@ -1,0 +1,33 @@
+{{- range .Values.nextcloud.backupCronjobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "nextcloud.fullname" $ }}-backup-{{ .name }}
+spec:
+  schedule: {{ .schedule }}
+  startingDeadlineSeconds: {{ .startingDeadlineSeconds }}
+  concurrencyPolicy: {{ .concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
+  suspend: {{ .suspend }}
+  jobTemplate:
+    {{/* Add the volumes */}}
+    {{- $volumeList := concat (default list .jobTemplate.spec.template.spec.volumes) (include "nextcloud.backupCronJobVolumes" $ | fromYamlArray) -}}
+    {{- $volumes := dict "spec" (dict "template" (dict "spec" (dict "volumes" $volumeList))) -}}
+    {{- $jobTemplate := merge $volumes .jobTemplate -}}
+
+    {{/* Add the volumeMounts and environment variables to every container */}}
+    {{- $containers := list -}}
+    {{- range .jobTemplate.spec.template.spec.containers -}}
+    {{-    $vm := dict "volumeMounts" (concat (include "nextcloud.backupCronJobVolumeMounts" $ | fromYamlArray) (default list .volumeMounts)) -}}
+    {{-    $c := merge $vm . -}}
+    {{-    $env := dict "env" (concat (include "nextcloud.backupCronJobEnv" $ | fromYamlArray) (default list .env)) -}}
+    {{-    $c = merge $env $c -}}
+    {{-   $containers = append $containers $c -}}
+    {{- end -}}
+
+    {{- $newContainers := dict "spec" (dict "template" (dict "spec" (dict "containers" $containers))) -}}
+    {{- $jobTemplate = merge $newContainers $jobTemplate -}}
+
+    {{- $jobTemplate | toYaml | nindent 4 -}}
+{{- end }}

@@ -276,15 +276,71 @@ nextcloud:
   #    - name: nextcloud-data
   #      mountPath: /run/nextcloud/data
 
+  # Nextcloud data backup Cronjobs
+  # See https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+  backupCronjobs: []
+  #   - name: backup
+  #     schedule: "15 * * * *"
+  #     concurrencyPolicy: Forbid
+  #     startingDeadlineSeconds: 300
+  #     successfulJobsHistoryLimit: 3
+  #     suspend: false
+  #     jobTemplate:
+  #       spec:
+  #         backoffLimit: 1
+  #         ttlSecondsAfterFinished: 300
+  #         template:
+  #           spec:
+  #             restartPolicy: Never
+  #             containers:
+  #               - name: restic
+  #                 image: restic/restic:0.16.4
+  #                 imagePullPolicy: IfNotPresent
+  #                 command:
+  #                   - /bin/sh
+  #                   - -c
+  #                   - "restic --quiet --json --host nextcloud-data --tag cron backup ${NEXTCLOUD_DATA_DIR}"
+  #                 env:
+  #                   - name: TZ
+  #                     value: "Europe/Berlin"
+  #                   - name: RESTIC_CACHE_DIR
+  #                     value: /run/restic/cache
+  #                   - name: RESTIC_CACERT
+  #                     value: /run/secrets/ca-cert/ca.crt
+  #                   - name: RESTIC_REPOSITORY
+  #                     valueFrom:
+  #                       secretKeyRef:
+  #                         name: nextcloud-restic-repository
+  #                         key: repository
+  #                   - name: RESTIC_PASSWORD
+  #                     valueFrom:
+  #                       secretKeyRef:
+  #                         name: nextcloud-restic-repository
+  #                         key: password
+  #                 volumeMounts:
+  #                   - name: ca-cert
+  #                     mountPath: /run/secrets/ca-cert
+  #                     readOnly: true
+  #                   - name: restic-cache
+  #                     mountPath: /run/restic/cache
+  #                     readOnly: false
+  #             terminationGracePeriodSeconds: 1
+  #             volumes:
+  #               - name: ca-cert
+  #                 secret:
+  #                   secretName: restic-ca-cert
+  #               - name: restic-cache
+  #                 emptyDir: {}
+
   # Extra mounts for the pods. Example shown is for connecting a legacy NFS volume
   # to NextCloud pods in Kubernetes. This can then be configured in External Storage
-  extraVolumes:
+  extraVolumes: []
   #  - name: nfs
   #    nfs:
   #      server: "10.0.0.1"
   #      path: "/nextcloud_data"
   #      readOnly: false
-  extraVolumeMounts:
+  extraVolumeMounts: []
   #  - name: nfs
   #    mountPath: "/legacy_data"
 
