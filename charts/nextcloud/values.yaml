@@ -83,7 +83,7 @@ nextcloud:
     # secretName: nameofsecret
     usernameKey: nextcloud-username
     passwordKey: nextcloud-password
-    tokenKey: nextcloud-token
+    tokenKey: ""
     smtpUsernameKey: smtp-username
     smtpPasswordKey: smtp-password
     smtpHostKey: smtp-host

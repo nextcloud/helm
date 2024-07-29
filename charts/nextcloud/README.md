@@ -119,6 +119,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpUsernameKey`                  | Name of the key that contains the SMTP username                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpPasswordKey`                  | Name of the key that contains the SMTP password                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpHostKey`                      | Name of the key that contains the SMTP hostname                                                     | `nil`                      |
+| `nextcloud.existingSecret.tokenKey`                         | Name of the key that contains the nextcloud metrics token                                           | `''`                       |
 | `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                        |
 | `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                       |
 | `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                       |
