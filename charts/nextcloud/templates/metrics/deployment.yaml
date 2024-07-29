@@ -40,12 +40,12 @@ spec:
           image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           env:
-            {{- if .Values.metrics.token }}
+            {{- if or .Values.metrics.token .Values.nextcloud.existingSecret.tokenKey }}
             - name: NEXTCLOUD_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-                  key: {{ .Values.nextcloud.existingSecret.tokenKey }}
+                  key: {{ .Values.nextcloud.existingSecret.tokenKey | default "nextcloud-token" }}
             {{- else }}
             - name: NEXTCLOUD_USERNAME
               valueFrom:
