@@ -238,8 +238,10 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `mariadb.image.registry`                                              | MariaDB image registry                                                            | `docker.io`            |
 | `mariadb.image.repository`                                            | MariaDB image repository                                                          | `bitnami/mariadb`      |
 | `mariadb.image.tag`                                                   | MariaDB image tag                                                                 | ``                     |
+| `mariadb.global.defaultStorageClass`                                  | MariaDB Global default StorageClass for Persistent Volume(s)                      | `''`                   |
 | `mariadb.primary.persistence.enabled`                                 | Whether or not to Use a PVC on MariaDB primary                                    | `false`                |
-| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `nil`                  |
+| `mariadb.primary.persistence.storageClass`                            | MariaDB primary persistent volume storage Class                                   | `''`                   |
+| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `''`                   |
 | `postgresql.enabled`                                                  | Whether to use the PostgreSQL chart                                               | `false`                |
 | `postgresql.image.registry`                                           | PostgreSQL image registry                                                         | `docker.io`            |
 | `postgresql.image.repository`                                         | PostgreSQL image repository                                                       | `bitnami/postgresql`   |
