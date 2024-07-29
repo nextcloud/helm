@@ -391,6 +391,11 @@ mariadb:
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
 
+  # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
+  global:
+    # overwrites the primary.persistence.storageClass value
+    defaultStorageClass: ""
+
   auth:
     database: nextcloud
     username: nextcloud
@@ -408,8 +413,8 @@ mariadb:
     persistence:
       enabled: false
       # Use an existing Persistent Volume Claim (must be created ahead of time)
-      # existingClaim: ""
-      # storageClass: ""
+      existingClaim: ""
+      storageClass: ""
       accessMode: ReadWriteOnce
       size: 8Gi
 
