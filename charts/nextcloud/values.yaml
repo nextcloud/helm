@@ -500,7 +500,7 @@ service:
   type: ClusterIP
   port: 8080
   loadBalancerIP: ""
-  nodePort: nil
+  nodePort:
   annotations: {}
     ## Insert your annotations such as below
     # test/test: pumuckel
