@@ -89,6 +89,10 @@ jobs:
             helm_args: |
                 --namespace nextcloud --skip-clean-up --helm-extra-set-args "--values charts/nextcloud/test-values/s3-as-primary-storage.yaml"
 
+          # test the helm chart with imaginary
+          - name: Imaginary Enabled
+            helm_args: --helm-extra-set-args "--values charts/nextcloud/test-values/imaginary.yaml"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
