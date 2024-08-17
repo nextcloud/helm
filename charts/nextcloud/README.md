@@ -21,6 +21,7 @@ helm install my-release nextcloud/nextcloud
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
     * [Probes Configurations](#probes-configurations)
+    * [Imaginary](#imaginary)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
@@ -425,6 +426,49 @@ The nextcloud deployment includes a series of different probes you can use to de
 
 > [!Note]
 > If you are getting errors on initialization (such as `Fatal error: require_once(): Failed opening required '/var/www/html/lib/versioncheck.php'`, but you can get other errors as well), a good first step is to try and enable the startupProbe and/or increase the `initialDelaySeconds` for the `livenessProbe` and `readinessProbe` to something much greater (consider using `120` seconds instead of `10`. This is an especially good idea if your cluster is running on older hardware, has a slow internet connection, or you're using a slower storage class, such as NFS that's running with older disks or a slow connection.
+
+### Imaginary
+
+We include an optional external preview provider from [h2non/imaginary](https://github.com/h2non/imaginary).
+
+| Parameter                              | Description                                                                             | Default           |
+|----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
+| `imaginary.enabled`                    | Start Imgaginary                                                                        | `false`           |
+| `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
+| `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
+| `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
+| `imaginary.image.tag`                  | Imaginary image tag                                                                     | `1.2.4`           |
+| `imaginary.image.pullPolicy`           | Imaginary image pull policy                                                             | `IfNotPresent`    |
+| `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
+| `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
+| `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
+| `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
+| `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
+| `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |
+| `imaginary.service.type`               | Imaginary: Kubernetes Service type                                                      | `ClusterIP`       |
+| `imaginary.service.loadBalancerIP`     | Imaginary: LoadBalancerIp for service type LoadBalancer                                 | `nil`             |
+| `imaginary.service.nodePort`           | Imaginary: NodePort for service type NodePort                                           | `nil`             |
+| `imaginary.service.annotations`        | Additional annotations for service imaginary                                            | `{}`              |
+| `imaginary.service.labels`             | Additional labels for service imaginary                                                 | `{}`              |
+
+
+> [!Note]
+> You also need to setup nextcloud, to use imaginary
+```yaml
+nextcloud:
+  defaultConfigs:
+    imaginary.config.php: true
+  configs:
+    previews.config.php: |-
+      <?php
+      $CONFIG = array(
+        'enabledPreviewProviders' => array(
+          0 => 'OC\\Preview\\Imaginary',
+        );
+
+imaginary:
+  enabled: true
+```
 
 ## Cron jobs
 
