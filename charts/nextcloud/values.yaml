@@ -633,24 +633,34 @@ metrics:
   ## Metrics exporter resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  # resources: {}
+  resources: {}
 
-  ## Metrics exporter pod Annotation and Labels
-  # podAnnotations: {}
+  # -- Metrics exporter pod Annotation
+  podAnnotations: {}
 
-  # podLabels: {}
+  # -- Metrics exporter pod Labels
+  podLabels: {}
+
+  # -- Metrics exporter pod nodeSelector
+  nodeSelector: {}
+
+  # -- Metrics exporter pod tolerations
+  tolerations: []
+
+  # -- Metrics exporter pod affinity
+  affinity: {}
 
   service:
     type: ClusterIP
-    ## Use serviceLoadBalancerIP to request a specific static IP,
-    ## otherwise leave blank
-    # loadBalancerIP:
+    # Use serviceLoadBalancerIP to request a specific static IP,
+    # otherwise leave blank
+    loadBalancerIP:
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9205"
     labels: {}
 
-  # security context for the metrics CONTAINER in the pod
+  # -- security context for the metrics CONTAINER in the pod
   securityContext:
     runAsUser: 1000
     runAsNonRoot: true
@@ -659,7 +669,7 @@ metrics:
     #   drop:
     #     - ALL
 
-  # security context for the metrics POD
+  # -- security context for the metrics POD
   podSecurityContext: {}
   # runAsNonRoot: true
   # seccompProfile:
