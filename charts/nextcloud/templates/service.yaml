@@ -32,8 +32,8 @@ spec:
       targetPort: {{ .Values.nextcloud.containerPort }}
       protocol: TCP
       name: http
-      {{- if (eq .Values.service.type "NodePort") }}
-      nodePort: {{ .Values.service.nodePort | default "" }}
+      {{- with .Values.service.nodePort }}
+      nodePort: {{ . }}
       {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "nextcloud.name" . }}
