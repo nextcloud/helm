@@ -331,6 +331,16 @@ nginx:
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    header:
+      # -- HSTS settings
+      # WARNING: Only add the preload option once you read about
+      # the consequences in https://hstspreload.org/. This option
+      # will add the domain to a hardcoded list that is shipped
+      # in all major browsers and getting removed from this list
+      # could take several months.
+      # example: hsts: "max-age=15768000; includeSubDomains; preload;"
+      hsts:
+
     custom:
     # custom: |-
     #     worker_processes  1;..

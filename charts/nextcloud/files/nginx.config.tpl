@@ -20,7 +20,9 @@ server {
     # will add the domain to a hardcoded list that is shipped
     # in all major browsers and getting removed from this list
     # could take several months.
-    #add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;" always;
+    {{- with .Values.nginx.config.header.hsts }}
+    add_header Strict-Transport-Security {{ . | quote }} always;
+    {{- end }}
 
     # set max upload size
     client_max_body_size 10G;
