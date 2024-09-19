@@ -20,6 +20,7 @@ helm install my-release nextcloud/nextcloud
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
+    * [Headers set on nginx](#headers-set-on-nginx)
     * [Probes Configurations](#probes-configurations)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
@@ -397,6 +398,34 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 ```
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
+
+
+### Headers set on NGINX
+
+It is possible to set any additional header
+
+| Parameter                    | Description                         | Default   |
+|------------------------------|-------------------------------------|-----------|
+| `nginx.config.headers.<key>` | Headers which are added with nginx  |           |
+
+
+Following keys are already set with this values:
+  - Referrer-Policy: `no-referrer`
+  - X-Content-Type-Options: `nosniff`
+  - X-Download-Options: `noopen`
+  - X-Frame-Options: `SAMEORIGIN`
+  - X-Permitted-Cross-Domain-Policies: `none`
+  - X-Robots-Tag: `noindex, nofollow`
+  - X-XSS-Protection: `1; mode=block`
+
+Maybe you like to set:
+  - Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
+> [!WARNING]
+> Only add the preload option once you read about
+> the consequences in https://hstspreload.org/. This option
+> will add the domain to a hardcoded list that is shipped
+> in all major browsers and getting removed from this list
+> could take several months.
 
 
 ### Probes Configurations
