@@ -603,13 +603,19 @@ dnsConfig: {}
 ## Prometheus Exporter / Metrics
 ##
 metrics:
+  # -- Setup nextcloud-exporter
+  # @section -- Metrics
   enabled: false
 
+  # -- relica count of nextcloud-exporter
+  # @section -- Metrics
   replicaCount: 1
-  # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
+  # -- Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
   # Without it, we will use the full name of the nextcloud service
+  # @section -- Metrics
   server: ""
-  # The metrics exporter needs to know how you serve Nextcloud either http or https
+  # -- The metrics exporter needs to know how you serve Nextcloud either http or https
+  # @section -- Metrics
   https: false
   # Use API token if set, otherwise fall back to password authentication
   # https://github.com/xperimental/nextcloud-exporter#token-authentication
