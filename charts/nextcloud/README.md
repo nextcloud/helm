@@ -433,7 +433,7 @@ We include an optional external preview provider from [h2non/imaginary](https://
 
 | Parameter                              | Description                                                                             | Default           |
 |----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
-| `imaginary.enabled`                    | Start Imgaginary                                                                        | `false`           |
+| `imaginary.enabled`                    | Start Imaginary                                                                         | `false`           |
 | `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
 | `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
 | `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
