@@ -1,841 +1,395 @@
-# Nextcloud Helm Chart
-
-[Nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
-
-## TL;DR;
-
-```console
-helm repo add nextcloud https://nextcloud.github.io/helm/
-helm install my-release nextcloud/nextcloud
-```
-
-## Quick Links
-
-* [Introduction](#introduction)
-* [Prerequisites](#prerequisites)
-* [Installing the Chart](#installing-the-chart)
-* [Uninstalling the Chart](#uninstalling-the-chart)
-* [Configuration](#configuration)
-    * [Ingress](#ingress)
-        * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
-            * [NGINX Ingress-Controller](#nginx-ingress-controller)
-            * [Traefik Ingress-Controller](#traefik-ingress-controller)
-            * [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
-    * [Database Configurations](#database-configurations)
-    * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
-    * [Persistence Configurations](#persistence-configurations)
-    * [Metrics Configurations](#metrics-configurations)
-    * [Headers set on NGINX](#headers-set-on-nginx)
-    * [Probes Configurations](#probes-configurations)
-    * [Collabora Configuration](#collabora-configuration)
-    * [Imaginary](#imaginary)
-* [Cron jobs](#cron-jobs)
-* [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
-* [Multiple config.php file](#multiple-configphp-file)
-* [Using nginx](#using-nginx)
-    * [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
-* [Preserving Source IP](#preserving-source-ip)
-* [Hugepages](#hugepages)
-* [HPA (Clustering)](#hpa-clustering)
-* [Adjusting PHP ini values](#adjusting-php-ini-values)
-* [Running `occ` commands](#running-occ-commands)
-    * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
-    * [Downloading models for recognize](#downloading-models-for-recognize)
-* [Backups](#backups)
-* [Upgrades](#upgrades)
-* [Troubleshooting](#troubleshooting)
-    * [Logging](#logging)
-        * [Changing the logging behavior](#changing-the-logging-behavior)
-        * [Viewing the logs](#viewing-the-logs)
-            * [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
-            * [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
-            * [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
-        * [Sharing the logs](#sharing-the-logs)
-
-## Introduction
-
-This chart bootstraps an [nextcloud](https://hub.docker.com/_/nextcloud/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
-
-You will also need a database compatible with Nextcloud. For more info, please see the [Database Configuration](#database-configurations) section below.
-
-If you want to persist data accross installs and upgrades, you'll need to configure persistence. For more info, please see the [Persistence Configuration](#persistence-configurations) section below.
-
-We also package the following helm charts from Bitnami for you to _optionally_ use:
-
-| Chart                                                                        | Descrption                      |
-|------------------------------------------------------------------------------|---------------------------------|
-| [Redis](https://github.com/bitnami/charts/tree/main/bitnami/redis)           | For enabling caching            |
-| [PostgreSQL](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) | For use as an external database |
-| [MariaDB](https://github.com/bitnami/charts/tree/main/bitnami/mariadb)       | For use as an external database |
-
-## Prerequisites
-
-- Kubernetes 1.24+
-- Persistent Volume provisioner support in the underlying infrastructure
-- Helm >=3.7.0 ([for subchart scope exposing](nextcloud/helm#152))
-
-## Installing the Chart
-
-To install the chart with the release name `my-release`:
-
-```console
-helm repo add nextcloud https://nextcloud.github.io/helm/
-helm install my-release nextcloud/nextcloud
-```
-
-The command deploys nextcloud on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.
-
-> **Tip**: List all releases using `helm list`
-
-## Uninstalling the Chart
-
-To uninstall/delete the `my-release` deployment:
-
-```console
-helm delete my-release
-```
-
-The command removes all the Kubernetes components associated with the chart and deletes the release.
-
-## Configuration
-
-The following table lists the configurable parameters of the nextcloud chart and their default values.
-
-| Parameter                                                   | Description                                                                                         | Default                    |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------------------|
-| `image.repository`                                          | nextcloud Image name                                                                                | `nextcloud`                |
-| `image.flavor`                                              | nextcloud Image type (Options: apache, fpm)                                                         | `apache`                   |
-| `image.tag`                                                 | nextcloud Image tag                                                                                 | `appVersion`               |
-| `image.pullPolicy`                                          | Image pull policy                                                                                   | `IfNotPresent`             |
-| `image.pullSecrets`                                         | Specify image pull secrets                                                                          | `nil`                      |
-| `replicaCount`                                              | Number of nextcloud pods to deploy                                                                  | `1`                        |
-| `ingress.className`                                         | Name of the ingress class to use                                                                    | `nil`                      |
-| `ingress.enabled`                                           | Enable use of ingress controllers                                                                   | `false`                    |
-| `ingress.servicePort`                                       | Ingress' backend servicePort                                                                        | `http`                     |
-| `ingress.annotations`                                       | An array of service annotations                                                                     | `nil`                      |
-| `ingress.labels`                                            | An array of service labels                                                                          | `nil`                      |
-| `ingress.path`                                              | The `Path` to use in Ingress' `paths`                                                               | `/`                        |
-| `ingress.pathType`                                          | The `PathType` to use in Ingress' `paths`                                                           | `Prefix`                   |
-| `ingress.tls`                                               | Ingress TLS configuration                                                                           | `[]`                       |
-| `nextcloud.host`                                            | nextcloud host to create application URLs, updates trusted_domains at installation time only        | `nextcloud.kube.home`      |
-| `nextcloud.username`                                        | User of the application                                                                             | `admin`                    |
-| `nextcloud.password`                                        | Application password                                                                                | `changeme`                 |
-| `nextcloud.existingSecret.enabled`                          | Whether to use an existing secret or not                                                            | `false`                    |
-| `nextcloud.existingSecret.secretName`                       | Name of the existing secret                                                                         | `nil`                      |
-| `nextcloud.existingSecret.usernameKey`                      | Name of the key that contains the username                                                          | `nil`                      |
-| `nextcloud.existingSecret.passwordKey`                      | Name of the key that contains the password                                                          | `nil`                      |
-| `nextcloud.existingSecret.smtpUsernameKey`                  | Name of the key that contains the SMTP username                                                     | `nil`                      |
-| `nextcloud.existingSecret.smtpPasswordKey`                  | Name of the key that contains the SMTP password                                                     | `nil`                      |
-| `nextcloud.existingSecret.smtpHostKey`                      | Name of the key that contains the SMTP hostname                                                     | `nil`                      |
-| `nextcloud.existingSecret.tokenKey`                         | Name of the key that contains the nextcloud metrics token                                           | `''`                       |
-| `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                        |
-| `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                       |
-| `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                       |
-| `nextcloud.datadir`                                         | nextcloud data dir location                                                                         | `/var/www/html/data`       |
-| `nextcloud.mail.enabled`                                    | Whether to enable/disable email settings                                                            | `false`                    |
-| `nextcloud.mail.fromAddress`                                | nextcloud mail send from field                                                                      | `nil`                      |
-| `nextcloud.mail.domain`                                     | nextcloud mail domain                                                                               | `nil`                      |
-| `nextcloud.mail.smtp.host`                                  | SMTP hostname                                                                                       | `nil`                      |
-| `nextcloud.mail.smtp.secure`                                | SMTP connection `ssl` or empty                                                                      | `''`                       |
-| `nextcloud.mail.smtp.port`                                  | Optional SMTP port                                                                                  | `nil`                      |
-| `nextcloud.mail.smtp.authtype`                              | SMTP authentication method                                                                          | `LOGIN`                    |
-| `nextcloud.mail.smtp.name`                                  | SMTP username, ONLY the part before the domain name. i.e. 'postmaster' NOT 'postmaster@example.com' | `''`                       |
-| `nextcloud.mail.smtp.password`                              | SMTP password                                                                                       | `''`                       |
-| `nextcloud.configs`                                         | Config files created in `/var/www/html/config`                                                      | `{}`                       |
-| `nextcloud.persistence.subPath`                             | Set the subPath for nextcloud to use in volume                                                      | `nil`                      |
-| `nextcloud.phpConfigs`                                      | PHP Config files created in `/usr/local/etc/php/conf.d`                                             | `{}`                       |
-| `nextcloud.defaultConfigs.\.htaccess`                       | Default .htaccess to protect `/var/www/html/config`                                                 | `true`                     |
-| `nextcloud.defaultConfigs.apache-pretty-urls\.config\.php`  | Default Apache configuration for rewrite urls                                                       | `true`                     |
-| `nextcloud.defaultConfigs.apcu\.config\.php`                | Default configuration to define APCu as local cache                                                 | `true`                     |
-| `nextcloud.defaultConfigs.apps\.config\.php`                | Default configuration for apps                                                                      | `true`                     |
-| `nextcloud.defaultConfigs.autoconfig\.php`                  | Default auto-configuration for databases                                                            | `true`                     |
-| `nextcloud.defaultConfigs.redis\.config\.php`               | Default Redis configuration                                                                         | `true`                     |
-| `nextcloud.defaultConfigs.reverse-proxy\.config\.php`       | Default Reverse proxy configuration                                                                 | `true`                     |
-| `nextcloud.defaultConfigs.s3\.config\.php`                  | Default configuration for S3 as primary Object Storage                                              | `true`                     |
-| `nextcloud.defaultConfigs.smtp\.config\.php`                | Default configuration for smtp                                                                      | `true`                     |
-| `nextcloud.defaultConfigs.swift\.config\.php`               | Default configuration for Swift as primary Object Storage                                           | `true`                     |
-| `nextcloud.defaultConfigs.upgrade-disable-web\.config\.php` | Default config to disable the web-based updater as the default docker image does not suppor it      | `true`                     |
-| `nextcloud.strategy`                                        | specifies the strategy used to replace old Pods by new ones                                         | `type: Recreate`           |
-| `nextcloud.extraEnv`                                        | specify additional environment variables                                                            | `{}`                       |
-| `nextcloud.extraSidecarContainers`                          | specify additional sidecar containers                                                               | `[]`                       |
-| `nextcloud.extraInitContainers`                             | specify additional init containers                                                                  | `[]`                       |
-| `nextcloud.extraVolumes`                                    | specify additional volumes for the NextCloud pod                                                    | `{}`                       |
-| `nextcloud.extraVolumeMounts`                               | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
-| `nextcloud.mariaDbInitContainer.resources`                  | set the `resources` field of the MariaDB init container in the Nextcloud Pod.                       | `{}`                       |
-| `nextcloud.mariaDbInitContainer.securityContext`            | set the `securityContext` field of the MariaDB init container in the Nextcloud Pod.                 | `{}`                       |
-| `nextcloud.postgreSqlInitContainer.resources`               | set the `resources` field of the PostgreSQL init container in the Nextcloud Pod.                    | `{}`                       |
-| `nextcloud.postgreSqlInitContainer.securityContext`         | set the `securityContext` field of the PostgreSQL init container in the Nextcloud Pod.              | `{}`                       |
-| `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                      |
-| `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
-| `nextcloud.postgreSqlInitContainer.securityContext`         | Set postgresql initContainer securityContext parameters.                                            | `{}`                       |
-| `nginx.enabled`                                             | Enable nginx (requires you use php-fpm image)                                                       | `false`                    |
-| `nginx.image.repository`                                    | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                    |
-| `nginx.image.tag`                                           | nginx Image tag                                                                                     | `alpine`                   |
-| `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
-| `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
-| `nginx.containerPort`                                       | Customize container port e.g. when not running as root                                              | `IfNotPresent`             |
-| `nginx.ipFamilies`                                          | Customize container to listen on IPv4, IPv6 or both                                                 | `["IPv4"]`                 |
-| `nginx.config.default`                                      | Whether to use nextcloud's recommended nginx config                                                 | `true`                     |
-| `nginx.config.custom`                                       | Specify a custom config for nginx                                                                   | `{}`                       |
-| `nginx.resources`                                           | nginx resources                                                                                     | `{}`                       |
-| `nginx.securityContext`                                     | Optional security context for the nginx container                                                   | `nil`                      |
-| `nginx.extraEnv`                                            | Optional environment variables for the nginx container                                              | `nil`                      |
-| `lifecycle.postStartCommand`                                | Specify deployment lifecycle hook postStartCommand                                                  | `nil`                      |
-| `lifecycle.preStopCommand`                                  | Specify deployment lifecycle hook preStopCommand                                                    | `nil`                      |
-| `redis.enabled`                                             | Whether to install/use redis for locking                                                            | `false`                    |
-| `redis.auth.enabled`                                        | Whether to enable password authentication with redis                                                | `true`                     |
-| `redis.auth.password`                                       | The password redis uses                                                                             | `''`                       |
-| `redis.auth.existingSecret`                                 | The name of an existing secret with Redis® credentials                                              | `''`                       |
-| `redis.auth.existingSecretPasswordKey`                      | Password key to be retrieved from existing secret                                                   | `''`                       |
-| `redis.global.storageClass`                                 | PVC Storage Class  for both Redis&reg; master and replica Persistent Volumes                        | `''`                       |
-| `redis.master.persistence.enabled`                          | Enable persistence on Redis&reg; master nodes using Persistent Volume Claims                        | `true`                     |
-| `redis.replica.persistence.enabled`                         | Enable persistence on Redis&reg; replica nodes using Persistent Volume Claims                       | `true`                     |
-| `cronjob.enabled`                                           | Whether to enable/disable cron jobs sidecar                                                         | `false`                    |
-| `cronjob.lifecycle.postStartCommand`                        | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                      |
-| `cronjob.lifecycle.preStopCommand`                          | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                          | `nil`                      |
-| `cronjob.resources`                                         | CPU/Memory resource requests/limits for the cron jobs sidecar                                       | `{}`                       |
-| `cronjob.securityContext`                                   | Optional security context for cron jobs sidecar                                                     | `nil`                      |
-| `service.type`                                              | Kubernetes Service type                                                                             | `ClusterIP`                |
-| `service.loadBalancerIP`                                    | LoadBalancerIp for service type LoadBalancer                                                        | `""`                       |
-| `service.annotations`                                       | Annotations for service type                                                                        | `{}`                       |
-| `service.nodePort`                                          | NodePort for service type NodePort                                                                  | `nil`                      |
-| `service.ipFamilies`                                        | Set ipFamilies as in k8s service objects                                                            | `nil`                      |
-| `service.ipFamyPolicy`                                      | define IP protocol bindings as in k8s service objects                                               | `nil`                      |
-| `phpClientHttpsFix.enabled`                                 | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `false`                    |
-| `phpClientHttpsFix.protocol`                                | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `https`                    |
-| `resources`                                                 | CPU/Memory resource requests/limits                                                                 | `{}`                       |
-| `rbac.enabled`                                              | Enable Role and rolebinding for priveledged PSP                                                     | `false`                    |
-| `rbac.serviceaccount.create`                                | Wether to create a serviceaccount or use an existing one (requires rbac)                            | `true`                     |
-| `rbac.serviceaccount.name`                                  | The name of the sevice account that the deployment will use (requires rbac)                         | `nextcloud-serviceaccount` |
-| `rbac.serviceaccount.annotations`                           | Serviceaccount annotations                                                                          | `{}`                       |
-| `hpa.enabled`                                               | Boolean to create a HorizontalPodAutoscaler. If set to `true`, ignores `replicaCount`.              | `false`                    |
-| `hpa.cputhreshold`                                          | CPU threshold percent for the HorizontalPodAutoscale                                                | `60`                       |
-| `hpa.minPods`                                               | Min. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `1`                        |
-| `hpa.maxPods`                                               | Max. pods for the Nextcloud HorizontalPodAutoscaler                                                 | `10`                       |
-| `deploymentLabels`                                          | Labels to be added at 'deployment' level                                                            | not set                    |
-| `deploymentAnnotations`                                     | Annotations to be added at 'deployment' level                                                       | not set                    |
-| `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                    |
-| `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                    |
-| `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
-
-### Ingress
-#### Ingress Sticky-Sessions
-
-For loadbalance over multiple Pods, it is useful to configure sticky session.
-
-##### NGINX Ingress-Controller
-To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
-For more information take a look in the [ingress-controller documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#session-affinity)
-```yaml
-ingress:
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: cookie
-```
-
-##### Traefik Ingress-Controller
-To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
-For more information take a look in the [ingress-controller documentation](https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service)
-```yaml
-service:
-  annotations:
-    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
-```
-
-##### HAProxy Ingress-Controller (Community-Version)
-To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
-For more infromation take a look in the  [ingress-controller documentation](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity)
-```yaml
-ingress:
-  annotations:
-    haproxy-ingress.github.io/affinity: cookie
-```
-
-### Database Configurations
-By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
-
-For convenience, we packages the following Bitnami charts for databases (feel free to choose _one_ below):
-- [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/main/bitnami/mariadb)
-- [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
-
-If you choose to use one of the prepackaged Bitnami helm charts, you must configure both the `externalDatabase` parameters, and the parameters for the chart you choose. For instance, if you choose to use the Bitnami PostgreSQL chart that we've prepackaged, you need to also configure all the parameters for `postgresql`. You do not need to use the Bitnami helm charts. If you want to use an already configured database that you have externally, just set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
-
-
-| Parameter                                                             | Description                                                                       | Default                |
-|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------|------------------------|
-| `internalDatabase.enabled`                                            | Whether to use internal sqlite database                                           | `true`                 |
-| `internalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
-| `externalDatabase.enabled`                                            | Whether to use external database                                                  | `false`                |
-| `externalDatabase.type`                                               | External database type: `mysql`, `postgresql`                                     | `mysql`                |
-| `externalDatabase.host`                                               | Host of the external database in form of `host:port`. Example: `"myhost:1234"`    | `""`                   |
-| `externalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
-| `externalDatabase.user`                                               | Existing username in the external db                                              | `nextcloud`            |
-| `externalDatabase.password`                                           | Password for the above username                                                   | `nil`                  |
-| `externalDatabase.existingSecret.enabled`                             | Whether to use a existing secret or not                                           | `false`                |
-| `externalDatabase.existingSecret.secretName`                          | Name of the existing secret                                                       | `nil`                  |
-| `externalDatabase.existingSecret.usernameKey`                         | Name of the key that contains the username                                        | `nil`                  |
-| `externalDatabase.existingSecret.passwordKey`                         | Name of the key that contains the password                                        | `nil`                  |
-| `externalDatabase.existingSecret.hostKey`                             | Name of the key that contains the database hostname or IP address                 | `nil`                  |
-| `externalDatabase.existingSecret.databaseKey`                         | Name of the key that contains the database name                                   | `nil`                  |
-| `mariadb.enabled`                                                     | Whether to use the MariaDB chart                                                  | `false`                |
-| `mariadb.auth.database`                                               | Database name to create                                                           | `nextcloud`            |
-| `mariadb.auth.username`                                               | Database user to create                                                           | `nextcloud`            |
-| `mariadb.auth.password`                                               | Password for the database                                                         | `changeme`             |
-| `mariadb.auth.rootPassword`                                           | MariaDB admin password                                                            | `nil`                  |
-| `mariadb.auth.existingSecret`                                         | Use existing secret for MariaDB password details; see values.yaml for more detail | `''`                   |
-| `mariadb.image.registry`                                              | MariaDB image registry                                                            | `docker.io`            |
-| `mariadb.image.repository`                                            | MariaDB image repository                                                          | `bitnami/mariadb`      |
-| `mariadb.image.tag`                                                   | MariaDB image tag                                                                 | ``                     |
-| `mariadb.global.defaultStorageClass`                                  | MariaDB Global default StorageClass for Persistent Volume(s)                      | `''`                   |
-| `mariadb.primary.persistence.enabled`                                 | Whether or not to Use a PVC on MariaDB primary                                    | `false`                |
-| `mariadb.primary.persistence.storageClass`                            | MariaDB primary persistent volume storage Class                                   | `''`                   |
-| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `''`                   |
-| `postgresql.enabled`                                                  | Whether to use the PostgreSQL chart                                               | `false`                |
-| `postgresql.image.registry`                                           | PostgreSQL image registry                                                         | `docker.io`            |
-| `postgresql.image.repository`                                         | PostgreSQL image repository                                                       | `bitnami/postgresql`   |
-| `postgresql.image.tag`                                                | PostgreSQL image tag                                                              | `15.4.0-debian-11-r10` |
-| `postgresql.global.postgresql.auth.database`                          | Database name to create                                                           | `nextcloud`            |
-| `postgresql.global.postgresql.auth.username`                          | Database user to create                                                           | `nextcloud`            |
-| `postgresql.global.postgresql.auth.password`                          | Password for the database                                                         | `changeme`             |
-| `postgresql.global.postgresql.auth.existingSecret`                    | Name of existing secret to use for PostgreSQL credentials                         | `''`                   |
-| `postgresql.global.postgresql.auth.secretKeys.adminPasswordKey`       | Name of key in existing secret to use for PostgreSQL admin password               | `''`                   |
-| `postgresql.global.postgresql.auth.secretKeys.userPasswordKey`        | Name of key in existing secret to use for PostgreSQL user password                | `''`                   |
-| `postgresql.global.postgresql.auth.secretKeys.replicationPasswordKey` | Name of key in existing secret to use for PostgreSQL replication password         | `''`                   |
-| `postgresql.primary.persistence.enabled`                              | Whether or not to use PVC on PostgreSQL primary                                   | `false`                |
-| `postgresql.primary.persistence.existingClaim`                        | Use an existing PVC for PostgreSQL primary                                        | `nil`                  |
-
-Is there a missing parameter for one of the Bitnami helm charts listed above? Please feel free to submit a PR to add that parameter in our values.yaml, but be sure to also update this README file :)
-
-
-### Object Storage as Primary Storage Configuration
-
-Nextcloud allows to configure object storages like OpenStack Swift or Amazon Simple Storage Service (S3) or any compatible S3-implementation (e.g. Minio or Ceph Object Gateway) as primary storage replacing the default storage of files.
-
-By default, files are stored in nextcloud/data or another directory configured in the config.php of your Nextcloud instance. This data directory might still be used for compatibility reasons)
-
-Read more in the official [docs](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage).
-
-Here are all the values you can currently configure in this helm chart to configure an Object Store as your Primary Storage.
-
-
-| Parameter                                       | Description                                                           | Default     |
-|-------------------------------------------------|-----------------------------------------------------------------------|-------------|
-| `nextcloud.objectStore.s3.enabled`              | enable configuring S3 as a primary object store                       | `false`     |
-| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existingSecret        | `''`        |
-| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existingSecret    | `''`        |
-| `nextcloud.objectStore.s3.legacyAuth`           | use legacy authentication for S3                                      | `false`     |
-| `nextcloud.objectStore.s3.host`                 | endpoint URL to connect to. Only required if not using AWS            | `''`        |
-| `nextcloud.objectStore.s3.ssl`                  | Use TLS connection when connecting to S3                              | `true`      |
-| `nextcloud.objectStore.s3.port`                 | Port for S3 host to use                                               | `443`       |
-| `nextcloud.objectStore.s3.region`               | region to look for bucket in on the S3 host                           | `eu-west-1` |
-| `nextcloud.objectStore.s3.bucket`               | bucket on the S3 host                                                 | `''`        |
-| `nextcloud.objectStore.s3.prefix`               | optional object prefix                                                | `''`        |
-| `nextcloud.objectStore.s3.usePathStyle`         | set to true if you are not using DNS for your buckets                 | `false`     |
-| `nextcloud.objectStore.s3.autoCreate`           | auto-create the S3 bucket                                             | `false`     |
-| `nextcloud.objectStore.s3.storageClass`         | S3 storage class to use                                               | `STANDARD`  |
-| `nextcloud.objectStore.s3.sse_c_key`            | S3 server side encryption key.                                        | `''`        |
-| `nextcloud.objectStore.s3.existingSecret`       | Use an existing Kubernetes Secret to fetch auth credentials           | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.host`      | if using s3.existingSecret, secret key to use for the host            | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.accessKey` | if using s3.existingSecret, secret key to use for the accessKeyID     | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.secretKey` | if using s3.existingSecret, secret key to use for the secretAccessKey | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.bucket`    | if using s3.existingSecret, secret key to use for the bucket          | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.sse_c_key` | if using s3.existingSecret, secret key to use for the sse_c_key       | `''`        |
-| `nextcloud.objectStore.swift.enabled`           | enable configuring Openstack Swift as a primary object store          | `false`     |
-| `nextcloud.objectStore.swift.user.domain`       | optional: swift user domain                                           | `'Default'` |
-| `nextcloud.objectStore.swift.user.name`         | Swift username                                                        | `''`        |
-| `nextcloud.objectStore.swift.user.password`     | Swift user password                                                   | `''`        |
-| `nextcloud.objectStore.swift.project.name`      | Swift project name                                                    | `''`        |
-| `nextcloud.objectStore.swift.project.domain`    | optional: swift project domain                                        | `'Default'` |
-| `nextcloud.objectStore.swift.url`               | Swift Identity / Keystone endpoint                                    | `''`        |
-| `nextcloud.objectStore.swift.region`            | Swift region                                                          | `''`        |
-| `nextcloud.objectStore.swift.service`           | Optional: service name, used on some swift implementations            | `'swift'`   |
-| `nextcloud.objectStore.swift.container`         | Swift container to store the data in                                  | `''`        |
-| `nextcloud.objectStore.swift.autoCreate`        | Autocreate the Swift container                                        | `false`     |
-
-
-
-### Persistence Configurations
-
-The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at the `/var/www/html` paths of the container.
-Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
-Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
-
-
-| Parameter                                 | Description                                          | Default                                     |
-|-------------------------------------------|------------------------------------------------------|---------------------------------------------|
-| `persistence.enabled`                     | Enable persistence using PVC                         | `false`                                     |
-| `persistence.annotations`                 | PVC annotations                                      | `{}`                                        |
-| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil` (uses alpha storage class annotation) |
-| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil` (uses alpha storage class annotation) |
-| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce`                             |
-| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`                                       |
-| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`                                     |
-| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`                                        |
-| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce`                             |
-| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`                                       |
-
-
-### Metrics Configurations
-
-We include an optional experimental Nextcloud Metrics exporter from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-exporter).
-
-| Parameter                              | Description                                                                         | Default                                                      |
-|----------------------------------------|-------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `metrics.enabled`                      | Start Prometheus metrics exporter                                                   | `false`                                                      |
-| `metrics.replicaCount`                 | Number of nextcloud-metrics pod replicas to deploy                                  | `1`                                                          |
-| `metrics.server`                       | Nextcloud Server URL to get metrics from. If not provided, defaults to service name | `""`                                                         |
-| `metrics.https`                        | Defines if https is used to connect to nextcloud                                    | `false` (uses http)                                          |
-| `metrics.token`                        | Uses token for auth instead of username/password                                    | `""`                                                         |
-| `metrics.timeout`                      | When the scrape times out                                                           | `5s`                                                         |
-| `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
-| `metrics.info.apps`                    | Enable gathering of apps-related metrics.                                           | `false`                                                      |
-| `metrics.image.repository`             | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
-| `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                                | `0.6.2`                                                      |
-| `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
-| `metrics.image.pullSecrets`            | Nextcloud metrics exporter image pull secrets                                       | `nil`                                                        |
-| `metrics.podAnnotations`               | Additional annotations for metrics exporter                                         | not set                                                      |
-| `metrics.podLabels`                    | Additional labels for metrics exporter                                              | not set                                                      |
-| `metrics.service.type`                 | Metrics: Kubernetes Service type                                                    | `ClusterIP`                                                  |
-| `metrics.service.loadBalancerIP`       | Metrics: LoadBalancerIp for service type LoadBalancer                               | `nil`                                                        |
-| `metrics.service.nodePort`             | Metrics: NodePort for service type NodePort                                         | `nil`                                                        |
-| `metrics.service.annotations`          | Additional annotations for service metrics exporter                                 | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
-| `metrics.service.labels`               | Additional labels for service metrics exporter                                      | `{}`                                                         |
-| `metrics.serviceMonitor.enabled`       | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator        | `false`                                                      |
-| `metrics.serviceMonitor.namespace`     | Namespace in which Prometheus is running                                            | ``                                                           |
-| `metrics.serviceMonitor.jobLabel`      | Name of the label on the target service to use as the job name in prometheus        | ``                                                           |
-| `metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped                                         | `30s`                                                        |
-| `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                                 | ``                                                           |
-| `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                                 | `{}                                                          |
-
-
-
-> **Note**:
->
-> For nextcloud to function correctly, you should specify the `nextcloud.host` parameter to specify the FQDN (recommended) or the public IP address of the nextcloud service.
->
-> Optionally, you can specify the `service.loadBalancerIP` parameter to assign a reserved IP address to the nextcloud service of the chart. However please note that this feature is only available on a few cloud providers (f.e. GKE).
->
-> To reserve a public IP address on GKE:
->
-> ```bash
-> gcloud compute addresses create nextcloud-public-ip
-> ```
->
-> The reserved IP address can be associated to the nextcloud service by specifying it as the value of the `service.loadBalancerIP` parameter while installing the chart.
-
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
-
-```console
-helm install --name my-release \
-  --set nextcloud.username=admin,nextcloud.password=password,mariadb.auth.rootPassword=secretpassword \
-    nextcloud/nextcloud
-```
-
-The above command sets the nextcloud administrator account username and password to `admin` and `password` respectively. Additionally, it sets the MariaDB `root` user password to `secretpassword`.
-
-Alternatively, a YAML file that specifies the values for the above parameters can be provided while installing the chart. For example,
-
-```console
-helm install --name my-release -f values.yaml nextcloud/nextcloud
-```
-
-> **Tip**: You can use the default [values.yaml](values.yaml)
-
-
-### Headers set on NGINX
-
-It is possible to set any additional header
-
-| Parameter                    | Description                         | Default   |
-|------------------------------|-------------------------------------|-----------|
-| `nginx.config.headers.<key>` | Headers which are added with nginx  |           |
-
-
-Following keys are already set with this values:
-  - Referrer-Policy: `no-referrer`
-  - X-Content-Type-Options: `nosniff`
-  - X-Download-Options: `noopen`
-  - X-Frame-Options: `SAMEORIGIN`
-  - X-Permitted-Cross-Domain-Policies: `none`
-  - X-Robots-Tag: `noindex, nofollow`
-  - X-XSS-Protection: `1; mode=block`
-
-Maybe you like to set:
-  - Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
-> [!WARNING]
-> Only add the preload option once you read about
-> the consequences in https://hstspreload.org/. This option
-> will add the domain to a hardcoded list that is shipped
-> in all major browsers and getting removed from this list
-> could take several months.
-
-
-### Probes Configurations
-
-The nextcloud deployment includes a series of different probes you can use to determine if a pod is ready or not. You can learn more in the [Configure Liveness, Readiness and Startup Probes Kubernetes docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
-
-
-| Parameter                            | Description                                 | Default |
-|--------------------------------------|---------------------------------------------|---------|
-| `livenessProbe.enabled`              | Turn on and off liveness probe              | `true`  |
-| `livenessProbe.initialDelaySeconds`  | Delay before liveness probe is initiated    | `10`    |
-| `livenessProbe.periodSeconds`        | How often to perform the probe              | `10`    |
-| `livenessProbe.timeoutSeconds`       | When the probe times out                    | `5`     |
-| `livenessProbe.failureThreshold`     | Minimum consecutive failures for the probe  | `3`     |
-| `livenessProbe.successThreshold`     | Minimum consecutive successes for the probe | `1`     |
-| `readinessProbe.enabled`             | Turn on and off readiness probe             | `true`  |
-| `readinessProbe.initialDelaySeconds` | Delay before readiness probe is initiated   | `10`    |
-| `readinessProbe.periodSeconds`       | How often to perform the probe              | `10`    |
-| `readinessProbe.timeoutSeconds`      | When the probe times out                    | `5`     |
-| `readinessProbe.failureThreshold`    | Minimum consecutive failures for the probe  | `3`     |
-| `readinessProbe.successThreshold`    | Minimum consecutive successes for the probe | `1`     |
-| `startupProbe.enabled`               | Turn on and off startup probe               | `false` |
-| `startupProbe.initialDelaySeconds`   | Delay before readiness probe is initiated   | `30`    |
-| `startupProbe.periodSeconds`         | How often to perform the probe              | `10`    |
-| `startupProbe.timeoutSeconds`        | When the probe times out                    | `5`     |
-| `startupProbe.failureThreshold`      | Minimum consecutive failures for the probe  | `30`    |
-| `startupProbe.successThreshold`      | Minimum consecutive successes for the probe | `1`     |
-
-> [!Note]
-> If you are getting errors on initialization (such as `Fatal error: require_once(): Failed opening required '/var/www/html/lib/versioncheck.php'`, but you can get other errors as well), a good first step is to try and enable the startupProbe and/or increase the `initialDelaySeconds` for the `livenessProbe` and `readinessProbe` to something much greater (consider using `120` seconds instead of `10`. This is an especially good idea if your cluster is running on older hardware, has a slow internet connection, or you're using a slower storage class, such as NFS that's running with older disks or a slow connection.
-
-### Collabora Configuration
-
-This section provides options to enable and configure the Collabora Online server within your deployment. Please ensure to review the [Collabora Online Helm chart documentation](https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online) for additional details and recommended values.
-
-| Parameter                              | Description                                                                                        | Default                                                                                             |
-|----------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `collabora.enabled`                    | Enable or disable the Collabora Online integration                                                 | `false`                                                                                             |
-| `collabora.autoscaling.enabled`        | Enable or disable autoscaling for the Collabora Online pods                                        | `false`                                                                                             |
-| `collabora.collabora.aliasgroups`      | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                             | `[]`                                                                                                |
-| `collabora.collabora.extra_params`     | Additional parameters for the Collabora Online service                                             | `"--o:ssl.enabled=false"`                                                                           |
-| `collabora.collabora.server_name`      | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `null`                                                                                              |
-| `collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                           | `false`                                                                                             |
-| `collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                     | `""`                                                                                                |
-| `collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                           | `"username"`                                                                                        |
-| `collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                           | `"password"`                                                                                        |
-| `collabora.collabora.username`         | Admin username for Collabora Online                                                                | `admin`                                                                                             |
-| `collabora.collabora.password`         | Admin password for Collabora Online                                                                | `examplepass`                                                                                       |
-| `collabora.ingress.enabled`            | Enable or disable ingress for Collabora Online                                                     | `false`                                                                                             |
-| `collabora.ingress.className`          | Class name for the ingress controller                                                              | `""`                                                                                                |
-| `collabora.ingress.annotations`        | Annotations for the ingress resource                                                               | `{}`                                                                                                |
-| `collabora.ingress.hosts`              | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
-| `collabora.ingress.tls`                | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
-| `collabora.resources`                  | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
-> **Note**:
->
-> You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work.
->
-> If you have both Nextcloud and Collabora behind a reverse proxy with HTTPS, `collabora.collabora.aliasgroups` should match your Nextcloud domain and `collabora.collabora.server_name` (if needed) should match your Collabora domain.
->
-> For more information, please check the [Collabora documentation](https://sdk.collaboraonline.com/docs/installation/index.html).
+# nextcloud
+
+![Version: 6.6.4](https://img.shields.io/badge/Version-6.6.4-informational?style=flat-square) ![AppVersion: 30.0.5](https://img.shields.io/badge/AppVersion-30.0.5-informational?style=flat-square)
+
+A file sharing server that puts the control and security of your own data back into your hands.
+
+**Homepage:** <https://nextcloud.com/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| skjnldsv | <skjnldsv@protonmail.com> |  |
+| chrisingenhaag | <christian.ingenhaag@googlemail.com> |  |
+| billimek | <jeff@billimek.com> |  |
+| WrenIX |  | <https://wrenix.eu> |
+| jessebot |  | <https://jessebot.work> |
+
+## Source Code
+
+* <https://github.com/nextcloud/helm>
+* <https://github.com/nextcloud/docker>
+
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://collaboraonline.github.io/online | collabora(collabora-online) | 1.1.20 |
+| oci://registry-1.docker.io/bitnamicharts | mariadb | 18.2.0 |
+| oci://registry-1.docker.io/bitnamicharts | postgresql | 15.5.0 |
+| oci://registry-1.docker.io/bitnamicharts | redis | 19.6.4 |
+
+## Values
+
+### Collabora
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| collabora.autoscaling.enabled | bool | `false` | enable autocaling, please check collabora README.md first |
+| collabora.collabora.aliasgroups | list | `[]` | HTTPS nextcloud domain, if needed |
+| collabora.collabora.existingSecret.enabled | bool | `false` | set to true to to get collabora admin credentials from an existin secret if set, ignores collabora.collabora.username and password |
+| collabora.collabora.existingSecret.passwordKey | string | `"password"` |  |
+| collabora.collabora.existingSecret.secretName | string | `""` | name of existing Kubernetes Secret with collboara admin credentials |
+| collabora.collabora.existingSecret.usernameKey | string | `"username"` |  |
+| collabora.collabora.extra_params | string | `"--o:ssl.enable=false"` | set extra parameters for collabora you may need to add --o:ssl.termination=true |
+| collabora.collabora.password | string | `"examplepass"` | setup admin login credentials, these are ignored if collabora.collabora.existingSecret.enabled=true |
+| collabora.collabora.server_name | string | `nil` | Specify server_name when the hostname is not reachable directly for example behind reverse-proxy. example: collabora.domain |
+| collabora.collabora.username | string | `"admin"` |  |
+| collabora.enabled | bool | `false` | Activate collabora subchart |
+| collabora.ingress.annotations | object | `{}` | please check collabora values.yaml for nginx/haproxy annotations examples |
+| collabora.ingress.className | string | `""` |  |
+| collabora.ingress.enabled | bool | `false` | enable ingress for collabora online |
+| collabora.ingress.hosts | list | `[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}]` | Ingress Host of collabora |
+| collabora.ingress.tls | list | `[]` | tls for ingress  - secretName: collabora-ingress-tls    hosts:      - collabora.domain |
+| collabora.resources | object | `{}` | see collabora helm README.md for recommended values |
+
+### Database - External
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| externalDatabase.database | string | `"nextcloud"` | Database name |
+| externalDatabase.enabled | bool | `false` |  |
+| externalDatabase.existingSecret.databaseKey | string | `nil` |  |
+| externalDatabase.existingSecret.enabled | bool | `false` |  |
+| externalDatabase.existingSecret.hostKey | string | `"db-hostname-or-ip"` |  |
+| externalDatabase.existingSecret.passwordKey | string | `"db-password"` |  |
+| externalDatabase.existingSecret.secretName | string | `nil` |  |
+| externalDatabase.existingSecret.usernameKey | string | `"db-username"` |  |
+| externalDatabase.host | string | `""` | Database host. You can optionally include a colon delimited port like "myhost:1234" |
+| externalDatabase.password | string | `""` | Database password |
+| externalDatabase.type | string | `"mysql"` | Supported database engines: mysql or postgresql |
+| externalDatabase.user | string | `"nextcloud"` | Database user |
 
 ### Imaginary
 
-We include an optional external preview provider from [h2non/imaginary](https://github.com/h2non/imaginary).
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| imaginary.enabled | bool | `false` | Start Imaginary |
+| imaginary.image.pullPolicy | string | `"IfNotPresent"` | Imaginary image pull policy |
+| imaginary.image.pullSecrets | list | `[]` | Imaginary image pull secrets |
+| imaginary.image.registry | string | `"docker.io"` | Imaginary image registry |
+| imaginary.image.repository | string | `"h2non/imaginary"` | Imaginary image name |
+| imaginary.image.tag | string | `"1.2.4"` | Imaginary image tag |
+| imaginary.livenessProbe.enabled | bool | `true` | active liveness probes |
+| imaginary.livenessProbe.failureThreshold | int | `3` | liveness probe: threshold for failure |
+| imaginary.livenessProbe.periodSeconds | int | `10` | liveness probe: period seconds |
+| imaginary.livenessProbe.successThreshold | int | `1` | liveness probe: threshold for success |
+| imaginary.livenessProbe.timeoutSeconds | int | `1` | liveness probe: timeout |
+| imaginary.podAnnotations | object | `{}` | Additional annotations for imaginary |
+| imaginary.podLabels | object | `{}` | Additional labels for imaginary |
+| imaginary.podSecurityContext | object | `{}` | Optional security context for the Imaginary pod (applies to all containers in the pod) runAsNonRoot: true seccompProfile:   type: RuntimeDefault |
+| imaginary.readinessProbe.enabled | bool | `true` | active readiness probes |
+| imaginary.readinessProbe.failureThreshold | int | `3` | readiness probe: threshold for failure |
+| imaginary.readinessProbe.periodSeconds | int | `10` | readiness probe: period seconds |
+| imaginary.readinessProbe.successThreshold | int | `1` | readiness probe: threshold for success |
+| imaginary.readinessProbe.timeoutSeconds | int | `1` | readinees probe: timeout |
+| imaginary.replicaCount | int | `1` | Number of imaginary pod replicas to deploy |
+| imaginary.resources | object | `{}` | imaginary resources |
+| imaginary.securityContext | object | `{"runAsNonRoot":true,"runAsUser":1000}` | Optional security context for the Imaginary container allowPrivilegeEscalation: false capabilities:   drop:     - ALL |
+| imaginary.service.annotations | object | `{}` | Additional annotations for service imaginary |
+| imaginary.service.labels | object | `{}` | Additional labels for service imaginary |
+| imaginary.service.loadBalancerIP | string | `nil` | Imaginary: LoadBalancerIp for service type LoadBalancer |
+| imaginary.service.nodePort | string | `nil` | Imaginary: NodePort for service type NodePort |
+| imaginary.service.type | string | `"ClusterIP"` | Imaginary: Kubernetes Service type |
 
-| Parameter                              | Description                                                                             | Default           |
-|----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
-| `imaginary.enabled`                    | Start Imaginary                                                                         | `false`           |
-| `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
-| `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
-| `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
-| `imaginary.image.tag`                  | Imaginary image tag                                                                     | `1.2.4`           |
-| `imaginary.image.pullPolicy`           | Imaginary image pull policy                                                             | `IfNotPresent`    |
-| `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
-| `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
-| `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
-| `imaginary.nodeSelector`               | Imaginary pod nodeSelector                                                                | `{}`              |
-| `imaginary.tolerations`                | Imaginary pod tolerations                                                | `[]`              |
-| `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
-| `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
-| `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |
-| `imaginary.service.type`               | Imaginary: Kubernetes Service type                                                      | `ClusterIP`       |
-| `imaginary.service.loadBalancerIP`     | Imaginary: LoadBalancerIp for service type LoadBalancer                                 | `nil`             |
-| `imaginary.service.nodePort`           | Imaginary: NodePort for service type NodePort                                           | `nil`             |
-| `imaginary.service.annotations`        | Additional annotations for service imaginary                                            | `{}`              |
-| `imaginary.service.labels`             | Additional labels for service imaginary                                                 | `{}`              |
+### Ingress
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| ingress.annotations | object | `{}` | Annotations |
+| ingress.className | string | `nil` | className |
+| ingress.enabled | bool | `false` |  |
+| ingress.labels | object | `{}` |  |
+| ingress.path | string | `"/"` |  |
+| ingress.pathType | string | `"Prefix"` |  |
+| ingress.tls | string | `nil` | TLS   - secretName: nextcloud-tls     hosts:       - nextcloud.kube.home |
 
-> [!Note]
-> You also need to setup nextcloud, to use imaginary
-```yaml
-nextcloud:
-  defaultConfigs:
-    imaginary.config.php: true
+### Database - Internal
 
-imaginary:
-  enabled: true
-```
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| internalDatabase.enabled | bool | `true` |  |
+| internalDatabase.name | string | `"nextcloud"` |  |
 
-## Cron jobs
+### Database - MariaDB
 
-To execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html) by using system cron instead of default Ajax cron, set `cronjob.enabled` parameter to `true`. Background jobs are important for tasks that do not necessarily need user intervention, but still need to be executed frequently (cleaning up, sending some notifications, pulling RSS feeds, etc.).
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| mariadb.architecture | string | `"standalone"` |  |
+| mariadb.auth.database | string | `"nextcloud"` |  |
+| mariadb.auth.existingSecret | string | `""` | Use existing secret (auth.rootPassword, auth.password, and auth.replicationPassword will be ignored). secret must contain the keys mariadb-root-password, mariadb-replication-password and mariadb-password |
+| mariadb.auth.password | string | `"changeme"` |  |
+| mariadb.auth.username | string | `"nextcloud"` |  |
+| mariadb.enabled | bool | `false` | Whether to deploy a mariadb server from the bitnami mariab db helm chart to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters |
+| mariadb.global.defaultStorageClass | string | `""` | overwrites the primary.persistence.storageClass value see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters |
+| mariadb.primary.persistence.accessMode | string | `"ReadWriteOnce"` |  |
+| mariadb.primary.persistence.enabled | bool | `false` |  |
+| mariadb.primary.persistence.existingClaim | string | `""` | Use an existing Persistent Volume Claim (must be created ahead of time) |
+| mariadb.primary.persistence.size | string | `"8Gi"` |  |
+| mariadb.primary.persistence.storageClass | string | `""` |  |
+| nextcloud.mariaDbInitContainer.resources | object | `{}` |  |
+| nextcloud.mariaDbInitContainer.securityContext | object | `{}` | Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive |
 
-Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to ***Cron***.
+### Metrics
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| metrics.affinity | object | `{}` | Metrics exporter pod affinity |
+| metrics.enabled | bool | `false` | Setup nextcloud-exporter |
+| metrics.https | bool | `false` | The metrics exporter needs to know how you serve Nextcloud either http or https |
+| metrics.image.pullPolicy | string | `"IfNotPresent"` | pull policy |
+| metrics.image.pullSecrets | string | `nil` | pull secret |
+| metrics.image.repository | string | `"xperimental/nextcloud-exporter"` | image repository |
+| metrics.image.tag | string | `"0.6.2"` | image tag |
+| metrics.info | object | `{"apps":false}` | Info |
+| metrics.nodeSelector | object | `{}` | Metrics exporter pod nodeSelector |
+| metrics.podAnnotations | object | `{}` | Metrics exporter pod Annotation |
+| metrics.podLabels | object | `{}` | Metrics exporter pod Labels |
+| metrics.podSecurityContext | object | `{}` | security context for the metrics POD runAsNonRoot: true seccompProfile:   type: RuntimeDefault |
+| metrics.replicaCount | int | `1` | relica count of nextcloud-exporter |
+| metrics.resources | object | `{}` | Metrics exporter resource requests and limits ref: http://kubernetes.io/docs/user-guide/compute-resources/ |
+| metrics.securityContext | object | `{"runAsNonRoot":true,"runAsUser":1000}` | security context for the metrics CONTAINER in the pod allowPrivilegeEscalation: false capabilities:   drop:     - ALL |
+| metrics.server | string | `""` | Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container. Without it, we will use the full name of the nextcloud service |
+| metrics.service.annotations | object | `{"prometheus.io/port":"9205","prometheus.io/scrape":"true"}` | Annotations |
+| metrics.service.labels | object | `{}` | Label on Service |
+| metrics.service.loadBalancerIP | string | `nil` | Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank |
+| metrics.service.type | string | `"ClusterIP"` | Service Type |
+| metrics.serviceMonitor.enabled | bool | `false` | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator |
+| metrics.serviceMonitor.interval | string | `"30s"` | Interval at which metrics should be scraped ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint |
+| metrics.serviceMonitor.jobLabel | string | `""` | The name of the label on the target service to use as the job name in prometheus. |
+| metrics.serviceMonitor.labels | object | `{}` | Extra labels for the ServiceMonitor |
+| metrics.serviceMonitor.namespace | string | `""` | Namespace in which Prometheus is running |
+| metrics.serviceMonitor.namespaceSelector | string | `nil` | The selector of the namespace where the target service is located (defaults to the release namespace) |
+| metrics.serviceMonitor.scrapeTimeout | string | `""` | Specify the timeout after which the scrape is ended ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint |
+| metrics.timeout | string | `"5s"` | Timeout |
+| metrics.tlsSkipVerify | bool | `false` | if set to true, exporter skips certificate verification of Nextcloud server. |
+| metrics.token | string | `""` | Use API token if set, otherwise fall back to password authentication https://github.com/xperimental/nextcloud-exporter#token-authentication Currently you still need to set the token manually in your nextcloud install |
+| metrics.tolerations | list | `[]` | Metrics exporter pod tolerations |
 
-## Using the nextcloud docker image auto-configuration via env vars
+### Primary ObjectStore - S3
 
-The [nextcloud/docker](https://github.com/nextcloud/docker/tree/master) image provides an auto-configuration via environment variables. See [their docs](https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables) for more info.
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nextcloud.objectStore.s3.accessKey | string | `""` | ignored if nextcloud.objectstore.s3.existingSecret is not empty string |
+| nextcloud.objectStore.s3.autoCreate | bool | `false` | autocreate the bucket |
+| nextcloud.objectStore.s3.bucket | string | `""` | required if using s3, the name of the bucket you'd like to use |
+| nextcloud.objectStore.s3.enabled | bool | `false` | Enable S3 https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3 |
+| nextcloud.objectStore.s3.existingSecret | string | `""` | use an existingSecret for S3 credentials. If set, we ignore the following under nextcloud.objectStore.s3 endpoint, accessKey, secretKey |
+| nextcloud.objectStore.s3.host | string | `""` | s3 endpoint to use; only required if you're not using AWS |
+| nextcloud.objectStore.s3.legacyAuth | bool | `false` | use legacy auth method |
+| nextcloud.objectStore.s3.port | string | `"443"` | default port that can be changed based on your object store, e.g. for minio, you can use 9000 |
+| nextcloud.objectStore.s3.prefix | string | `""` | object prefix in bucket |
+| nextcloud.objectStore.s3.region | string | `"eu-west-1"` | this is the default in the nextcloud docs |
+| nextcloud.objectStore.s3.secretKey | string | `""` | ignored if nextcloud.objectstore.s3.existingSecret is not empty string |
+| nextcloud.objectStore.s3.secretKeys.accessKey | string | `""` | key in nextcloud.objectStore.s3.existingSecret to use for s3 accessKeyID |
+| nextcloud.objectStore.s3.secretKeys.bucket | string | `""` | key in nextcloud.objectStore.s3.existingSecret to use for the s3 bucket |
+| nextcloud.objectStore.s3.secretKeys.host | string | `""` | key in nextcloud.objectStore.s3.existingSecret to use for s3 endpoint |
+| nextcloud.objectStore.s3.secretKeys.secretKey | string | `""` | key in nextcloud.objectStore.s3.existingSecret to use for s3 secretAccessKey |
+| nextcloud.objectStore.s3.secretKeys.sse_c_key | string | `""` | key in nextcloud.objectStore.s3.existingSecret to use for the s3 sse_c_key |
+| nextcloud.objectStore.s3.sse_c_key | string | `""` | server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support |
+| nextcloud.objectStore.s3.ssl | bool | `true` | use TLS/SSL for S3 connections |
+| nextcloud.objectStore.s3.storageClass | string | `"STANDARD"` | optonal parameter: you probably want to keep this as default |
+| nextcloud.objectStore.s3.usePathStyle | bool | `false` | set to true if you are not using DNS for your buckets. |
 
+### Primary ObjectStore - Swift
 
-## Multiple config.php file
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nextcloud.objectStore.swift.autoCreate | bool | `false` | autocreate container |
+| nextcloud.objectStore.swift.container | string | `""` | the container to store the data in |
+| nextcloud.objectStore.swift.enabled | bool | `false` | Enabled options related to using Swift as a primary object storage https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#openstack-swift |
+| nextcloud.objectStore.swift.project.domain | string | `"Default"` | swift project info |
+| nextcloud.objectStore.swift.project.name | string | `""` | swift project info |
+| nextcloud.objectStore.swift.region | string | `""` |  |
+| nextcloud.objectStore.swift.service | string | `"swift"` | optional on some swift implementations |
+| nextcloud.objectStore.swift.url | string | `""` | The Identity / Keystone endpoint |
+| nextcloud.objectStore.swift.user.domain | string | `"Default"` | swift user info |
+| nextcloud.objectStore.swift.user.name | string | `""` | swift user info |
+| nextcloud.objectStore.swift.user.password | string | `""` | swift user info |
 
-Nextcloud supports loading configuration parameters from multiple files.
-You can add arbitrary files ending with `.config.php` in the `config/` directory.
-See [documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file). For example, to enable image and document previews:
+### Database - PostgreSQL
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nextcloud.postgreSqlInitContainer.resources | object | `{}` |  |
+| nextcloud.postgreSqlInitContainer.securityContext | object | `{}` | Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive |
+| postgresql.enabled | bool | `false` |  |
+| postgresql.global.postgresql.auth.database | string | `"nextcloud"` |  |
+| postgresql.global.postgresql.auth.existingSecret | string | `""` | Name of existing secret to use for PostgreSQL credentials. auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret. secret might also contains the key ldap-password if LDAP is enabled. ldap.bind_password will be ignored and picked from this secret in this case. |
+| postgresql.global.postgresql.auth.password | string | `"changeme"` |  |
+| postgresql.global.postgresql.auth.secretKeys.adminPasswordKey | string | `""` | Names of keys in existing secret to use for PostgreSQL credentials |
+| postgresql.global.postgresql.auth.secretKeys.replicationPasswordKey | string | `""` | Names of keys in existing secret to use for PostgreSQL credentials |
+| postgresql.global.postgresql.auth.secretKeys.userPasswordKey | string | `""` | Names of keys in existing secret to use for PostgreSQL credentials |
+| postgresql.global.postgresql.auth.username | string | `"nextcloud"` |  |
+| postgresql.primary.persistence.enabled | bool | `false` |  |
+| postgresql.primary.persistence.existingClaim | string | `""` | Use an existing Persistent Volume Claim (must be created ahead of time) |
+| postgresql.primary.persistence.storageClass | string | `""` |  |
 
-```yaml
-nextcloud:
-  configs:
-    previews.config.php: |-
-      <?php
-      $CONFIG = array (
-        'enable_previews' => true,
-        'enabledPreviewProviders' => array (
-          'OC\Preview\Movie',
-          'OC\Preview\PNG',
-          'OC\Preview\JPEG',
-          'OC\Preview\GIF',
-          'OC\Preview\BMP',
-          'OC\Preview\XBitmap',
-          'OC\Preview\MP3',
-          'OC\Preview\MP4',
-          'OC\Preview\TXT',
-          'OC\Preview\MarkDown',
-          'OC\Preview\PDF'
-        ),
-      );
-```
+### nginx
 
-## Using nginx
-To use nginx instead of apache to serve nextcloud, Set the following parameters in your `values.yaml`:
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nginx.config.custom | string | `nil` |      worker_processes  1;.. |
+| nginx.config.default | bool | `true` | This generates the default nginx config as per the nextcloud documentation |
+| nginx.config.headers | object | `{"Referrer-Policy":"no-referrer","Strict-Transport-Security":"","X-Content-Type-Options":"nosniff","X-Download-Options":"noopen","X-Frame-Options":"SAMEORIGIN","X-Permitted-Cross-Domain-Policies":"none","X-Robots-Tag":"noindex, nofollow","X-XSS-Protection":"1; mode=block"}` | Header set on http requerst |
+| nginx.config.headers.Strict-Transport-Security | string | `""` | HSTS settings WARNING: Only add the preload option once you read about the consequences in https://hstspreload.org/. This option will add the domain to a hardcoded list that is shipped in all major browsers and getting removed from this list could take several months. Example: "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;" |
+| nginx.containerPort | int | `80` |  |
+| nginx.enabled | bool | `false` | You need to set an fpm version of the image for nextcloud if you want to use nginx!i |
+| nginx.extraEnv | list | `[]` | Extra environment variables |
+| nginx.image.pullPolicy | string | `"IfNotPresent"` |  |
+| nginx.image.repository | string | `"nginx"` |  |
+| nginx.image.tag | string | `"alpine"` |  |
+| nginx.ipFamilies | list | `["IPv4"]` | This configures nginx to listen on either IPv4, IPv6 or both |
+| nginx.resources | object | `{}` |  |
+| nginx.securityContext | object | `{}` | Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive the nginx alpine container default user is 82   runAsUser: 82   runAsGroup: 33   runAsNonRoot: true   readOnlyRootFilesystem: true |
 
-```yaml
-# This Generates an image tag using the chart's app version
-# e.g. if the app version is 25.0.3, the image tag will be 25.0.3-fpm
-image:
-  flavor: fpm
-  # You can also specify a tag directly. this version is an example:
-  # tag: 25.0.3-fpm
-```
+### redis
 
-```yaml
-# this deploys an nginx container within the nextcloud pod
-nginx
-  enabled: true
-```
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| redis.auth.enabled | bool | `true` |  |
+| redis.auth.existingSecret | string | `""` | name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time |
+| redis.auth.existingSecretPasswordKey | string | `""` | Password key to be retrieved from existing secret |
+| redis.auth.password | string | `"changeme"` |  |
+| redis.enabled | bool | `false` |  |
+| redis.global.storageClass | string | `""` |  |
+| redis.master.persistence.enabled | bool | `true` |  |
+| redis.replica.persistence.enabled | bool | `true` |  |
 
-### Service discovery with nginx and ingress
+### Deprecated
 
-For service discovery (CalDAV, CardDAV, webfinger, nodeinfo) to work you need to add redirects to your ingress.
-If you use the [ingress-nginx](https://github.com/kubernetes/ingress-nginx) you can use the following server snippet annotation:
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| securityContext | object | `{}` | for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead |
 
-<!-- Keep this in sync with the values.yaml -->
-```yaml
-ingress:
-  annotations:
-    nginx.ingress.kubernetes.io/server-snippet: |-
-      server_tokens off;
-      proxy_hide_header X-Powered-By;
-      rewrite ^/.well-known/webfinger /index.php/.well-known/webfinger last;
-      rewrite ^/.well-known/nodeinfo /index.php/.well-known/nodeinfo last;
-      rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
-      rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json;
-      location = /.well-known/carddav {
-        return 301 $scheme://$host/remote.php/dav;
-      }
-      location = /.well-known/caldav {
-        return 301 $scheme://$host/remote.php/dav;
-      }
-      location = /robots.txt {
-        allow all;
-        log_not_found off;
-        access_log off;
-      }
-      location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
-        deny all;
-      }
-      location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
-        deny all;
-      }
-```
-## Preserving Source IP
+### Other Values
 
-- Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
-- Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
-```yaml
-ingress:
-  annotations:
-   nginx.ingress.kubernetes.io/enable-cors: "true"
-   nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
-```
-- The next layer is nextcloud pod's nginx container. In in your `values.yaml`, if `nextcloud.tag` has `fpm` in it, or `image.flavor` is set to `fpm`, this can be left at default
-- Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
-```php
-  configs:
-    proxy.config.php: |-
-      <?php
-      $CONFIG = array (
-        'trusted_proxies' => array(
-          0 => '127.0.0.1',
-          1 => '10.0.0.0/8',
-        ),
-        'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
-      );
-```
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| cronjob.enabled | bool | `false` |  |
+| cronjob.lifecycle | object | `{}` |  |
+| cronjob.resources | object | `{}` |  |
+| cronjob.securityContext | object | `{}` |  |
+| deploymentAnnotations | object | `{}` |  |
+| deploymentLabels | object | `{}` |  |
+| dnsConfig | object | `{}` |  |
+| fullnameOverride | string | `""` |  |
+| hpa.cputhreshold | int | `60` |  |
+| hpa.enabled | bool | `false` |  |
+| hpa.maxPods | int | `10` |  |
+| hpa.minPods | int | `1` |  |
+| image.flavor | string | `"apache"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"nextcloud"` |  |
+| image.tag | string | `nil` |  |
+| imaginary.nodeSelector | object | `{}` | Imaginary pod nodeSelector |
+| imaginary.tolerations | list | `[]` | Imaginary pod tolerations |
+| lifecycle | object | `{}` |  |
+| livenessProbe.enabled | bool | `true` |  |
+| livenessProbe.failureThreshold | int | `3` |  |
+| livenessProbe.initialDelaySeconds | int | `10` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `5` |  |
+| nameOverride | string | `""` |  |
+| nextcloud.configs | object | `{}` |  |
+| nextcloud.containerPort | int | `80` |  |
+| nextcloud.datadir | string | `"/var/www/html/data"` |  |
+| nextcloud.defaultConfigs.".htaccess" | bool | `true` |  |
+| nextcloud.defaultConfigs."apache-pretty-urls.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."apcu.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."apps.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."autoconfig.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."imaginary.config.php" | bool | `false` | imaginary support config |
+| nextcloud.defaultConfigs."redis.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."reverse-proxy.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."s3.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."smtp.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."swift.config.php" | bool | `true` |  |
+| nextcloud.defaultConfigs."upgrade-disable-web.config.php" | bool | `true` |  |
+| nextcloud.existingSecret.enabled | bool | `false` |  |
+| nextcloud.existingSecret.passwordKey | string | `"nextcloud-password"` |  |
+| nextcloud.existingSecret.smtpHostKey | string | `"smtp-host"` |  |
+| nextcloud.existingSecret.smtpPasswordKey | string | `"smtp-password"` |  |
+| nextcloud.existingSecret.smtpUsernameKey | string | `"smtp-username"` |  |
+| nextcloud.existingSecret.tokenKey | string | `""` |  |
+| nextcloud.existingSecret.usernameKey | string | `"nextcloud-username"` |  |
+| nextcloud.extraEnv | string | `nil` |  |
+| nextcloud.extraInitContainers | list | `[]` |  |
+| nextcloud.extraSidecarContainers | list | `[]` |  |
+| nextcloud.extraVolumeMounts | string | `nil` |  |
+| nextcloud.extraVolumes | string | `nil` |  |
+| nextcloud.hooks.before-starting | string | `nil` |  |
+| nextcloud.hooks.post-installation | string | `nil` |  |
+| nextcloud.hooks.post-upgrade | string | `nil` |  |
+| nextcloud.hooks.pre-installation | string | `nil` |  |
+| nextcloud.hooks.pre-upgrade | string | `nil` |  |
+| nextcloud.host | string | `"nextcloud.kube.home"` |  |
+| nextcloud.mail.domain | string | `"domain.com"` |  |
+| nextcloud.mail.enabled | bool | `false` |  |
+| nextcloud.mail.fromAddress | string | `"user"` |  |
+| nextcloud.mail.smtp.authtype | string | `"LOGIN"` |  |
+| nextcloud.mail.smtp.host | string | `"domain.com"` |  |
+| nextcloud.mail.smtp.name | string | `"user"` |  |
+| nextcloud.mail.smtp.password | string | `"pass"` |  |
+| nextcloud.mail.smtp.port | int | `465` |  |
+| nextcloud.mail.smtp.secure | string | `"ssl"` |  |
+| nextcloud.password | string | `"changeme"` |  |
+| nextcloud.persistence.subPath | string | `nil` |  |
+| nextcloud.phpConfigs | object | `{}` |  |
+| nextcloud.podSecurityContext | object | `{}` |  |
+| nextcloud.securityContext | object | `{}` |  |
+| nextcloud.strategy.type | string | `"Recreate"` |  |
+| nextcloud.trustedDomains | list | `[]` |  |
+| nextcloud.update | int | `0` |  |
+| nextcloud.username | string | `"admin"` |  |
+| nodeSelector | object | `{}` |  |
+| persistence.accessMode | string | `"ReadWriteOnce"` |  |
+| persistence.annotations | object | `{}` |  |
+| persistence.enabled | bool | `false` |  |
+| persistence.nextcloudData.accessMode | string | `"ReadWriteOnce"` |  |
+| persistence.nextcloudData.annotations | object | `{}` |  |
+| persistence.nextcloudData.enabled | bool | `false` |  |
+| persistence.nextcloudData.size | string | `"8Gi"` |  |
+| persistence.nextcloudData.subPath | string | `nil` |  |
+| persistence.size | string | `"8Gi"` |  |
+| phpClientHttpsFix.enabled | bool | `false` |  |
+| phpClientHttpsFix.protocol | string | `"https"` |  |
+| podAnnotations | object | `{}` |  |
+| rbac.enabled | bool | `false` |  |
+| rbac.serviceaccount.annotations | object | `{}` |  |
+| rbac.serviceaccount.create | bool | `true` |  |
+| rbac.serviceaccount.name | string | `"nextcloud-serviceaccount"` |  |
+| readinessProbe.enabled | bool | `true` |  |
+| readinessProbe.failureThreshold | int | `3` |  |
+| readinessProbe.initialDelaySeconds | int | `10` |  |
+| readinessProbe.periodSeconds | int | `10` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `5` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| service.annotations | object | `{}` |  |
+| service.loadBalancerIP | string | `""` |  |
+| service.nodePort | string | `nil` |  |
+| service.port | int | `8080` |  |
+| service.type | string | `"ClusterIP"` |  |
+| startupProbe.enabled | bool | `false` |  |
+| startupProbe.failureThreshold | int | `30` |  |
+| startupProbe.initialDelaySeconds | int | `30` |  |
+| startupProbe.periodSeconds | int | `10` |  |
+| startupProbe.successThreshold | int | `1` |  |
+| startupProbe.timeoutSeconds | int | `5` |  |
+| tolerations | list | `[]` |  |
 
-## Hugepages
-
-If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error. This is due
-to your webserver attempting to memory map a file and use hugepages. This can happen in both the apache and fpm images. The fix is to either disable huge pages on the node or map hugepages into the container:
-
-```yaml
-nextcloud:
-  extraVolumes:
-    - name: hugepages
-      emptyDir:
-        medium: HugePages-2Mi
-  extraVolumeMounts:
-    - name: hugepages
-      mountPath: /dev/hugepages
-resources:
-  requests:
-    hugepages-2Mi: 500Mi
-    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-    memory: 500Mi
-  limits:
-    # limit and request must be the same for hugepages. They are a fixed resource.
-    hugepages-2Mi: 500Mi
-    # note that Kubernetes currently requires cpu or memory requests and limits before hugepages are allowed.
-    memory: 1Gi
-```
-
-## HPA (Clustering)
-If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared persistence between the containers.
-
-Minimum cluster compatible persistence settings:
-```yaml
-persistence:
-  enabled: true
-  accessMode: ReadWriteMany
-```
-
-## Adjusting PHP ini values
-
-Sometimes you may need special [`php.ini`](https://www.php.net/manual/en/ini.list.php) values. For instance, perhaps your setup requires a bit more memory. You can add additional `php.ini` files in the values.yaml by providing `nextcloud.phpConfigs.NAME_OF_FILE`. Here's an examples:
-
-```yaml
-nextcloud:
-  phpConfigs:
-    zz-memory_limit.ini: |-
-      memory_limit=512M
-```
-
-> [!Note]
-> Be sure to prefix your file name with `zz` to ensure it is loaded at the end.
-
-
-## Running `occ` commands
-Sometimes you need to run an [occ](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html) command on the Nextcloud container directly. You can do that by running commands as the user `www-data` via the `kubectl exec` command.
-
-```bash
-# $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ myocccomand"
-```
-
-Here are some examples below.
-
-### Putting Nextcloud into maintanence mode
-Some admin actions require you to put your Nextcloud instance into [maintanence mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups):
-
-```bash
-# $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mode --on"
-```
-
-### Downloading models for recognize
-[Recognize](https://github.com/nextcloud/recognize) requires you to download models before using it:
-
-```bash
-# $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
-kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
-```
-
-# Backups
-Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).
-
-# Upgrades
-Since this chart utilizes the [nextcloud/docker](https://github.com/nextcloud/docker) image, provided you are using persistent volumes, [upgrades of your Nextcloud server are handled automatically](https://github.com/nextcloud/docker#update-to-a-newer-version) from one version to the next, however, you can only upgrade one major version at a time. For example, if you want to upgrade from version `25` to `27`, you will have to upgrade from version `25` to `26`, then from `26` to `27`. Since our docker tag is set via the [`appVersion` in `Chart.yaml`](https://github.com/nextcloud/helm/blob/main/charts/nextcloud/Chart.yaml#L4), you'll need to make sure you gradually upgrade the helm chart if you have missed serveral app versions.
-
-⚠️ *Before Upgrading Nextcloud or the attached database, always make sure you take [backups](#backups)!*
-
-After an upgrade, you may have missing indices. To fix this, you can run:
-
-```bash
-# where NEXTCLOUD_POD is *your* nextcloud pod
-kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-missing-indices"
-```
-
-# Troubleshooting
-
-## Logging
-The nextcloud instance deployed by this chart doesn't currently create a log file locally inside the container.
-Examples scenarios to change this behavior include:
- - Triaging mailserver issues
- - Any time you're confused by server behavior and need more context
- - Before submitting a GitHub Issue (you can include relevant log messages that way)
-
-### Changing the logging behavior
-To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
-```yaml
-nextcloud:
-  configs:
-    logging.config.php: |-
-      <?php
-      $CONFIG = array (
-        'log_type' => 'file',
-        'logfile' => 'nextcloud.log',
-        'loglevel' => 0,
-        'logdateformat' => 'F d, Y H:i:s'
-        );
-```
-`loglevel` corresponds to the detail of the logs. Valid values are:
-```
-0: DEBUG: All activity; the most detailed logging.
-
-1: INFO: Activity such as user logins and file activities, plus warnings, errors, and fatal errors.
-
-2: WARN: Operations succeed, but with warnings of potential problems, plus errors and fatal errors.
-
-3: ERROR: An operation fails, but other services and operations continue, plus fatal errors.
-
-4: FATAL: The server stops.
-```
-[More information about Nextcloud logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html)
-
-### Viewing the logs
-To view logs after changing the logging behavior, you can exec into the Kubernetes pod, or copy them to your local machine.
-
-#### Exec into the kubernetes pod:
-```bash
-kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/sh
-```
-
-#### Then look for the `nextcloud.log` file with tail or cat:
-
-```bash
-cat nextcloud.log
-tail -f nextcloud.log
-```
-
-#### Copy the log file to your local machine:
-```bash
-kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log
-```
-
-### Sharing the logs
-Remember to anonymize your logs and snippets from your pod before sharing them with the internet. Kubernetes secrets, even Sealed ones, live in plaintext `env` variables on your running containers, and log messages can include other information that should stay safely with you.
