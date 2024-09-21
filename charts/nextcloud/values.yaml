@@ -23,8 +23,14 @@ replicaCount: 1
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ##
 ingress:
+  # --
+  # @section -- Ingress
   enabled: false
-  # className: nginx
+  # -- className
+  # @section -- Ingress
+  className:
+  # -- Annotations
+  # @section -- Ingress
   annotations: {}
   #  nginx.ingress.kubernetes.io/proxy-body-size: 4G
   #  kubernetes.io/tls-acme: "true"
@@ -54,12 +60,20 @@ ingress:
   #    location ~ ^/(?:autotest|occ|issue|indie|db_|console) {
   #      deny all;
   #    }
-  # tls:
+  # -- TLS
   #   - secretName: nextcloud-tls
   #     hosts:
   #       - nextcloud.kube.home
+  # @section -- Ingress
+  tls:
+  # --
+  # @section -- Ingress
   labels: {}
+  # --
+  # @section -- Ingress
   path: /
+  # --
+  # @section -- Ingress
   pathType: Prefix
 
 
@@ -112,70 +126,107 @@ nextcloud:
   ## Primary ObjectStore options
   # see: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage
   objectStore:
-    # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
     s3:
+      # -- Enable S3
+      # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#simple-storage-service-s3
+      # @section -- Primary ObjectStore - S3
       enabled: false
-      # ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      # -- ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      # @section -- Primary ObjectStore - S3
       accessKey: ""
-      # ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      # -- ignored if nextcloud.objectstore.s3.existingSecret is not empty string
+      # @section -- Primary ObjectStore - S3
       secretKey: ""
-      # use legacy auth method
+      # -- use legacy auth method
+      # @section -- Primary ObjectStore - S3
       legacyAuth: false
-      # s3 endpoint to use; only required if you're not using AWS
+      # -- s3 endpoint to use; only required if you're not using AWS
+      # @section -- Primary ObjectStore - S3
       host: ""
-      # use TLS/SSL for S3 connections
+      # -- use TLS/SSL for S3 connections
+      # @section -- Primary ObjectStore - S3
       ssl: true
-      # default port that can be changed based on your object store, e.g. for minio, you can use 9000
+      # -- default port that can be changed based on your object store, e.g. for minio, you can use 9000
+      # @section -- Primary ObjectStore - S3
       port: "443"
-      # this is the default in the nextcloud docs
+      # -- this is the default in the nextcloud docs
+      # @section -- Primary ObjectStore - S3
       region: "eu-west-1"
-      # required if using s3, the name of the bucket you'd like to use
+      # -- required if using s3, the name of the bucket you'd like to use
+      # @section -- Primary ObjectStore - S3
       bucket: ""
-      # object prefix in bucket
+      # -- object prefix in bucket
+      # @section -- Primary ObjectStore - S3
       prefix: ""
-      # set to true if you are not using DNS for your buckets.
+      # -- set to true if you are not using DNS for your buckets.
+      # @section -- Primary ObjectStore - S3
       usePathStyle: false
-      # autocreate the bucket
+      # -- autocreate the bucket
+      # @section -- Primary ObjectStore - S3
       autoCreate: false
-      # optonal parameter: you probably want to keep this as default
+      # -- optonal parameter: you probably want to keep this as default
+      # @section -- Primary ObjectStore - S3
       storageClass: "STANDARD"
-      # server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support
+      # -- server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support
+      # @section -- Primary ObjectStore - S3
       sse_c_key: ""
-      # use an existingSecret for S3 credentials. If set, we ignore the following under nextcloud.objectStore.s3
+      # -- use an existingSecret for S3 credentials. If set, we ignore the following under nextcloud.objectStore.s3
       # endpoint, accessKey, secretKey
+      # @section -- Primary ObjectStore - S3
       existingSecret: ""
       secretKeys:
-        # key in nextcloud.objectStore.s3.existingSecret to use for s3 endpoint
+        # -- key in nextcloud.objectStore.s3.existingSecret to use for s3 endpoint
+        # @section -- Primary ObjectStore - S3
         host: ""
-        # key in nextcloud.objectStore.s3.existingSecret to use for s3 accessKeyID
+        # -- key in nextcloud.objectStore.s3.existingSecret to use for s3 accessKeyID
+        # @section -- Primary ObjectStore - S3
         accessKey: ""
-        # key in nextcloud.objectStore.s3.existingSecret to use for s3 secretAccessKey
+        # -- key in nextcloud.objectStore.s3.existingSecret to use for s3 secretAccessKey
+        # @section -- Primary ObjectStore - S3
         secretKey: ""
-        # key in nextcloud.objectStore.s3.existingSecret to use for the s3 bucket
+        # -- key in nextcloud.objectStore.s3.existingSecret to use for the s3 bucket
+        # @section -- Primary ObjectStore - S3
         bucket: ""
-        # key in nextcloud.objectStore.s3.existingSecret to use for the s3 sse_c_key
+        # -- key in nextcloud.objectStore.s3.existingSecret to use for the s3 sse_c_key
+        # @section -- Primary ObjectStore - S3
         sse_c_key: ""
-    ## options related to using Swift as a primary object storage
-    # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#openstack-swift
     swift:
+      # -- Enabled
+      # options related to using Swift as a primary object storage
+      # https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#openstack-swift
+      # @section -- Primary ObjectStore - Swift
       enabled: false
-      # swift user info
       user:
+        # -- swift user info
+        # @section -- Primary ObjectStore - Swift
         domain: "Default"
+        # -- swift user info
+        # @section -- Primary ObjectStore - Swift
         name: ""
+        # -- swift user info
+        # @section -- Primary ObjectStore - Swift
         password: ""
-      # swift project info
       project:
+        # -- swift project info
+        # @section -- Primary ObjectStore - Swift
         name: ""
+        # -- swift project info
+        # @section -- Primary ObjectStore - Swift
         domain: "Default"
-      # The Identity / Keystone endpoint
+      # -- The Identity / Keystone endpoint
+      # @section -- Primary ObjectStore - Swift
       url: ""
+      # --
+      # @section -- Primary ObjectStore - Swift
       region: ""
-      # optional on some swift implementations
+      # -- optional on some swift implementations
+      # @section -- Primary ObjectStore - Swift
       service: "swift"
-      # the container to store the data in
+      # -- the container to store the data in
+      # @section -- Primary ObjectStore - Swift
       container: ""
-      # autocreate container
+      # -- autocreate container
+      # @section -- Primary ObjectStore - Swift
       autoCreate: false
 
   ## PHP Configuration files
@@ -307,34 +358,52 @@ nextcloud:
 
   # Settings for the MariaDB init container
   mariaDbInitContainer:
+    # --
+    # @section -- Database - MariaDB
     resources: {}
-    # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    # -- Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    # @section -- Database - MariaDB
     securityContext: {}
 
-  # Settings for the PostgreSQL init container
   postgreSqlInitContainer:
+    # --
+    # @section -- Database - PostgreSQL
     resources: {}
-    # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    # -- Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
+    # @section -- Database - PostgreSQL
     securityContext: {}
 
 
 nginx:
-  ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
+  # -- You need to set an fpm version of the image for nextcloud if you want to use nginx!i
+  # @section -- nginx
   enabled: false
 
   image:
+    # --
+    # @section -- nginx
     repository: nginx
+    # --
+    # @section -- nginx
     tag: alpine
+    # --
+    # @section -- nginx
     pullPolicy: IfNotPresent
 
+  # --
+  # @section -- nginx
   containerPort: 80
-  # This configures nginx to listen on either IPv4, IPv6 or both
+  # -- This configures nginx to listen on either IPv4, IPv6 or both
+  # @section -- nginx
   ipFamilies:
     - IPv4
     # - IPv6
   config:
-    # This generates the default nginx config as per the nextcloud documentation
+    # -- This generates the default nginx config as per the nextcloud documentation
+    # @section -- nginx
     default: true
+    # -- Header set on http requerst
+    # @section -- nginx
     headers:
       # -- HSTS settings
       # WARNING: Only add the preload option once you read about
@@ -344,6 +413,7 @@ nginx:
       # could take several months.
       # Example:
       # "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
+      # @section -- nginx
       "Strict-Transport-Security": ""
       "Referrer-Policy": "no-referrer"
       "X-Content-Type-Options": "nosniff"
@@ -353,82 +423,121 @@ nginx:
       "X-Robots-Tag": "noindex, nofollow"
       "X-XSS-Protection": "1; mode=block"
 
-    custom:
-    # custom: |-
+    # --
     #     worker_processes  1;..
+    # @section -- nginx
+    custom:
 
+  # --
+  # @section -- nginx
   resources: {}
 
-  # Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
-  securityContext: {}
+  # -- Set nginx container securityContext parameters. For example, you may need to define runAsNonRoot directive
   # the nginx alpine container default user is 82
   #   runAsUser: 82
   #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
+  # @section -- nginx
+  securityContext: {}
 
-  ## Extra environment variables
+  # -- Extra environment variables
+  # @section -- nginx
   extraEnv: []
   #  - name: SOME_ENV
   #    value: ENV_VALUE
 
 internalDatabase:
+  # --
+  # @section -- Database - Internal
   enabled: true
+  # --
+  # @section -- Database - Internal
   name: nextcloud
 
 ##
 ## External database configuration
 ##
 externalDatabase:
+  # --
+  # @section -- Database - External
   enabled: false
 
-  ## Supported database engines: mysql or postgresql
+  # -- Supported database engines: mysql or postgresql
+  # @section -- Database - External
   type: mysql
 
-  ## Database host. You can optionally include a colon delimited port like "myhost:1234"
+  # -- Database host. You can optionally include a colon delimited port like "myhost:1234"
+  # @section -- Database - External
   host: ""
 
-  ## Database user
+  # -- Database user
+  # @section -- Database - External
   user: nextcloud
 
-  ## Database password
+  # -- Database password
+  # @section -- Database - External
   password: ""
 
-  ## Database name
+  # -- Database name
+  # @section -- Database - External
   database: nextcloud
 
   ## Use a existing secret
   existingSecret:
+    # --
+    # @section -- Database - External
     enabled: false
-    # secretName: nameofsecret
+    # --
+    # @section -- Database - External
+    secretName:
+    # --
+    # @section -- Database - External
     usernameKey: db-username
+    # --
+    # @section -- Database - External
     passwordKey: db-password
-    # hostKey: db-hostname-or-ip
-    # databaseKey: db-name
+    # --
+    # @section -- Database - External
+    hostKey: db-hostname-or-ip
+    # --
+    # @section -- Database - External
+    databaseKey:
 
 ##
 ## MariaDB chart configuration
 ## ref: https://github.com/bitnami/charts/tree/main/bitnami/mariadb
 ##
 mariadb:
-  ## Whether to deploy a mariadb server from the bitnami mariab db helm chart
+  # --  Whether to deploy a mariadb server from the bitnami mariab db helm chart
   # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
+  # @section -- Database - MariaDB
   enabled: false
 
-  # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
   global:
-    # overwrites the primary.persistence.storageClass value
+    # -- overwrites the primary.persistence.storageClass value
+    # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
+    # @section -- Database - MariaDB
     defaultStorageClass: ""
 
   auth:
+    # --
+    # @section -- Database - MariaDB
     database: nextcloud
+    # --
+    # @section -- Database - MariaDB
     username: nextcloud
+    # --
+    # @section -- Database - MariaDB
     password: changeme
-    # Use existing secret (auth.rootPassword, auth.password, and auth.replicationPassword will be ignored).
+    # -- Use existing secret (auth.rootPassword, auth.password, and auth.replicationPassword will be ignored).
     # secret must contain the keys mariadb-root-password, mariadb-replication-password and mariadb-password
+    # @section -- Database - MariaDB
     existingSecret: ""
 
+  # --
+  # @section -- Database - MariaDB
   architecture: standalone
 
   ## Enable persistence using Persistent Volume Claims
@@ -436,11 +545,20 @@ mariadb:
   ##
   primary:
     persistence:
+      # --
+      # @section -- Database - MariaDB
       enabled: false
-      # Use an existing Persistent Volume Claim (must be created ahead of time)
+      # -- Use an existing Persistent Volume Claim (must be created ahead of time)
+      # @section -- Database - MariaDB
       existingClaim: ""
+      # --
+      # @section -- Database - MariaDB
       storageClass: ""
+      # --
+      # @section -- Database - MariaDB
       accessMode: ReadWriteOnce
+      # --
+      # @section -- Database - MariaDB
       size: 8Gi
 
 ##
@@ -448,53 +566,86 @@ mariadb:
 ## for more options see https://github.com/bitnami/charts/tree/main/bitnami/postgresql
 ##
 postgresql:
+  # --
+  # @section -- Database - PostgreSQL
   enabled: false
   global:
     postgresql:
       # global.postgresql.auth overrides postgresql.auth
       auth:
+        # --
+        # @section -- Database - PostgreSQL
         username: nextcloud
+        # --
+        # @section -- Database - PostgreSQL
         password: changeme
+        # --
+        # @section -- Database - PostgreSQL
         database: nextcloud
-        # Name of existing secret to use for PostgreSQL credentials.
+        # -- Name of existing secret to use for PostgreSQL credentials.
         # auth.postgresPassword, auth.password, and auth.replicationPassword will be ignored and picked up from this secret.
         # secret might also contains the key ldap-password if LDAP is enabled.
         # ldap.bind_password will be ignored and picked from this secret in this case.
+        # @section -- Database - PostgreSQL
         existingSecret: ""
-        # Names of keys in existing secret to use for PostgreSQL credentials
         secretKeys:
+          # -- Names of keys in existing secret to use for PostgreSQL credentials
+          # @section -- Database - PostgreSQL
           adminPasswordKey: ""
+          # -- Names of keys in existing secret to use for PostgreSQL credentials
+          # @section -- Database - PostgreSQL
           userPasswordKey: ""
+          # -- Names of keys in existing secret to use for PostgreSQL credentials
+          # @section -- Database - PostgreSQL
           replicationPasswordKey: ""
   primary:
     persistence:
+      # --
+      # @section -- Database - PostgreSQL
       enabled: false
-      # Use an existing Persistent Volume Claim (must be created ahead of time)
-      # existingClaim: ""
-      # storageClass: ""
+      # -- Use an existing Persistent Volume Claim (must be created ahead of time)
+      # @section -- Database - PostgreSQL
+      existingClaim: ""
+      # --
+      # @section -- Database - PostgreSQL
+      storageClass: ""
 
 ##
 ## Redis chart configuration
 ## for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
 ##
+# Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
 
 redis:
+  # --
+  # @section -- redis
   enabled: false
   auth:
+    # --
+    # @section -- redis
     enabled: true
+    # --
+    # @section -- redis
     password: 'changeme'
-    # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
+    # -- name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
+    # @section -- redis
     existingSecret: ""
-    # Password key to be retrieved from existing secret
+    # -- Password key to be retrieved from existing secret
+    # @section -- redis
     existingSecretPasswordKey: ""
-  # Since Redis is used for caching only, you might want to use a storageClass with different reclaim policy and backup settings
   global:
+    # --
+    # @section -- redis
     storageClass: ""
   master:
     persistence:
+      # --
+      # @section -- redis
       enabled: true
   replica:
     persistence:
+      # --
+      # @section -- redis
       enabled: true
 
 ##
@@ -502,57 +653,81 @@ redis:
 ## for more options see https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online
 ##
 collabora:
+  # -- Activate collabora subchart
+  # @section -- Collabora
   enabled: false
 
   autoscaling:
-    # enable autocaling, please check collabora README.md first
+    # -- enable autocaling, please check collabora README.md first
+    # @section -- Collabora
     enabled: false
 
   collabora:
-    ## HTTPS nextcloud domain, if needed
+    # --  HTTPS nextcloud domain, if needed
+    # @section -- Collabora
     aliasgroups: []
     #   - host: "https://nextcloud.domain:443"
 
-    # set extra parameters for collabora
+    # -- set extra parameters for collabora
     # you may need to add --o:ssl.termination=true
+    # @section -- Collabora
     extra_params: --o:ssl.enable=false
 
-    ## Specify server_name when the hostname is not reachable directly for
+    # -- Specify server_name when the hostname is not reachable directly for
     # example behind reverse-proxy. example: collabora.domain
+    # @section -- Collabora
     server_name: null
 
     existingSecret:
-      # set to true to to get collabora admin credentials from an existin secret
+      # -- set to true to to get collabora admin credentials from an existin secret
       # if set, ignores collabora.collabora.username and password
+      # @section -- Collabora
       enabled: false
-      # name of existing Kubernetes Secret with collboara admin credentials
+      # -- name of existing Kubernetes Secret with collboara admin credentials
+      # @section -- Collabora
       secretName: ""
+      # --
+      # @section -- Collabora
       usernameKey: "username"
+      # --
+      # @section -- Collabora
       passwordKey: "password"
 
-    # setup admin login credentials, these are ignored if
+    # -- setup admin login credentials, these are ignored if
     # collabora.collabora.existingSecret.enabled=true
+    # @section -- Collabora
     password: examplepass
+    # --
+    # @section -- Collabora
     username: admin
 
   # setup ingress
   ingress:
-    # enable ingress for collabora online
+    # -- enable ingress for collabora online
+    # @section -- Collabora
     enabled: false
+    # --
+    # @section -- Collabora
     className: ""
-    # please check collabora values.yaml for nginx/haproxy annotations examples
+    # -- please check collabora values.yaml for nginx/haproxy annotations examples
+    # @section -- Collabora
     annotations: {}
+    # -- Ingress Host of collabora
+    # @section -- Collabora
     hosts:
       - host: chart-example.local
         paths:
         - path: /
           pathType: ImplementationSpecific
-    tls: []
+    # -- tls for ingress
     #  - secretName: collabora-ingress-tls
     #    hosts:
     #      - collabora.domain
+    # @section -- Collabora
+    tls: []
 
-  # see collabora helm README.md for recommended values
+  # -- see collabora helm README.md for recommended values
+  # @section -- Collabora
   resources: {}
 
 
@@ -584,8 +759,9 @@ service:
   port: 8080
   loadBalancerIP: ""
   nodePort:
-  # -- use additional annotation on service for nextcloud
   annotations: {}
+    ## Insert your annotations such as below
+    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
@@ -683,26 +859,35 @@ dnsConfig: {}
 #     value: "1"
 
 imaginary:
-  # -- Start Imgaginary
+  # -- Start Imaginary
+  # @section -- Imaginary
   enabled: false
   # -- Number of imaginary pod replicas to deploy
+  # @section -- Imaginary
   replicaCount: 1
 
   image:
     # -- Imaginary image registry
+    # @section -- Imaginary
     registry: docker.io
     # -- Imaginary image name
+    # @section -- Imaginary
     repository: h2non/imaginary
     # -- Imaginary image tag
+    # @section -- Imaginary
     tag: 1.2.4
     # -- Imaginary image pull policy
+    # @section -- Imaginary
     pullPolicy: IfNotPresent
     # -- Imaginary image pull secrets
+    # @section -- Imaginary
     pullSecrets: []
 
   # -- Additional annotations for imaginary
+  # @section -- Imaginary
   podAnnotations: {}
   # -- Additional labels for imaginary
+  # @section -- Imaginary
   podLabels: {}
   # -- Imaginary pod nodeSelector
   nodeSelector: {}
@@ -710,153 +895,216 @@ imaginary:
   tolerations: []
 
   # -- imaginary resources
+  # @section -- Imaginary
   resources: {}
 
   # -- Optional security context for the Imaginary container
+  # allowPrivilegeEscalation: false
+  # capabilities:
+  #   drop:
+  #     - ALL
+  # @section -- Imaginary
   securityContext:
     runAsUser: 1000
     runAsNonRoot: true
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #     - ALL
 
   # -- Optional security context for the Imaginary pod (applies to all containers in the pod)
-  podSecurityContext: {}
   # runAsNonRoot: true
   # seccompProfile:
   #   type: RuntimeDefault
+  # @section -- Imaginary
+  podSecurityContext: {}
 
   readinessProbe:
+    # -- active readiness probes
+    # @section -- Imaginary
     enabled: true
+    # -- readiness probe: threshold for failure
+    # @section -- Imaginary
     failureThreshold: 3
+    # -- readiness probe: threshold for success
+    # @section -- Imaginary
     successThreshold: 1
+    # -- readiness probe: period seconds
+    # @section -- Imaginary
     periodSeconds: 10
+    # -- readinees probe: timeout
+    # @section -- Imaginary
     timeoutSeconds: 1
   livenessProbe:
+    # -- active liveness probes
+    # @section -- Imaginary
     enabled: true
+    # -- liveness probe: threshold for failure
+    # @section -- Imaginary
     failureThreshold: 3
+    # -- liveness probe: threshold for success
+    # @section -- Imaginary
     successThreshold: 1
+    # -- liveness probe: period seconds
+    # @section -- Imaginary
     periodSeconds: 10
+    # -- liveness probe: timeout
+    # @section -- Imaginary
     timeoutSeconds: 1
 
   service:
     # -- Imaginary: Kubernetes Service type
+    # @section -- Imaginary
     type: ClusterIP
     # -- Imaginary: LoadBalancerIp for service type LoadBalancer
+    # @section -- Imaginary
     loadBalancerIP:
     # -- Imaginary: NodePort for service type NodePort
+    # @section -- Imaginary
     nodePort:
     # -- Additional annotations for service imaginary
+    # @section -- Imaginary
     annotations: {}
     # -- Additional labels for service imaginary
+    # @section -- Imaginary
     labels: {}
 
 ## Prometheus Exporter / Metrics
 ##
 metrics:
+  # -- Setup nextcloud-exporter
+  # @section -- Metrics
   enabled: false
 
+  # -- relica count of nextcloud-exporter
+  # @section -- Metrics
   replicaCount: 1
-  # Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
+  # -- Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container.
   # Without it, we will use the full name of the nextcloud service
+  # @section -- Metrics
   server: ""
-  # The metrics exporter needs to know how you serve Nextcloud either http or https
+  # -- The metrics exporter needs to know how you serve Nextcloud either http or https
+  # @section -- Metrics
   https: false
-  # Use API token if set, otherwise fall back to password authentication
+  # -- Use API token if set, otherwise fall back to password authentication
   # https://github.com/xperimental/nextcloud-exporter#token-authentication
   # Currently you still need to set the token manually in your nextcloud install
+  # @section -- Metrics
   token: ""
+  # -- Timeout
+  # @section -- Metrics
   timeout: 5s
-  # if set to true, exporter skips certificate verification of Nextcloud server.
+  # -- if set to true, exporter skips certificate verification of Nextcloud server.
+  # @section -- Metrics
   tlsSkipVerify: false
+  # -- Info
+  # @section -- Metrics
   info:
     # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
     # Enables gathering of apps-related metrics. Defaults to false
     apps: false
 
   image:
+    # -- image repository
+    # @section -- Metrics
     repository: xperimental/nextcloud-exporter
+    # -- image tag
+    # @section -- Metrics
     tag: 0.6.2
+    # -- pull policy
+    # @section -- Metrics
     pullPolicy: IfNotPresent
-    # pullSecrets:
+    # -- pull secret
+    # @section -- Metrics
+    pullSecrets:
     #   - myRegistrKeySecretName
 
-  ## Metrics exporter resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
+  # -- Metrics exporter resource requests and limits
+  # ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  # @section -- Metrics
   resources: {}
 
   # -- Metrics exporter pod Annotation
+  # @section -- Metrics
   podAnnotations: {}
 
   # -- Metrics exporter pod Labels
+  # @section -- Metrics
   podLabels: {}
 
   # -- Metrics exporter pod nodeSelector
+  # @section -- Metrics
   nodeSelector: {}
 
   # -- Metrics exporter pod tolerations
+  # @section -- Metrics
   tolerations: []
 
   # -- Metrics exporter pod affinity
+  # @section -- Metrics
   affinity: {}
 
   service:
+    # -- Service Type
+    # @section -- Metrics
     type: ClusterIP
-    # Use serviceLoadBalancerIP to request a specific static IP,
+    # -- Use serviceLoadBalancerIP to request a specific static IP,
     # otherwise leave blank
+    # @section -- Metrics
     loadBalancerIP:
+    # -- Annotations
+    # @section -- Metrics
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9205"
+    # -- Label on Service
+    # @section -- Metrics
     labels: {}
 
   # -- security context for the metrics CONTAINER in the pod
+  # allowPrivilegeEscalation: false
+  # capabilities:
+  #   drop:
+  #     - ALL
+  # @section -- Metrics
   securityContext:
     runAsUser: 1000
     runAsNonRoot: true
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #     - ALL
 
   # -- security context for the metrics POD
-  podSecurityContext: {}
   # runAsNonRoot: true
   # seccompProfile:
   #   type: RuntimeDefault
+  # @section -- Metrics
+  podSecurityContext: {}
 
   ## Prometheus Operator ServiceMonitor configuration
   ##
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
-    ##
+    # -- Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
+    # @section -- Metrics
     enabled: false
 
-    ## @param metrics.serviceMonitor.namespace Namespace in which Prometheus is running
-    ##
+    # -- Namespace in which Prometheus is running
+    # @section -- Metrics
     namespace: ""
 
-    ## @param metrics.serviceMonitor.namespaceSelector The selector of the namespace where the target service is located (defaults to the release namespace)
+    # -- The selector of the namespace where the target service is located (defaults to the release namespace)
+    # @section -- Metrics
     namespaceSelector:
 
-    ## @param metrics.serviceMonitor.jobLabel The name of the label on the target service to use as the job name in prometheus.
-    ##
+    # -- The name of the label on the target service to use as the job name in prometheus.
+    # @section -- Metrics
     jobLabel: ""
 
-    ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
-    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-    ##
+    # -- Interval at which metrics should be scraped
+    # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    # @section -- Metrics
     interval: 30s
 
-    ## @param metrics.serviceMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
-    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-    ##
+    # -- Specify the timeout after which the scrape is ended
+    # ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    # @section -- Metrics
     scrapeTimeout: ""
 
-    ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
-    ##
+    # -- Extra labels for the ServiceMonitor
+    # @section -- Metrics
     labels: {}
 
 
@@ -868,5 +1116,6 @@ rbac:
     annotations: {}
 
 
-## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
+# -- for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
+# @section -- Deprecated
 securityContext: {}
