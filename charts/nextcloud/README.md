@@ -1,6 +1,6 @@
 # nextcloud
 
-![Version: 6.0.1](https://img.shields.io/badge/Version-6.0.1-informational?style=flat-square) ![AppVersion: 30.0.0](https://img.shields.io/badge/AppVersion-30.0.0-informational?style=flat-square)
+![Version: 6.0.2](https://img.shields.io/badge/Version-6.0.2-informational?style=flat-square) ![AppVersion: 30.0.0](https://img.shields.io/badge/AppVersion-30.0.0-informational?style=flat-square)
 
 A file sharing server that puts the control and security of your own data back into your hands.
 
@@ -13,6 +13,7 @@ A file sharing server that puts the control and security of your own data back i
 | skjnldsv | <skjnldsv@protonmail.com> |  |
 | chrisingenhaag | <christian.ingenhaag@googlemail.com> |  |
 | billimek | <jeff@billimek.com> |  |
+| WrenIX |  | <https://wrenix.eu> |
 
 ## Source Code
 
