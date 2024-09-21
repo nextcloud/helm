@@ -30,6 +30,17 @@ A file sharing server that puts the control and security of your own data back i
 
 ## Values
 
+### Metrics
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| metrics.enabled | bool | `false` | Setup nextcloud-exporter |
+| metrics.https | bool | `false` | The metrics exporter needs to know how you serve Nextcloud either http or https |
+| metrics.replicaCount | int | `1` | relica count of nextcloud-exporter |
+| metrics.server | string | `""` | Optional: becomes NEXTCLOUD_SERVER env var in the nextcloud-exporter container. Without it, we will use the full name of the nextcloud service |
+
+### Other Values
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
@@ -85,8 +96,6 @@ A file sharing server that puts the control and security of your own data back i
 | mariadb.primary.persistence.size | string | `"8Gi"` |  |
 | mariadb.primary.persistence.storageClass | string | `""` |  |
 | metrics.affinity | object | `{}` | Metrics exporter pod affinity |
-| metrics.enabled | bool | `false` |  |
-| metrics.https | bool | `false` |  |
 | metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | metrics.image.repository | string | `"xperimental/nextcloud-exporter"` |  |
 | metrics.image.tag | string | `"0.6.2"` |  |
@@ -95,10 +104,8 @@ A file sharing server that puts the control and security of your own data back i
 | metrics.podAnnotations | object | `{}` | Metrics exporter pod Annotation |
 | metrics.podLabels | object | `{}` | Metrics exporter pod Labels |
 | metrics.podSecurityContext | object | `{}` | security context for the metrics POD |
-| metrics.replicaCount | int | `1` |  |
 | metrics.resources | object | `{}` |  |
 | metrics.securityContext | object | `{"runAsNonRoot":true,"runAsUser":1000}` | security context for the metrics CONTAINER in the pod |
-| metrics.server | string | `""` |  |
 | metrics.service.annotations."prometheus.io/port" | string | `"9205"` |  |
 | metrics.service.annotations."prometheus.io/scrape" | string | `"true"` |  |
 | metrics.service.labels | object | `{}` |  |
