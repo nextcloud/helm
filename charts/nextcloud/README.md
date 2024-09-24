@@ -119,6 +119,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpUsernameKey`                  | Name of the key that contains the SMTP username                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpPasswordKey`                  | Name of the key that contains the SMTP password                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpHostKey`                      | Name of the key that contains the SMTP hostname                                                     | `nil`                      |
+| `nextcloud.existingSecret.tokenKey`                         | Name of the key that contains the nextcloud metrics token                                           | `''`                       |
 | `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                        |
 | `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                       |
 | `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                       |
@@ -238,8 +239,10 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `mariadb.image.registry`                                              | MariaDB image registry                                                            | `docker.io`            |
 | `mariadb.image.repository`                                            | MariaDB image repository                                                          | `bitnami/mariadb`      |
 | `mariadb.image.tag`                                                   | MariaDB image tag                                                                 | ``                     |
+| `mariadb.global.defaultStorageClass`                                  | MariaDB Global default StorageClass for Persistent Volume(s)                      | `''`                   |
 | `mariadb.primary.persistence.enabled`                                 | Whether or not to Use a PVC on MariaDB primary                                    | `false`                |
-| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `nil`                  |
+| `mariadb.primary.persistence.storageClass`                            | MariaDB primary persistent volume storage Class                                   | `''`                   |
+| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `''`                   |
 | `postgresql.enabled`                                                  | Whether to use the PostgreSQL chart                                               | `false`                |
 | `postgresql.image.registry`                                           | PostgreSQL image registry                                                         | `docker.io`            |
 | `postgresql.image.repository`                                         | PostgreSQL image repository                                                       | `bitnami/postgresql`   |
