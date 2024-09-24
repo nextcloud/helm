@@ -360,8 +360,8 @@ externalDatabase:
   ## Supported database engines: mysql or postgresql
   type: mysql
 
-  ## Database host
-  host:
+  ## Database host. You can optionally include a colon delimited port like "myhost:1234"
+  host: ""
 
   ## Database user
   user: nextcloud
