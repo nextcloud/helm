@@ -500,7 +500,6 @@ collabora:
       passwordKey: "password"
     password: examplepass
     username: admin
-  
   # setup ingress
   ingress:
     enabled: false
