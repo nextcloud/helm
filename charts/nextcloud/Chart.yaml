@@ -15,6 +15,8 @@ maintainers:
     email: jeff@billimek.com
   - name: WrenIX
     url: https://wrenix.eu
+  - name: jessebot
+    url: https://jessebot.work
 keywords:
   - nextcloud
   - storage
