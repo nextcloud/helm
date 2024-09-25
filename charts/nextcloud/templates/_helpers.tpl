@@ -247,7 +247,7 @@ S3 as primary object store env vars
   value: {{ .Values.nextcloud.objectStore.s3.usePathStyle | quote }}
 {{- with .Values.nextcloud.objectStore.s3.legacyAuth }}
 - name: OBJECTSTORE_S3_LEGACYAUTH
-  value: {{ . }}
+  value: {{ . | quote }}
 {{- end }}
 - name: OBJECTSTORE_S3_AUTOCREATE
   value: {{ .Values.nextcloud.objectStore.s3.autoCreate | quote }}
