@@ -464,6 +464,7 @@ nextcloud:
       $CONFIG = array(
         'enabledPreviewProviders' => array(
           0 => 'OC\\Preview\\Imaginary',
+          1 => 'OC\\Preview\\ImaginaryPDF',
         );
 
 imaginary:
