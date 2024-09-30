@@ -161,6 +161,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
 | `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
 | `nginx.containerPort`                                       | Customize container port e.g. when not running as root                                              | `IfNotPresent`             |
+| `nginx.ipFamilies`                                          | Customize container to listen on IPv4, IPv6 or both                                                 | `["IPv4"]`                 |
 | `nginx.config.default`                                      | Whether to use nextcloud's recommended nginx config                                                 | `true`                     |
 | `nginx.config.custom`                                       | Specify a custom config for nginx                                                                   | `{}`                       |
 | `nginx.resources`                                           | nginx resources                                                                                     | `{}`                       |
