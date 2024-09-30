@@ -220,7 +220,7 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `internalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
 | `externalDatabase.enabled`                                            | Whether to use external database                                                  | `false`                |
 | `externalDatabase.type`                                               | External database type: `mysql`, `postgresql`                                     | `mysql`                |
-| `externalDatabase.host`                                               | Host of the external database in form of `host:port`                              | `nil`                  |
+| `externalDatabase.host`                                               | Host of the external database in form of `host:port`. Example: `"myhost:1234"`    | `""`                   |
 | `externalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
 | `externalDatabase.user`                                               | Existing username in the external db                                              | `nextcloud`            |
 | `externalDatabase.password`                                           | Password for the above username                                                   | `nil`                  |
