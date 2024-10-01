@@ -324,7 +324,10 @@ nginx:
     pullPolicy: IfNotPresent
 
   containerPort: 80
-
+  # This configures nginx to listen on either IPv4, IPv6 or both
+  ipFamilies:
+    - IPv4
+    # - IPv6
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
