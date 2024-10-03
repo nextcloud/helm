@@ -39,6 +39,7 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
@@ -102,6 +103,7 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
