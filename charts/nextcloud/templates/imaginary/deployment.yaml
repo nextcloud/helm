@@ -1,0 +1,88 @@
+{{- if .Values.imaginary.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-imaginary
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: imaginary
+spec:
+  replicas: {{ .Values.imaginary.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: imaginary
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.imaginary.podAnnotations | nindent 8 }}
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: imaginary
+        {{- with .Values.imaginary.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imaginary.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end}}
+      {{- end }}
+      containers:
+        - name: imaginary
+          {{- with .Values.imaginary.image }}
+          image: "{{ .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          env:
+            - name: PORT
+              value: "9000"
+          ports:
+            - name: http
+              containerPort: 9000
+          {{- with .Values.imaginary.readinessProbe }}
+          {{- if .enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.imaginary.livenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.imaginary.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.imaginary.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.imaginary.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+{{- end }}
