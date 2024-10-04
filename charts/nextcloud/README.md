@@ -288,6 +288,13 @@ Here are all the values you can currently configure in this helm chart to config
 | `nextcloud.objectStore.s3.autoCreate`           | auto-create the S3 bucket                                             | `false`     |
 | `nextcloud.objectStore.s3.storageClass`         | S3 storage class to use                                               | `STANDARD`  |
 | `nextcloud.objectStore.s3.sse_c_key`            | S3 server side encryption key.                                        | `''`        |
+| `nextcloud.objectStore.s3.concurrency`          | S3 maximum number of concurrent multipart uploads.                    | `5`         |
+| `nextcloud.objectStore.s3.proxy`                | S3 proxy enabled or not.                                              | `false`     |
+| `nextcloud.objectStore.s3.timeout`              | S3 timeout in seconds.                                                | `15`        |
+| `nextcloud.objectStore.s3.uploadPartSize`       | S3 max upload size, in bytes.                                         | `524288000` |
+| `nextcloud.objectStore.s3.putSizeLimit`         | S3 max PUT size, in bytes.                                            | `104857600` |
+| `nextcloud.objectStore.s3.version`              | S3 version to use.                                                    | `'latest'`  |
+| `nextcloud.objectStore.s3.verify_bucket_exists` | S3 param to check if bucket already exists on startup.                | `true`      |
 | `nextcloud.objectStore.s3.existingSecret`       | Use an existing Kubernetes Secret to fetch auth credentials           | `''`        |
 | `nextcloud.objectStore.s3.secretKeys.host`      | if using s3.existingSecret, secret key to use for the host            | `''`        |
 | `nextcloud.objectStore.s3.secretKeys.accessKey` | if using s3.existingSecret, secret key to use for the accessKeyID     | `''`        |

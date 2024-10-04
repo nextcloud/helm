@@ -141,6 +141,16 @@ nextcloud:
       storageClass: "STANDARD"
       # server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support
       sse_c_key: ""
+      # defines the maximum number of concurrent multipart uploads
+      concurrency: 5
+      proxy: false
+      timeout: 15
+      uploadPartSize: 524288000
+      putSizeLimit: 104857600
+      version: "latest"
+      # Setting this to false after confirming the bucket has been created may provide a performance benefit,
+      # but may not be possible in multibucket scenarios.
+      verify_bucket_exists: true
       # use an existingSecret for S3 credentials. If set, we ignore the following under nextcloud.objectStore.s3
       # endpoint, accessKey, secretKey
       existingSecret: ""

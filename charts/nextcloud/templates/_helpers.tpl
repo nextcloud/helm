@@ -249,6 +249,22 @@ S3 as primary object store env vars
 - name: OBJECTSTORE_S3_LEGACYAUTH
   value: {{ . | quote }}
 {{- end }}
+- name: OBJECTSTORE_S3_CONCURRENCY
+  value: {{ .Values.nextcloud.objectStore.s3.concurrency | quote }}
+{{- with .Values.nextcloud.objectStore.s3.proxy }}
+- name: OBJECTSTORE_S3_PROXY
+  value: {{ . | quote }}
+{{- end }}
+- name: OBJECTSTORE_S3_TIMEOUT
+  value: {{ .Values.nextcloud.objectStore.s3.timeout | quote }}
+- name: OBJECTSTORE_S3_UPLOADPARTSIZE
+  value: {{ .Values.nextcloud.objectStore.s3.uploadPartSize | quote }}
+- name: OBJECTSTORE_S3_PUTSIZELIMIT
+  value: {{ .Values.nextcloud.objectStore.s3.putSizeLimit | quote }}
+- name: OBJECTSTORE_S3_VERSION
+  value: {{ .Values.nextcloud.objectStore.s3.version | quote }}
+- name: OBJECTSTORE_S3_VERIFY_BUCKET_EXISTS
+  value: {{ .Values.nextcloud.objectStore.s3.verify_bucket_exists | quote }}
 - name: OBJECTSTORE_S3_AUTOCREATE
   value: {{ .Values.nextcloud.objectStore.s3.autoCreate | quote }}
 - name: OBJECTSTORE_S3_REGION
