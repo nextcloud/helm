@@ -308,7 +308,7 @@ S3 as primary object store env vars
       name: {{ .Values.nextcloud.objectStore.s3.existingSecret }}
       key: {{ .Values.nextcloud.objectStore.s3.secretKeys.sse_c_key }}
 {{- end }}
-{{- if (len .Values.nextcloud.objectStore.s3.sse_c_key > 0 and len .Values.nextcloud.objectStore.s3.secretKeys.sse_c_key < 1) }}
+{{- if and (gt (len .Values.nextcloud.objectStore.s3.sse_c_key) 0) (lt (len .Values.nextcloud.objectStore.s3.secretKeys.sse_c_key) 1) }}
 - name: OBJECTSTORE_S3_SSE_C_KEY
   value: {{ .Values.nextcloud.objectStore.s3.sse_c_key | quote }}
 {{- end }}
