@@ -548,8 +548,8 @@ ingress:
 
 ## Hugepages
 
-If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
-to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge pages on the node or map hugepages into the container:
+If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error. This is due
+to your webserver attempting to memory map a file and use hugepages. This can happen in both the apache and fpm images. The fix is to either disable huge pages on the node or map hugepages into the container:
 
 ```yaml
 nextcloud:
