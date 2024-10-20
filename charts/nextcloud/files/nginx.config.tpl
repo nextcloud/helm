@@ -3,7 +3,16 @@ upstream php-handler {
 }
 
 server {
+    {{- if and (has "IPv4" .Values.nginx.ipFamilies) (has "IPv6" .Values.nginx.ipFamilies) }}
+    # Both IPv4 and IPv6 are enabled
+    listen [::]:{{ .Values.nginx.containerPort }} ipv6only=off;
+    {{- else if and (not (has "IPv4" .Values.nginx.ipFamilies)) (has "IPv6" .Values.nginx.ipFamilies) }}
+    # Only IPv6 is enabled
+    listen [::]:{{ .Values.nginx.containerPort }};
+    {{- else }}
+    # Default, IPv4 only
     listen {{ .Values.nginx.containerPort }};
+    {{- end }}
 
     # HSTS settings
     # WARNING: Only add the preload option once you read about
@@ -48,7 +57,7 @@ server {
     include mime.types;
     types {
         text/javascript js mjs;
-    }        
+    }
 
     # Path to the root of your installation
     root /var/www/html;
