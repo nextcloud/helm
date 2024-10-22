@@ -1,0 +1,5 @@
+hpa:
+  enabled: true
+  minPods: 2
+  maxPods: 3
+  targetCPUUtilizationPercentage: 75
