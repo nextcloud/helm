@@ -1,0 +1,5 @@
+image:
+  flavor: fpm
+
+nginx:
+  enabled: true
