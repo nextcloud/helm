@@ -1,0 +1,21 @@
+fullnameOverride: nextcloud
+
+image:
+  flavor: fpm
+
+nextcloud:
+  host: nextcloud
+  trustedDomains: [ "*" ]
+  objectStore:
+    s3:
+      enabled: true
+      host: minio.nextcloud.svc.cluster.local
+      port: 9000
+      ssl: false
+      accessKey: nextcloud
+      secretKey: rootpass123
+      bucket: nextcloud
+      usePathStyle: true
+
+nginx:
+  enabled: true
