@@ -1,0 +1,6 @@
+nextcloud:
+  defaultConfigs:
+    imaginary.config.php: true
+
+imaginary:
+  enabled: true
