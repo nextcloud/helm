@@ -562,14 +562,6 @@ We include an optional external preview provider from [h2non/imaginary](https://
 nextcloud:
   defaultConfigs:
     imaginary.config.php: true
-  configs:
-    previews.config.php: |-
-      <?php
-      $CONFIG = array(
-        'enabledPreviewProviders' => array(
-          0 => 'OC\\Preview\\Imaginary',
-          1 => 'OC\\Preview\\ImaginaryPDF',
-        );
 
 imaginary:
   enabled: true
