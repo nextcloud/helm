@@ -1,0 +1,63 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: test-nextcloud
+  namespace: nextcloud
+spec:
+  template:
+    metadata:
+      name: test-nextcloud
+    spec:
+      initContainers:
+        - name: 05-create-nextcloud-file
+          image: curlimages/curl
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "download image:"
+              curl -s "https://upload.wikimedia.org/wikipedia/commons/d/df/Open_data.png" -o test_upload.png
+              echo "upload to nextcloud:"
+              curl \
+                -s \
+                -w "%{http_code}" \
+                -u admin:changeme \
+                -T test_upload.png \
+              "http://nextcloud.nextcloud.svc.cluster.local:8080/remote.php/dav/files/admin/test_upload.png" || exit 1;
+              echo "done"
+        - name: 10-generate-preview
+          image: docker.io/library/nextcloud:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "fetch preview:"
+              OUTPUT=$(curl \
+                -s \
+                -w "%{http_code}" \
+                -u admin:changeme \
+              "http://nextcloud.nextcloud.svc.cluster.local:8080/index.php/core/preview.png?file=test_upload.png&x=128&y=128&mimeFallback=true&a=0" \
+                -o - | file -)
+              echo "${OUTPUT}";
+              if ! echo "${OUTPUT}" | grep -q "PNG"; then
+                echo "PNG was not detected"
+                exit 1;
+              fi
+              if ! echo "${OUTPUT}" | grep -q "256 x 256"; then
+                echo "Image size is incorrect"
+                exit 1;
+              fi
+              echo "done"
+      containers:
+        - name: final
+          image: curlimages/curl
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "All tests run successfull (initContainer in given order)"
+      restartPolicy: Never
