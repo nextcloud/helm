@@ -8,6 +8,9 @@ nginx:
 
 nextcloud:
   host: nextcloud
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
   objectStore:
     s3:
       enabled: true

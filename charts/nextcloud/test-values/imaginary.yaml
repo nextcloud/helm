@@ -1,4 +1,10 @@
+fullnameOverride: nextcloud
+
 nextcloud:
+  host: nextcloud
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
   defaultConfigs:
     imaginary.config.php: true
 
