@@ -8,8 +8,6 @@ nginx:
 
 nextcloud:
   host: nextcloud
-  trustedDomains:
-    - '*'
   objectStore:
     s3:
       enabled: true
