@@ -1,0 +1,70 @@
+{{- if .Values.notifyPush.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-notify-push
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: notify-push
+spec:
+  replicas: {{ .Values.notifyPush.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: notify-push
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.notifyPush.podAnnotations | nindent 8 }}
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: notify-push
+        {{- with .Values.notifyPush.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.notifyPush.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end}}
+      {{- end }}
+      containers:
+        - name: notify-push
+          {{- with .Values.notifyPush.image }}
+          image: "{{ .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          env:
+            - name: PORT
+              value: "7867"
+            - name: METRICS_PORT
+              value: "9867"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
+                  key: {{ .Values.externalDatabase.existingSecret.databaseURLKey }}
+            - name: REDIS_URL
+              value: "redis://{{ if .Values.redis.auth.enabled }}:{{ .Values.redis.auth.password }}@{{ end }}{{ template "nextcloud.redis.fullname" . }}-master:{{ .Values.redis.master.service.ports.redis }}"
+            - name: NEXTCLOUD_URL # deployment.namespace.svc.cluster.local
+              value: "http{{ if .Values.notifyPush.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+          ports:
+            - name: http
+              containerPort: 7867
+            - name: metrics
+              containerPort: 9867
+          {{- with .Values.notifyPush.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
+{{- end }}
