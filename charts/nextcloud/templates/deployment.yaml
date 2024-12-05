@@ -295,9 +295,11 @@ spec:
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
           image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
-          {{- with .Values.nextcloud.mariaDbInitContainer.securityContext }}
+          {{- with .Values.nextcloud.mariaDbInitContainer }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .securityContext | nindent 12 }}
           {{- end }}
           env:
             - name: MYSQL_USER
@@ -317,9 +319,11 @@ spec:
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
           image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
-          {{- with .Values.nextcloud.postgreSqlInitContainer.securityContext }}
+          {{- with .Values.nextcloud.postgreSqlInitContainer }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
           securityContext:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .securityContext | nindent 12 }}
           {{- end }}
           env:
             - name: POSTGRES_USER

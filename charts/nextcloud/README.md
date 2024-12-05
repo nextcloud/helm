@@ -155,6 +155,10 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraInitContainers`                             | specify additional init containers                                                                  | `[]`                       |
 | `nextcloud.extraVolumes`                                    | specify additional volumes for the NextCloud pod                                                    | `{}`                       |
 | `nextcloud.extraVolumeMounts`                               | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
+| `nextcloud.mariaDbInitContainer.resources`                  | set the `resources` field of the MariaDB init container in the Nextcloud Pod.                       | `{}`                       |
+| `nextcloud.mariaDbInitContainer.securityContext`            | set the `securityContext` field of the MariaDB init container in the Nextcloud Pod.                 | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.resources`               | set the `resources` field of the PostgreSQL init container in the Nextcloud Pod.                    | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.securityContext`         | set the `securityContext` field of the PostgreSQL init container in the Nextcloud Pod.              | `{}`                       |
 | `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                      |
 | `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
 | `nextcloud.postgreSqlInitContainer.securityContext`         | Set postgresql initContainer securityContext parameters.                                            | `{}`                       |
