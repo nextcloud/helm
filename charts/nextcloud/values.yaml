@@ -495,6 +495,53 @@ redis:
     persistence:
       enabled: true
 
+##
+## Collabora chart configuration
+## for more options see https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online
+##
+collabora:
+  enabled: false
+
+  # please check collabora README.md first
+  autoscaling:
+    enabled: false
+
+  collabora:
+    ## HTTPS nextcloud domain, if needed
+    # aliasgroups:
+    #   - host: "https://nextcloud.domain:443"
+    # extra_params: --o:ssl.enable=false --o:ssl.termination=true
+
+    ## Specify server_name when the hostname is not reachable directly for example behind reverse-proxy
+    # server_name: collabora.domain
+
+    # setup admin login credentials
+    existingSecret:
+      enabled: false
+      secretName: ""
+      usernameKey: "username"
+      passwordKey: "password"
+    password: examplepass
+    username: admin
+  # setup ingress
+  ingress:
+    enabled: false
+    className: ""
+    # please check collabora values.yaml for nginx/haproxy annotations examples
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: collabora-ingress-tls
+    #    hosts:
+    #      - collabora.domain
+
+  # see collabora helm README.md for recommended values
+  resources: {}
+
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
