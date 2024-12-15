@@ -58,7 +58,7 @@ jobs:
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [changes, lint]
     # only run this job if there are helm chart file changes
     if: needs.changes.outputs.src != 'false'
@@ -73,21 +73,21 @@ jobs:
 
           # test the helm chart with postgresql subchart enabled
           - name: PostgreSQL Enabled
-            helm_args: '--helm-extra-set-args "--set=postgresql.enabled=true --set=postgresql.global.postgresql.auth.password=testing123456 --set=internalDatabase.enabled=false --set=externalDatabase.enabled=True --set=externalDatabase.type=postgresql --set=externalDatabase.password=testing12345"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/postgresql.yaml"'
 
           # test the helm chart with nginx container enabled
           - name: Nginx Enabled
-            helm_args: '--helm-extra-set-args "--set=image.flavor=fpm --set=nginx.enabled=true"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/nginx.yaml"'
 
           # test the helm chart with horizontal pod autoscaling enabled
           - name: Horizontal Pod Autoscaling Enabled
-            helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=2 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/hpa.yaml"'
 
           # test the helm chart with s3 as the primary storage
           - name: S3 Enabled as Primary Storage
             # we need to skip the clean up so we can test adding a file
             helm_args: |
-                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--set=fullnameOverride=nextcloud --set=nextcloud.objectStore.s3.enabled=true --set=nextcloud.objectStore.s3.accessKey=nextcloud --set=nextcloud.objectStore.s3.secretKey=rootpass123 --set=nextcloud.objectStore.s3.host=minio.nextcloud.svc.cluster.local --set=nextcloud.objectStore.s3.port=9000 --set=nextcloud.objectStore.s3.ssl=false --set=nextcloud.objectStore.s3.bucket=nextcloud --set=nextcloud.objectStore.s3.usePathStyle=true --set=image.flavor=fpm --set=nginx.enabled=true --set=nextcloud.host=nextcloud --set=nextcloud.trustedDomains[0]='*'"
+                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--values charts/nextcloud/test-values/s3-as-primary-storage.yaml"
 
     steps:
       - name: Checkout

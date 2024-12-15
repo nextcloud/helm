@@ -16,10 +16,12 @@ helm install my-release nextcloud/nextcloud
 * [Installing the Chart](#installing-the-chart)
 * [Uninstalling the Chart](#uninstalling-the-chart)
 * [Configuration](#configuration)
+    * [Ingress-Controller](#ingress)
     * [Database Configurations](#database-configurations)
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
+    * [Headers set on nginx](#headers-set-on-nginx)
     * [Probes Configurations](#probes-configurations)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
@@ -153,8 +155,13 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraInitContainers`                             | specify additional init containers                                                                  | `[]`                       |
 | `nextcloud.extraVolumes`                                    | specify additional volumes for the NextCloud pod                                                    | `{}`                       |
 | `nextcloud.extraVolumeMounts`                               | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
+| `nextcloud.mariaDbInitContainer.resources`                  | set the `resources` field of the MariaDB init container in the Nextcloud Pod.                       | `{}`                       |
+| `nextcloud.mariaDbInitContainer.securityContext`            | set the `securityContext` field of the MariaDB init container in the Nextcloud Pod.                 | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.resources`               | set the `resources` field of the PostgreSQL init container in the Nextcloud Pod.                    | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.securityContext`         | set the `securityContext` field of the PostgreSQL init container in the Nextcloud Pod.              | `{}`                       |
 | `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                      |
 | `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
+| `nextcloud.postgreSqlInitContainer.securityContext`         | Set postgresql initContainer securityContext parameters.                                            | `{}`                       |
 | `nginx.enabled`                                             | Enable nginx (requires you use php-fpm image)                                                       | `false`                    |
 | `nginx.image.repository`                                    | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                    |
 | `nginx.image.tag`                                           | nginx Image tag                                                                                     | `alpine`                   |
@@ -204,6 +211,38 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                    |
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                    |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
+
+### Ingress
+#### Ingress Sticky-Sessions
+
+For loadbalance over multiple Pods, it is useful to configure sticky session.
+
+##### NGINX Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#session-affinity)
+```yaml
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+```
+
+##### Traefik Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service)
+```yaml
+service:
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+```
+
+##### HAProxy Ingress-Controller (Community-Version)
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more infromation take a look in the  [ingress-controller documentation](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity)
+```yaml
+ingress:
+  annotations:
+    haproxy-ingress.github.io/affinity: cookie
+```
 
 ### Database Configurations
 By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
@@ -398,6 +437,34 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
 
+### Headers set on NGINX
+
+It is possible to set any additional header
+
+| Parameter                    | Description                         | Default   |
+|------------------------------|-------------------------------------|-----------|
+| `nginx.config.headers.<key>` | Headers which are added with nginx  |           |
+
+
+Following keys are already set with this values:
+  - Referrer-Policy: `no-referrer`
+  - X-Content-Type-Options: `nosniff`
+  - X-Download-Options: `noopen`
+  - X-Frame-Options: `SAMEORIGIN`
+  - X-Permitted-Cross-Domain-Policies: `none`
+  - X-Robots-Tag: `noindex, nofollow`
+  - X-XSS-Protection: `1; mode=block`
+
+Maybe you like to set:
+  - Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
+> [!WARNING]
+> Only add the preload option once you read about
+> the consequences in https://hstspreload.org/. This option
+> will add the domain to a hardcoded list that is shipped
+> in all major browsers and getting removed from this list
+> could take several months.
+
+
 ### Probes Configurations
 
 The nextcloud deployment includes a series of different probes you can use to determine if a pod is ready or not. You can learn more in the [Configure Liveness, Readiness and Startup Probes Kubernetes docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
@@ -579,8 +646,8 @@ ingress:
 
 ## Hugepages
 
-If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
-to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge pages on the node or map hugepages into the container:
+If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error. This is due
+to your webserver attempting to memory map a file and use hugepages. This can happen in both the apache and fpm images. The fix is to either disable huge pages on the node or map hugepages into the container:
 
 ```yaml
 nextcloud:

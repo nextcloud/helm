@@ -305,11 +305,13 @@ nextcloud:
 
   # Settings for the MariaDB init container
   mariaDbInitContainer:
+    resources: {}
     # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
   # Settings for the PostgreSQL init container
   postgreSqlInitContainer:
+    resources: {}
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
@@ -331,6 +333,24 @@ nginx:
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    headers:
+      # -- HSTS settings
+      # WARNING: Only add the preload option once you read about
+      # the consequences in https://hstspreload.org/. This option
+      # will add the domain to a hardcoded list that is shipped
+      # in all major browsers and getting removed from this list
+      # could take several months.
+      # Example:
+      # "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
+      "Strict-Transport-Security": ""
+      "Referrer-Policy": "no-referrer"
+      "X-Content-Type-Options": "nosniff"
+      "X-Download-Options": "noopen"
+      "X-Frame-Options": "SAMEORIGIN"
+      "X-Permitted-Cross-Domain-Policies": "none"
+      "X-Robots-Tag": "noindex, nofollow"
+      "X-XSS-Protection": "1; mode=block"
+
     custom:
     # custom: |-
     #     worker_processes  1;..
@@ -551,9 +571,8 @@ service:
   port: 8080
   loadBalancerIP: ""
   nodePort:
+  # -- use additional annotation on service for nextcloud
   annotations: {}
-    ## Insert your annotations such as below
-    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
