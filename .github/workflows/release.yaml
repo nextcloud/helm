@@ -35,6 +35,7 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add collabora https://collaboraonline.github.io/online/
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
