@@ -16,13 +16,18 @@ helm install my-release nextcloud/nextcloud
 * [Installing the Chart](#installing-the-chart)
 * [Uninstalling the Chart](#uninstalling-the-chart)
 * [Configuration](#configuration)
-    * [Ingress-Controller](#ingress)
+    * [Ingress](#ingress)
+        * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
+            * [NGINX Ingress-Controller](#nginx-ingress-controller)
+            * [Traefik Ingress-Controller](#traefik-ingress-controller)
+            * [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
     * [Database Configurations](#database-configurations)
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
-    * [Headers set on nginx](#headers-set-on-nginx)
+    * [Headers set on NGINX](#headers-set-on-nginx)
     * [Probes Configurations](#probes-configurations)
+    * [Collabora Configuration](#collabora-configuration)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
@@ -498,29 +503,29 @@ The nextcloud deployment includes a series of different probes you can use to de
 
 This section provides options to enable and configure the Collabora Online server within your deployment. Please ensure to review the [Collabora Online Helm chart documentation](https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online) for additional details and recommended values.
 
-| Parameter                              | Description                                                                                      | Default                                                                                          |
-|----------------------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| `collabora.enabled`                    | Enable or disable the Collabora Online integration                                               | `false`                                                                                          |
-| `collabora.autoscaling.enabled`        | Enable or disable autoscaling for the Collabora Online pods                                      | `false`                                                                                          |
-| `collabora.collabora.aliasgroups`      | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                           | `nil`                                                                                   |
-| `collabora.collabora.extra_params`     | Additional parameters for the Collabora Online service                                           | `nil`                                  |
-| `collabora.collabora.server_name`      | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `nil`                                                                                          |
-| `collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                         | `false`                                                                                          |
-| `collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                   | `""`                                                                                     |
-| `collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                         | `"username"`                                                                                     |
-| `collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                         | `"password"`                                                                                     |
-| `collabora.collabora.username`         | Admin username for Collabora Online                                                              | `admin`                                                                                        |
-| `collabora.collabora.password`         | Admin password for Collabora Online                                                              | `examplepass`                                                                                  |
-| `collabora.ingress.enabled`            | Enable or disable ingress for Collabora Online                                                   | `false`                                                                                          |
-| `collabora.ingress.className`          | Class name for the ingress controller                                                            | `""`                                                                                     |
-| `collabora.ingress.annotations`        | Annotations for the ingress resource                                                             | `{}`                                                                                     |
-| `collabora.ingress.hosts`              | List of hosts for the Collabora ingress                                                          | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
-| `collabora.ingress.tls`                | TLS configuration for the Collabora ingress                                                      | `[]`                                                                                     |
-| `collabora.resources`                  | Resource requests and limits for the Collabora Online pods                                       | `{}`                                                                                     |
+| Parameter                              | Description                                                                                        | Default                                                                                             |
+|----------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `collabora.enabled`                    | Enable or disable the Collabora Online integration                                                 | `false`                                                                                             |
+| `collabora.autoscaling.enabled`        | Enable or disable autoscaling for the Collabora Online pods                                        | `false`                                                                                             |
+| `collabora.collabora.aliasgroups`      | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                             | `[]`                                                                                                |
+| `collabora.collabora.extra_params`     | Additional parameters for the Collabora Online service                                             | `"--o:ssl.enabled=false"`                                                                           |
+| `collabora.collabora.server_name`      | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `null`                                                                                              |
+| `collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                           | `false`                                                                                             |
+| `collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                     | `""`                                                                                                |
+| `collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                           | `"username"`                                                                                        |
+| `collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                           | `"password"`                                                                                        |
+| `collabora.collabora.username`         | Admin username for Collabora Online                                                                | `admin`                                                                                             |
+| `collabora.collabora.password`         | Admin password for Collabora Online                                                                | `examplepass`                                                                                       |
+| `collabora.ingress.enabled`            | Enable or disable ingress for Collabora Online                                                     | `false`                                                                                             |
+| `collabora.ingress.className`          | Class name for the ingress controller                                                              | `""`                                                                                                |
+| `collabora.ingress.annotations`        | Annotations for the ingress resource                                                               | `{}`                                                                                                |
+| `collabora.ingress.hosts`              | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
+| `collabora.ingress.tls`                | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
+| `collabora.resources`                  | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
 > **Note**:
 >
-> You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work. 
-> 
+> You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work.
+>
 > If you have both Nextcloud and Collabora behind a reverse proxy with HTTPS, `collabora.collabora.aliasgroups` should match your Nextcloud domain and `collabora.collabora.server_name` (if needed) should match your Collabora domain.
 >
 > For more information, please check the [Collabora documentation](https://sdk.collaboraonline.com/docs/installation/index.html).

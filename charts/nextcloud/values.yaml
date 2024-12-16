@@ -502,29 +502,40 @@ redis:
 collabora:
   enabled: false
 
-  # please check collabora README.md first
   autoscaling:
+    # enable autocaling, please check collabora README.md first
     enabled: false
 
   collabora:
     ## HTTPS nextcloud domain, if needed
-    # aliasgroups:
+    aliasgroups: []
     #   - host: "https://nextcloud.domain:443"
-    # extra_params: --o:ssl.enable=false --o:ssl.termination=true
 
-    ## Specify server_name when the hostname is not reachable directly for example behind reverse-proxy
-    # server_name: collabora.domain
+    # set extra parameters for collabora
+    # you may need to add --o:ssl.termination=true
+    extra_params: --o:ssl.enable=false
 
-    # setup admin login credentials
+    ## Specify server_name when the hostname is not reachable directly for
+    # example behind reverse-proxy. example: collabora.domain
+    server_name: null
+
     existingSecret:
+      # set to true to to get collabora admin credentials from an existin secret
+      # if set, ignores collabora.collabora.username and password
       enabled: false
+      # name of existing Kubernetes Secret with collboara admin credentials
       secretName: ""
       usernameKey: "username"
       passwordKey: "password"
+
+    # setup admin login credentials, these are ignored if
+    # collabora.collabora.existingSecret.enabled=true
     password: examplepass
     username: admin
+
   # setup ingress
   ingress:
+    # enable ingress for collabora online
     enabled: false
     className: ""
     # please check collabora values.yaml for nginx/haproxy annotations examples
