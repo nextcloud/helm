@@ -3,6 +3,52 @@ entries:
   nextcloud:
   - apiVersion: v2
     appVersion: 30.0.4
+    created: "2024-12-17T18:15:36.969126544Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 15.5.0
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.2.0
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 19.6.4
+    - alias: collabora
+      condition: collabora.enabled
+      name: collabora-online
+      repository: https://collaboraonline.github.io/online
+      version: 1.1.20
+    description: A file sharing server that puts the control and security of your
+      own data back into your hands.
+    digest: bcad9232df68d8071e2657ee09cdcaf903b9c8679201f1ce4b88a5571e1301db
+    home: https://nextcloud.com/
+    icon: https://cdn.rawgit.com/docker-library/docs/defa5ffc7123177acd60ddef6e16bddf694cc35f/nextcloud/logo.svg
+    keywords:
+    - nextcloud
+    - storage
+    - http
+    - web
+    - php
+    maintainers:
+    - email: skjnldsv@protonmail.com
+      name: skjnldsv
+    - email: christian.ingenhaag@googlemail.com
+      name: chrisingenhaag
+    - email: jeff@billimek.com
+      name: billimek
+    name: nextcloud
+    sources:
+    - https://github.com/nextcloud/helm
+    - https://github.com/nextcloud/docker
+    urls:
+    - https://github.com/nextcloud/helm/releases/download/nextcloud-6.5.0/nextcloud-6.5.0.tgz
+    version: 6.5.0
+  - apiVersion: v2
+    appVersion: 30.0.4
     created: "2024-12-16T17:19:54.166490923Z"
     dependencies:
     - condition: postgresql.enabled
@@ -7751,4 +7797,4 @@ entries:
     urls:
     - https://github.com/nextcloud/helm/releases/download/nextcloud-2.0.2/nextcloud-2.0.2.tgz
     version: 2.0.2
-generated: "2024-12-16T17:19:54.167405758Z"
+generated: "2024-12-17T18:15:36.969673461Z"
