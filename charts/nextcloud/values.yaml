@@ -208,6 +208,8 @@ nextcloud:
     swift.config.php: true
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
+    # -- imaginary support config
+    imaginary.config.php: false
 
   # Extra config files created in /var/www/html/config/
   # ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
@@ -679,6 +681,71 @@ dnsConfig: {}
 # options:
 #   - name: ndots
 #     value: "1"
+
+imaginary:
+  # -- Start Imgaginary
+  enabled: false
+  # -- Number of imaginary pod replicas to deploy
+  replicaCount: 1
+
+  image:
+    # -- Imaginary image registry
+    registry: docker.io
+    # -- Imaginary image name
+    repository: h2non/imaginary
+    # -- Imaginary image tag
+    tag: 1.2.4
+    # -- Imaginary image pull policy
+    pullPolicy: IfNotPresent
+    # -- Imaginary image pull secrets
+    pullSecrets: []
+
+  # -- Additional annotations for imaginary
+  podAnnotations: {}
+  # -- Additional labels for imaginary
+  podLabels: {}
+  # -- imaginary resources
+  resources: {}
+
+  # -- Optional security context for the Imaginary container
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # -- Optional security context for the Imaginary pod (applies to all containers in the pod)
+  podSecurityContext: {}
+  # runAsNonRoot: true
+  # seccompProfile:
+  #   type: RuntimeDefault
+
+  readinessProbe:
+    enabled: true
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+  livenessProbe:
+    enabled: true
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  service:
+    # -- Imaginary: Kubernetes Service type
+    type: ClusterIP
+    # -- Imaginary: LoadBalancerIp for service type LoadBalancer
+    loadBalancerIP:
+    # -- Imaginary: NodePort for service type NodePort
+    nodePort:
+    # -- Additional annotations for service imaginary
+    annotations: {}
+    # -- Additional labels for service imaginary
+    labels: {}
 
 ## Prometheus Exporter / Metrics
 ##

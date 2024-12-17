@@ -28,6 +28,7 @@ helm install my-release nextcloud/nextcloud
     * [Headers set on NGINX](#headers-set-on-nginx)
     * [Probes Configurations](#probes-configurations)
     * [Collabora Configuration](#collabora-configuration)
+    * [Imaginary](#imaginary)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
@@ -529,6 +530,42 @@ This section provides options to enable and configure the Collabora Online serve
 > If you have both Nextcloud and Collabora behind a reverse proxy with HTTPS, `collabora.collabora.aliasgroups` should match your Nextcloud domain and `collabora.collabora.server_name` (if needed) should match your Collabora domain.
 >
 > For more information, please check the [Collabora documentation](https://sdk.collaboraonline.com/docs/installation/index.html).
+
+### Imaginary
+
+We include an optional external preview provider from [h2non/imaginary](https://github.com/h2non/imaginary).
+
+| Parameter                              | Description                                                                             | Default           |
+|----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
+| `imaginary.enabled`                    | Start Imaginary                                                                         | `false`           |
+| `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
+| `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
+| `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
+| `imaginary.image.tag`                  | Imaginary image tag                                                                     | `1.2.4`           |
+| `imaginary.image.pullPolicy`           | Imaginary image pull policy                                                             | `IfNotPresent`    |
+| `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
+| `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
+| `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
+| `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
+| `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
+| `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |
+| `imaginary.service.type`               | Imaginary: Kubernetes Service type                                                      | `ClusterIP`       |
+| `imaginary.service.loadBalancerIP`     | Imaginary: LoadBalancerIp for service type LoadBalancer                                 | `nil`             |
+| `imaginary.service.nodePort`           | Imaginary: NodePort for service type NodePort                                           | `nil`             |
+| `imaginary.service.annotations`        | Additional annotations for service imaginary                                            | `{}`              |
+| `imaginary.service.labels`             | Additional labels for service imaginary                                                 | `{}`              |
+
+
+> [!Note]
+> You also need to setup nextcloud, to use imaginary
+```yaml
+nextcloud:
+  defaultConfigs:
+    imaginary.config.php: true
+
+imaginary:
+  enabled: true
+```
 
 ## Cron jobs
 
