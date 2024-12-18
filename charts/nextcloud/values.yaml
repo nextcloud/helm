@@ -408,8 +408,6 @@ externalDatabase:
     hostKey:
     # -- e.g. db-name
     databaseKey:
-    # -- complete URL with type, username and password (current only for notify_push used)
-    databaseURLKey: db-url
 
 ##
 ## MariaDB chart configuration
@@ -420,6 +418,9 @@ mariadb:
   # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
+
+  image:
+    registry: "docker.io"
 
   # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
   global:
@@ -454,6 +455,8 @@ mariadb:
 ##
 postgresql:
   enabled: false
+  image:
+    registry: "docker.io"
   global:
     postgresql:
       # global.postgresql.auth overrides postgresql.auth
@@ -709,6 +712,8 @@ notifyPush:
     pullPolicy: IfNotPresent
     pullSecrets:
     #   - myRegistrKeySecretName
+  # -- option to set the redis_url per env (if a external redis is used) e.g.: `value: ""` or `valueFrom: {secretKeyRef:{name:"",key:""}}`
+  redisURLEnv:
 
   resources: {}
 
