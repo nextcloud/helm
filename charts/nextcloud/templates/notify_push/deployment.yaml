@@ -46,13 +46,16 @@ spec:
               value: "7867"
             - name: METRICS_PORT
               value: "9867"
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-                  key: {{ .Values.externalDatabase.existingSecret.databaseURLKey }}
-            - name: REDIS_URL
-              value: "redis://{{ if .Values.redis.auth.enabled }}:{{ .Values.redis.auth.password }}@{{ end }}{{ template "nextcloud.redis.fullname" . }}-master:{{ .Values.redis.master.service.ports.redis }}"
+            {{- include "nextcloud.env.database" . | nindent 12 }}
+            {{- with .Values.notifyPush.redisURLEnv }}
+            - name: "REDIS_URL"
+              {{- toYaml . | nindent 14 }}
+            {{- else }}
+            {{- if not .Values.redis.enabled }}
+            {{- fail "notify-push needs an redis (redis.enabled=true or notifyPush.redisURLEnv={...})" }}
+            {{- end }}
+            {{- include "nextcloud.env.redis" . | nindent 12 }}
+            {{- end }}
             - name: NEXTCLOUD_URL # deployment.namespace.svc.cluster.local
               value: "http{{ if .Values.notifyPush.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
           ports:
