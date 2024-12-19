@@ -23,3 +23,5 @@ Here we list all major versions and their breaking changes for migration.
                 - mountPath: "/bitnami/postgresql"
                   name: "data"
       ```
+- update mariadb to v19 (see [CHANGELOG](https://github.com/bitnami/charts/blob/main/bitnami/mariadb/CHANGELOG.md#1900-2024-07-11))
+- update mariadb to v20 (see [CHANGELOG](https://github.com/bitnami/charts/blob/main/bitnami/mariadb/CHANGELOG.md#2000-2024-11-08))
