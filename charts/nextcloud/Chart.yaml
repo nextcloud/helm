@@ -32,7 +32,7 @@ dependencies:
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
   - name: mariadb
-    version: 18.2.0
+    version: 20.5.5
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: mariadb.enabled
   - name: redis
