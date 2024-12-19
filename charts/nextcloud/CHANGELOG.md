@@ -7,3 +7,4 @@ Here we list all major versions and their breaking changes for migration.
 ## v7
 
 - update redis to v20 (see [CHANGELOG](https://github.com/bitnami/charts/blob/main/bitnami/redis/CHANGELOG.md#2000-2024-08-09))
+- update postgresql to v16 (see [CHANGELOG](https://github.com/bitnami/charts/blob/main/bitnami/postgresql/CHANGELOG.md#1600-2024-10-02))
