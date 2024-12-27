@@ -320,8 +320,8 @@ Here are all the values you can currently configure in this helm chart to config
 | Parameter                                       | Description                                                           | Default     |
 |-------------------------------------------------|-----------------------------------------------------------------------|-------------|
 | `nextcloud.objectStore.s3.enabled`              | enable configuring S3 as a primary object store                       | `false`     |
-| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existinSecret         | `''`        |
-| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existinSecret     | `''`        |
+| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existingSecret        | `''`        |
+| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existingSecret    | `''`        |
 | `nextcloud.objectStore.s3.legacyAuth`           | use legacy authentication for S3                                      | `false`     |
 | `nextcloud.objectStore.s3.host`                 | endpoint URL to connect to. Only required if not using AWS            | `''`        |
 | `nextcloud.objectStore.s3.ssl`                  | Use TLS connection when connecting to S3                              | `true`      |
