@@ -7,4 +7,4 @@ Here we list, what is changed.
 
 ## v7
 
-- move `metrics.serviceMonitor` to `prometheus.serviceMonitor`: It us used for nextcloud-exporter and notify-push
+- move `metrics.serviceMonitor` to `prometheus.serviceMonitor`: It is used for nextcloud-exporter and notify-push
