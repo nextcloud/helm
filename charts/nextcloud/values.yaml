@@ -233,6 +233,34 @@ nextcloud:
   #        'OC\Preview\PDF'
   #      ),
   #    );
+  #
+  # This next section is for people using TLS behind a proxy
+  # which should be everyone using a helm chart
+  # re: https://github.com/nextcloud/helm/issues/679
+  #
+  # proxies.config.php: |-
+  #   <?php
+  #   $CONFIG = array (
+  #     'trusted_proxies' =>
+  #     array(
+  #     0 => 'nextcloud.kube.com',
+  #     ),
+  #   );
+  #
+  # domains.config.php: |-
+  #   <?php
+  #   $CONFIG = array (
+  #     'trusted_domains' =>
+  #     array(
+  #     0 => 'nextcloud.kube.com',
+  #     ),
+  #   );
+  #
+  # overwrite.config.php: |-
+  #   <?php
+  #   $CONFIG = array (
+  #     'overwriteprotocol' => 'https'
+  #   );
 
   # Hooks for auto configuration
   # Here you could write small scripts which are placed in `/docker-entrypoint-hooks.d/<hook-name>/helm.sh`
