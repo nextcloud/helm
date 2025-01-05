@@ -704,6 +704,11 @@ imaginary:
   podAnnotations: {}
   # -- Additional labels for imaginary
   podLabels: {}
+  # -- Imaginary pod nodeSelector
+  nodeSelector: {}
+  # -- Imaginary pod tolerations
+  tolerations: []
+
   # -- imaginary resources
   resources: {}
 
