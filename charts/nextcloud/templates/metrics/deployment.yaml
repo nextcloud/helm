@@ -40,12 +40,12 @@ spec:
           image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           env:
-            {{- if .Values.metrics.token }}
+            {{- if or .Values.metrics.token .Values.nextcloud.existingSecret.tokenKey }}
             - name: NEXTCLOUD_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-                  key: {{ .Values.nextcloud.existingSecret.tokenKey }}
+                  key: {{ .Values.nextcloud.existingSecret.tokenKey | default "nextcloud-token" }}
             {{- else }}
             - name: NEXTCLOUD_USERNAME
               valueFrom:
@@ -79,7 +79,24 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.metrics.securityContext }}
           securityContext:
-            runAsUser: 1000
-            runAsNonRoot: true
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.metrics.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+      {{- with .Values.metrics.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.metrics.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.metrics.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- end }}

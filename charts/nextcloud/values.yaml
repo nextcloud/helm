@@ -83,7 +83,7 @@ nextcloud:
     # secretName: nameofsecret
     usernameKey: nextcloud-username
     passwordKey: nextcloud-password
-    tokenKey: nextcloud-token
+    tokenKey: ""
     smtpUsernameKey: smtp-username
     smtpPasswordKey: smtp-password
     smtpHostKey: smtp-host
@@ -208,6 +208,8 @@ nextcloud:
     swift.config.php: true
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
+    # -- imaginary support config
+    imaginary.config.php: false
 
   # Extra config files created in /var/www/html/config/
   # ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file
@@ -305,11 +307,13 @@ nextcloud:
 
   # Settings for the MariaDB init container
   mariaDbInitContainer:
+    resources: {}
     # Set mariadb initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
   # Settings for the PostgreSQL init container
   postgreSqlInitContainer:
+    resources: {}
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
@@ -324,10 +328,31 @@ nginx:
     pullPolicy: IfNotPresent
 
   containerPort: 80
-
+  # This configures nginx to listen on either IPv4, IPv6 or both
+  ipFamilies:
+    - IPv4
+    # - IPv6
   config:
     # This generates the default nginx config as per the nextcloud documentation
     default: true
+    headers:
+      # -- HSTS settings
+      # WARNING: Only add the preload option once you read about
+      # the consequences in https://hstspreload.org/. This option
+      # will add the domain to a hardcoded list that is shipped
+      # in all major browsers and getting removed from this list
+      # could take several months.
+      # Example:
+      # "Strict-Transport-Security": "max-age=15768000; includeSubDomains; preload;"
+      "Strict-Transport-Security": ""
+      "Referrer-Policy": "no-referrer"
+      "X-Content-Type-Options": "nosniff"
+      "X-Download-Options": "noopen"
+      "X-Frame-Options": "SAMEORIGIN"
+      "X-Permitted-Cross-Domain-Policies": "none"
+      "X-Robots-Tag": "noindex, nofollow"
+      "X-XSS-Protection": "1; mode=block"
+
     custom:
     # custom: |-
     #     worker_processes  1;..
@@ -360,8 +385,8 @@ externalDatabase:
   ## Supported database engines: mysql or postgresql
   type: mysql
 
-  ## Database host
-  host:
+  ## Database host. You can optionally include a colon delimited port like "myhost:1234"
+  host: ""
 
   ## Database user
   user: nextcloud
@@ -391,6 +416,11 @@ mariadb:
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
 
+  # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
+  global:
+    # overwrites the primary.persistence.storageClass value
+    defaultStorageClass: ""
+
   auth:
     database: nextcloud
     username: nextcloud
@@ -408,8 +438,8 @@ mariadb:
     persistence:
       enabled: false
       # Use an existing Persistent Volume Claim (must be created ahead of time)
-      # existingClaim: ""
-      # storageClass: ""
+      existingClaim: ""
+      storageClass: ""
       accessMode: ReadWriteOnce
       size: 8Gi
 
@@ -467,6 +497,64 @@ redis:
     persistence:
       enabled: true
 
+##
+## Collabora chart configuration
+## for more options see https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online
+##
+collabora:
+  enabled: false
+
+  autoscaling:
+    # enable autocaling, please check collabora README.md first
+    enabled: false
+
+  collabora:
+    ## HTTPS nextcloud domain, if needed
+    aliasgroups: []
+    #   - host: "https://nextcloud.domain:443"
+
+    # set extra parameters for collabora
+    # you may need to add --o:ssl.termination=true
+    extra_params: --o:ssl.enable=false
+
+    ## Specify server_name when the hostname is not reachable directly for
+    # example behind reverse-proxy. example: collabora.domain
+    server_name: null
+
+    existingSecret:
+      # set to true to to get collabora admin credentials from an existin secret
+      # if set, ignores collabora.collabora.username and password
+      enabled: false
+      # name of existing Kubernetes Secret with collboara admin credentials
+      secretName: ""
+      usernameKey: "username"
+      passwordKey: "password"
+
+    # setup admin login credentials, these are ignored if
+    # collabora.collabora.existingSecret.enabled=true
+    password: examplepass
+    username: admin
+
+  # setup ingress
+  ingress:
+    # enable ingress for collabora online
+    enabled: false
+    className: ""
+    # please check collabora values.yaml for nginx/haproxy annotations examples
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: collabora-ingress-tls
+    #    hosts:
+    #      - collabora.domain
+
+  # see collabora helm README.md for recommended values
+  resources: {}
+
 
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
@@ -495,10 +583,9 @@ service:
   type: ClusterIP
   port: 8080
   loadBalancerIP: ""
-  nodePort: nil
+  nodePort:
+  # -- use additional annotation on service for nextcloud
   annotations: {}
-    ## Insert your annotations such as below
-    # test/test: pumuckel
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
@@ -595,6 +682,71 @@ dnsConfig: {}
 #   - name: ndots
 #     value: "1"
 
+imaginary:
+  # -- Start Imgaginary
+  enabled: false
+  # -- Number of imaginary pod replicas to deploy
+  replicaCount: 1
+
+  image:
+    # -- Imaginary image registry
+    registry: docker.io
+    # -- Imaginary image name
+    repository: h2non/imaginary
+    # -- Imaginary image tag
+    tag: 1.2.4
+    # -- Imaginary image pull policy
+    pullPolicy: IfNotPresent
+    # -- Imaginary image pull secrets
+    pullSecrets: []
+
+  # -- Additional annotations for imaginary
+  podAnnotations: {}
+  # -- Additional labels for imaginary
+  podLabels: {}
+  # -- imaginary resources
+  resources: {}
+
+  # -- Optional security context for the Imaginary container
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # -- Optional security context for the Imaginary pod (applies to all containers in the pod)
+  podSecurityContext: {}
+  # runAsNonRoot: true
+  # seccompProfile:
+  #   type: RuntimeDefault
+
+  readinessProbe:
+    enabled: true
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+  livenessProbe:
+    enabled: true
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  service:
+    # -- Imaginary: Kubernetes Service type
+    type: ClusterIP
+    # -- Imaginary: LoadBalancerIp for service type LoadBalancer
+    loadBalancerIP:
+    # -- Imaginary: NodePort for service type NodePort
+    nodePort:
+    # -- Additional annotations for service imaginary
+    annotations: {}
+    # -- Additional labels for service imaginary
+    labels: {}
+
 ## Prometheus Exporter / Metrics
 ##
 metrics:
@@ -628,22 +780,47 @@ metrics:
   ## Metrics exporter resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  # resources: {}
+  resources: {}
 
-  ## Metrics exporter pod Annotation and Labels
-  # podAnnotations: {}
+  # -- Metrics exporter pod Annotation
+  podAnnotations: {}
 
-  # podLabels: {}
+  # -- Metrics exporter pod Labels
+  podLabels: {}
+
+  # -- Metrics exporter pod nodeSelector
+  nodeSelector: {}
+
+  # -- Metrics exporter pod tolerations
+  tolerations: []
+
+  # -- Metrics exporter pod affinity
+  affinity: {}
 
   service:
     type: ClusterIP
-    ## Use serviceLoadBalancerIP to request a specific static IP,
-    ## otherwise leave blank
-    # loadBalancerIP:
+    # Use serviceLoadBalancerIP to request a specific static IP,
+    # otherwise leave blank
+    loadBalancerIP:
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9205"
     labels: {}
+
+  # -- security context for the metrics CONTAINER in the pod
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # -- security context for the metrics POD
+  podSecurityContext: {}
+  # runAsNonRoot: true
+  # seccompProfile:
+  #   type: RuntimeDefault
 
   ## Prometheus Operator ServiceMonitor configuration
   ##

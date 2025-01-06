@@ -16,11 +16,19 @@ helm install my-release nextcloud/nextcloud
 * [Installing the Chart](#installing-the-chart)
 * [Uninstalling the Chart](#uninstalling-the-chart)
 * [Configuration](#configuration)
+    * [Ingress](#ingress)
+        * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
+            * [NGINX Ingress-Controller](#nginx-ingress-controller)
+            * [Traefik Ingress-Controller](#traefik-ingress-controller)
+            * [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
     * [Database Configurations](#database-configurations)
     * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
     * [Persistence Configurations](#persistence-configurations)
     * [Metrics Configurations](#metrics-configurations)
+    * [Headers set on NGINX](#headers-set-on-nginx)
     * [Probes Configurations](#probes-configurations)
+    * [Collabora Configuration](#collabora-configuration)
+    * [Imaginary](#imaginary)
 * [Cron jobs](#cron-jobs)
 * [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
 * [Multiple config.php file](#multiple-configphp-file)
@@ -119,6 +127,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpUsernameKey`                  | Name of the key that contains the SMTP username                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpPasswordKey`                  | Name of the key that contains the SMTP password                                                     | `nil`                      |
 | `nextcloud.existingSecret.smtpHostKey`                      | Name of the key that contains the SMTP hostname                                                     | `nil`                      |
+| `nextcloud.existingSecret.tokenKey`                         | Name of the key that contains the nextcloud metrics token                                           | `''`                       |
 | `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                        |
 | `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                       |
 | `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                       |
@@ -152,14 +161,20 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.extraInitContainers`                             | specify additional init containers                                                                  | `[]`                       |
 | `nextcloud.extraVolumes`                                    | specify additional volumes for the NextCloud pod                                                    | `{}`                       |
 | `nextcloud.extraVolumeMounts`                               | specify additional volume mounts for the NextCloud pod                                              | `{}`                       |
+| `nextcloud.mariaDbInitContainer.resources`                  | set the `resources` field of the MariaDB init container in the Nextcloud Pod.                       | `{}`                       |
+| `nextcloud.mariaDbInitContainer.securityContext`            | set the `securityContext` field of the MariaDB init container in the Nextcloud Pod.                 | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.resources`               | set the `resources` field of the PostgreSQL init container in the Nextcloud Pod.                    | `{}`                       |
+| `nextcloud.postgreSqlInitContainer.securityContext`         | set the `securityContext` field of the PostgreSQL init container in the Nextcloud Pod.              | `{}`                       |
 | `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                      |
 | `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                      |
+| `nextcloud.postgreSqlInitContainer.securityContext`         | Set postgresql initContainer securityContext parameters.                                            | `{}`                       |
 | `nginx.enabled`                                             | Enable nginx (requires you use php-fpm image)                                                       | `false`                    |
 | `nginx.image.repository`                                    | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                    |
 | `nginx.image.tag`                                           | nginx Image tag                                                                                     | `alpine`                   |
 | `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
 | `nginx.image.pullPolicy`                                    | nginx Image pull policy                                                                             | `IfNotPresent`             |
 | `nginx.containerPort`                                       | Customize container port e.g. when not running as root                                              | `IfNotPresent`             |
+| `nginx.ipFamilies`                                          | Customize container to listen on IPv4, IPv6 or both                                                 | `["IPv4"]`                 |
 | `nginx.config.default`                                      | Whether to use nextcloud's recommended nginx config                                                 | `true`                     |
 | `nginx.config.custom`                                       | Specify a custom config for nginx                                                                   | `{}`                       |
 | `nginx.resources`                                           | nginx resources                                                                                     | `{}`                       |
@@ -203,6 +218,38 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                    |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                       |
 
+### Ingress
+#### Ingress Sticky-Sessions
+
+For loadbalance over multiple Pods, it is useful to configure sticky session.
+
+##### NGINX Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#session-affinity)
+```yaml
+ingress:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+```
+
+##### Traefik Ingress-Controller
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more information take a look in the [ingress-controller documentation](https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service)
+```yaml
+service:
+  annotations:
+    traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
+```
+
+##### HAProxy Ingress-Controller (Community-Version)
+To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
+For more infromation take a look in the  [ingress-controller documentation](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity)
+```yaml
+ingress:
+  annotations:
+    haproxy-ingress.github.io/affinity: cookie
+```
+
 ### Database Configurations
 By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
 
@@ -219,7 +266,7 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `internalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
 | `externalDatabase.enabled`                                            | Whether to use external database                                                  | `false`                |
 | `externalDatabase.type`                                               | External database type: `mysql`, `postgresql`                                     | `mysql`                |
-| `externalDatabase.host`                                               | Host of the external database in form of `host:port`                              | `nil`                  |
+| `externalDatabase.host`                                               | Host of the external database in form of `host:port`. Example: `"myhost:1234"`    | `""`                   |
 | `externalDatabase.database`                                           | Name of the existing database                                                     | `nextcloud`            |
 | `externalDatabase.user`                                               | Existing username in the external db                                              | `nextcloud`            |
 | `externalDatabase.password`                                           | Password for the above username                                                   | `nil`                  |
@@ -238,8 +285,10 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 | `mariadb.image.registry`                                              | MariaDB image registry                                                            | `docker.io`            |
 | `mariadb.image.repository`                                            | MariaDB image repository                                                          | `bitnami/mariadb`      |
 | `mariadb.image.tag`                                                   | MariaDB image tag                                                                 | ``                     |
+| `mariadb.global.defaultStorageClass`                                  | MariaDB Global default StorageClass for Persistent Volume(s)                      | `''`                   |
 | `mariadb.primary.persistence.enabled`                                 | Whether or not to Use a PVC on MariaDB primary                                    | `false`                |
-| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `nil`                  |
+| `mariadb.primary.persistence.storageClass`                            | MariaDB primary persistent volume storage Class                                   | `''`                   |
+| `mariadb.primary.persistence.existingClaim`                           | Use an existing PVC for MariaDB primary                                           | `''`                   |
 | `postgresql.enabled`                                                  | Whether to use the PostgreSQL chart                                               | `false`                |
 | `postgresql.image.registry`                                           | PostgreSQL image registry                                                         | `docker.io`            |
 | `postgresql.image.repository`                                         | PostgreSQL image repository                                                       | `bitnami/postgresql`   |
@@ -271,8 +320,8 @@ Here are all the values you can currently configure in this helm chart to config
 | Parameter                                       | Description                                                           | Default     |
 |-------------------------------------------------|-----------------------------------------------------------------------|-------------|
 | `nextcloud.objectStore.s3.enabled`              | enable configuring S3 as a primary object store                       | `false`     |
-| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existinSecret         | `''`        |
-| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existinSecret     | `''`        |
+| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existingSecret        | `''`        |
+| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existingSecret    | `''`        |
 | `nextcloud.objectStore.s3.legacyAuth`           | use legacy authentication for S3                                      | `false`     |
 | `nextcloud.objectStore.s3.host`                 | endpoint URL to connect to. Only required if not using AWS            | `''`        |
 | `nextcloud.objectStore.s3.ssl`                  | Use TLS connection when connecting to S3                              | `true`      |
@@ -394,6 +443,34 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
 
+### Headers set on NGINX
+
+It is possible to set any additional header
+
+| Parameter                    | Description                         | Default   |
+|------------------------------|-------------------------------------|-----------|
+| `nginx.config.headers.<key>` | Headers which are added with nginx  |           |
+
+
+Following keys are already set with this values:
+  - Referrer-Policy: `no-referrer`
+  - X-Content-Type-Options: `nosniff`
+  - X-Download-Options: `noopen`
+  - X-Frame-Options: `SAMEORIGIN`
+  - X-Permitted-Cross-Domain-Policies: `none`
+  - X-Robots-Tag: `noindex, nofollow`
+  - X-XSS-Protection: `1; mode=block`
+
+Maybe you like to set:
+  - Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
+> [!WARNING]
+> Only add the preload option once you read about
+> the consequences in https://hstspreload.org/. This option
+> will add the domain to a hardcoded list that is shipped
+> in all major browsers and getting removed from this list
+> could take several months.
+
+
 ### Probes Configurations
 
 The nextcloud deployment includes a series of different probes you can use to determine if a pod is ready or not. You can learn more in the [Configure Liveness, Readiness and Startup Probes Kubernetes docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
@@ -422,6 +499,73 @@ The nextcloud deployment includes a series of different probes you can use to de
 
 > [!Note]
 > If you are getting errors on initialization (such as `Fatal error: require_once(): Failed opening required '/var/www/html/lib/versioncheck.php'`, but you can get other errors as well), a good first step is to try and enable the startupProbe and/or increase the `initialDelaySeconds` for the `livenessProbe` and `readinessProbe` to something much greater (consider using `120` seconds instead of `10`. This is an especially good idea if your cluster is running on older hardware, has a slow internet connection, or you're using a slower storage class, such as NFS that's running with older disks or a slow connection.
+
+### Collabora Configuration
+
+This section provides options to enable and configure the Collabora Online server within your deployment. Please ensure to review the [Collabora Online Helm chart documentation](https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online) for additional details and recommended values.
+
+| Parameter                              | Description                                                                                        | Default                                                                                             |
+|----------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `collabora.enabled`                    | Enable or disable the Collabora Online integration                                                 | `false`                                                                                             |
+| `collabora.autoscaling.enabled`        | Enable or disable autoscaling for the Collabora Online pods                                        | `false`                                                                                             |
+| `collabora.collabora.aliasgroups`      | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                             | `[]`                                                                                                |
+| `collabora.collabora.extra_params`     | Additional parameters for the Collabora Online service                                             | `"--o:ssl.enabled=false"`                                                                           |
+| `collabora.collabora.server_name`      | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `null`                                                                                              |
+| `collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                           | `false`                                                                                             |
+| `collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                     | `""`                                                                                                |
+| `collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                           | `"username"`                                                                                        |
+| `collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                           | `"password"`                                                                                        |
+| `collabora.collabora.username`         | Admin username for Collabora Online                                                                | `admin`                                                                                             |
+| `collabora.collabora.password`         | Admin password for Collabora Online                                                                | `examplepass`                                                                                       |
+| `collabora.ingress.enabled`            | Enable or disable ingress for Collabora Online                                                     | `false`                                                                                             |
+| `collabora.ingress.className`          | Class name for the ingress controller                                                              | `""`                                                                                                |
+| `collabora.ingress.annotations`        | Annotations for the ingress resource                                                               | `{}`                                                                                                |
+| `collabora.ingress.hosts`              | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
+| `collabora.ingress.tls`                | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
+| `collabora.resources`                  | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
+> **Note**:
+>
+> You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work.
+>
+> If you have both Nextcloud and Collabora behind a reverse proxy with HTTPS, `collabora.collabora.aliasgroups` should match your Nextcloud domain and `collabora.collabora.server_name` (if needed) should match your Collabora domain.
+>
+> For more information, please check the [Collabora documentation](https://sdk.collaboraonline.com/docs/installation/index.html).
+
+### Imaginary
+
+We include an optional external preview provider from [h2non/imaginary](https://github.com/h2non/imaginary).
+
+| Parameter                              | Description                                                                             | Default           |
+|----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
+| `imaginary.enabled`                    | Start Imaginary                                                                         | `false`           |
+| `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
+| `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
+| `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
+| `imaginary.image.tag`                  | Imaginary image tag                                                                     | `1.2.4`           |
+| `imaginary.image.pullPolicy`           | Imaginary image pull policy                                                             | `IfNotPresent`    |
+| `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
+| `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
+| `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
+| `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
+| `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
+| `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |
+| `imaginary.service.type`               | Imaginary: Kubernetes Service type                                                      | `ClusterIP`       |
+| `imaginary.service.loadBalancerIP`     | Imaginary: LoadBalancerIp for service type LoadBalancer                                 | `nil`             |
+| `imaginary.service.nodePort`           | Imaginary: NodePort for service type NodePort                                           | `nil`             |
+| `imaginary.service.annotations`        | Additional annotations for service imaginary                                            | `{}`              |
+| `imaginary.service.labels`             | Additional labels for service imaginary                                                 | `{}`              |
+
+
+> [!Note]
+> You also need to setup nextcloud, to use imaginary
+```yaml
+nextcloud:
+  defaultConfigs:
+    imaginary.config.php: true
+
+imaginary:
+  enabled: true
+```
 
 ## Cron jobs
 
@@ -544,8 +688,8 @@ ingress:
 
 ## Hugepages
 
-If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error in Apache. This is due
-to Apache attempting to memory map a file and use hugepages. The fix is to either disable huge pages on the node or map hugepages into the container:
+If your node has hugepages enabled, but you do not map any into the container, it could fail to start with a bus error. This is due
+to your webserver attempting to memory map a file and use hugepages. This can happen in both the apache and fpm images. The fix is to either disable huge pages on the node or map hugepages into the container:
 
 ```yaml
 nextcloud:

@@ -3,7 +3,16 @@ upstream php-handler {
 }
 
 server {
+    {{- if and (has "IPv4" .Values.nginx.ipFamilies) (has "IPv6" .Values.nginx.ipFamilies) }}
+    # Both IPv4 and IPv6 are enabled
+    listen [::]:{{ .Values.nginx.containerPort }} ipv6only=off;
+    {{- else if and (not (has "IPv4" .Values.nginx.ipFamilies)) (has "IPv6" .Values.nginx.ipFamilies) }}
+    # Only IPv6 is enabled
+    listen [::]:{{ .Values.nginx.containerPort }};
+    {{- else }}
+    # Default, IPv4 only
     listen {{ .Values.nginx.containerPort }};
+    {{- end }}
 
     # HSTS settings
     # WARNING: Only add the preload option once you read about
@@ -11,7 +20,11 @@ server {
     # will add the domain to a hardcoded list that is shipped
     # in all major browsers and getting removed from this list
     # could take several months.
-    #add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;" always;
+    {{- range $name, $value := .Values.nginx.config.headers }}
+    {{- if $value }}
+    add_header {{ $name }} {{ $value | quote }} always;
+    {{- end }}
+    {{- end }}
 
     # set max upload size
     client_max_body_size 10G;
@@ -29,15 +42,6 @@ server {
     # with the `ngx_pagespeed` module, uncomment this line to disable it.
     #pagespeed off;
 
-    # HTTP response headers borrowed from Nextcloud `.htaccess`
-    add_header Referrer-Policy                      "no-referrer"       always;
-    add_header X-Content-Type-Options               "nosniff"           always;
-    add_header X-Download-Options                   "noopen"            always;
-    add_header X-Frame-Options                      "SAMEORIGIN"        always;
-    add_header X-Permitted-Cross-Domain-Policies    "none"              always;
-    add_header X-Robots-Tag                         "noindex, nofollow" always;
-    add_header X-XSS-Protection                     "1; mode=block"     always;
-
     # Remove X-Powered-By, which is an information leak
     fastcgi_hide_header X-Powered-By;
 
@@ -48,7 +52,7 @@ server {
     include mime.types;
     types {
         text/javascript js mjs;
-    }        
+    }
 
     # Path to the root of your installation
     root /var/www/html;

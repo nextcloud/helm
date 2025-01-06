@@ -247,7 +247,7 @@ S3 as primary object store env vars
   value: {{ .Values.nextcloud.objectStore.s3.usePathStyle | quote }}
 {{- with .Values.nextcloud.objectStore.s3.legacyAuth }}
 - name: OBJECTSTORE_S3_LEGACYAUTH
-  value: {{ . }}
+  value: {{ . | quote }}
 {{- end }}
 - name: OBJECTSTORE_S3_AUTOCREATE
   value: {{ .Values.nextcloud.objectStore.s3.autoCreate | quote }}
@@ -301,7 +301,7 @@ S3 as primary object store env vars
 - name: OBJECTSTORE_S3_SECRET
   value: {{ .Values.nextcloud.objectStore.s3.secretKey | quote }}
 {{- end }}
-{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.bucket }}
+{{- if and .Values.nextcloud.objectStore.s3.existingSecret .Values.nextcloud.objectStore.s3.secretKeys.sse_c_key }}
 - name: OBJECTSTORE_S3_SSE_C_KEY
   valueFrom:
     secretKeyRef:

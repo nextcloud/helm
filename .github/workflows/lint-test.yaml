@@ -38,6 +38,7 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
@@ -63,7 +64,7 @@ jobs:
           helm unittest charts/nextcloud
 
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [changes, lint]
     # only run this job if there are helm chart file changes
     if: needs.changes.outputs.src != 'false'
@@ -78,21 +79,27 @@ jobs:
 
           # test the helm chart with postgresql subchart enabled
           - name: PostgreSQL Enabled
-            helm_args: '--helm-extra-set-args "--set=postgresql.enabled=true --set=postgresql.global.postgresql.auth.password=testing123456 --set=internalDatabase.enabled=false --set=externalDatabase.enabled=True --set=externalDatabase.type=postgresql --set=externalDatabase.password=testing12345"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/postgresql.yaml"'
 
           # test the helm chart with nginx container enabled
           - name: Nginx Enabled
-            helm_args: '--helm-extra-set-args "--set=image.flavor=fpm --set=nginx.enabled=true"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/nginx.yaml"'
 
           # test the helm chart with horizontal pod autoscaling enabled
           - name: Horizontal Pod Autoscaling Enabled
-            helm_args: '--helm-extra-set-args "--set=hpa.enabled=true --set=hpa.minPods=2 --set=hpa.maxPods=3 --set=hpa.targetCPUUtilizationPercentage=75"'
+            helm_args: '--helm-extra-set-args "--values charts/nextcloud/test-values/hpa.yaml"'
 
           # test the helm chart with s3 as the primary storage
           - name: S3 Enabled as Primary Storage
             # we need to skip the clean up so we can test adding a file
             helm_args: |
-                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--set=fullnameOverride=nextcloud --set=nextcloud.objectStore.s3.enabled=true --set=nextcloud.objectStore.s3.accessKey=nextcloud --set=nextcloud.objectStore.s3.secretKey=rootpass123 --set=nextcloud.objectStore.s3.host=minio.nextcloud.svc.cluster.local --set=nextcloud.objectStore.s3.port=9000 --set=nextcloud.objectStore.s3.ssl=false --set=nextcloud.objectStore.s3.bucket=nextcloud --set=nextcloud.objectStore.s3.usePathStyle=true --set=image.flavor=fpm --set=nginx.enabled=true --set=nextcloud.host=nextcloud --set=nextcloud.trustedDomains[0]='*'"
+                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--values charts/nextcloud/test-values/s3-as-primary-storage.yaml"
+            test: true
+
+          # test the helm chart with imaginary
+          - name: Imaginary Enabled
+            helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/imaginary.yaml"
+            test: true
 
     steps:
       - name: Checkout
@@ -108,6 +115,7 @@ jobs:
       - name: Add dependency chart repos
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
@@ -121,7 +129,7 @@ jobs:
           fi
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+        uses: helm/kind-action@v1.12.0
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Install MinIO for testing S3 as Primary Storage
@@ -144,18 +152,20 @@ jobs:
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }} ${{ matrix.test_cases.helm_args }}
 
-      - name: Try adding a file to Nextcloud
-        if: matrix.test_cases.name == 'S3 Enabled as Primary Storage'
+      - name: Run test for Nextcloud
+        if: matrix.test_cases.test
         # applies a kubernetes job that uploads a file and then checks log of finished pod
         run: |
+            EXIT=0
             kubectl config set-context --current --namespace=nextcloud && \
-            kubectl apply -f ./.github/tests/test_upload_job.yaml --wait=true && \
+            kubectl apply -f ./.github/tests/test_job.yaml --wait=true && \
             sleep 2 && \
-            kubectl wait --for=condition=Complete --timeout=2m job/create-nextcloud-file && \
-            echo "Here's the logs from the job:" && \
-            kubectl logs --tail=-1 -f -l batch.kubernetes.io/job-name=create-nextcloud-file && \
-            echo "Here's the logs from the nextcloud pod:" && \
-            kubectl logs -l app.kubernetes.io/name=nextcloud
+            kubectl wait --for=condition=Complete --timeout=2m job/test-nextcloud || EXIT=1
+            echo "Here's the logs from the job:"
+            kubectl logs --ignore-errors --prefix --tail=-1 --all-containers=true -l batch.kubernetes.io/job-name=test-nextcloud
+            echo "Here's the logs from the nextcloud pod:"
+            kubectl logs --ignore-errors --prefix -l app.kubernetes.io/name=nextcloud
+            exit $EXIT
 
   summary:
     runs-on: ubuntu-latest-low
