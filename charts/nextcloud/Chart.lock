@@ -4,12 +4,12 @@ dependencies:
   version: 16.3.5
 - name: mariadb
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 18.2.0
+  version: 20.2.1
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
-  version: 19.6.4
+  version: 20.6.0
 - name: collabora-online
   repository: https://collaboraonline.github.io/online
   version: 1.1.20
-digest: sha256:c15e97de1c3acf872f73356faa838b59718a1c723c4f698422dbd8a7616e3d69
-generated: "2025-01-12T20:10:26.935856912+01:00"
+digest: sha256:0d0aa377c2b2411bb5c42329c15cf652fbfc7badf9e896d1953c24a928af9562
+generated: "2025-01-12T20:13:27.705912683+01:00"
