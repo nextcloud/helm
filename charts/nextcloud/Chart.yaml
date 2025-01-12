@@ -23,7 +23,7 @@ maintainers:
     email: jeff@billimek.com
 dependencies:
   - name: postgresql
-    version: 15.5.0
+    version: 16.3.5
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
   - name: mariadb
