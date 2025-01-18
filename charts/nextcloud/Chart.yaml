@@ -1,6 +1,7 @@
 apiVersion: v2
 name: nextcloud
 version: 6.6.3
+# renovate: image=docker.io/library/nextcloud
 appVersion: 30.0.5
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
@@ -21,6 +22,10 @@ maintainers:
     email: christian.ingenhaag@googlemail.com
   - name: billimek
     email: jeff@billimek.com
+  - name: WrenIX
+    url: https://wrenix.eu
+  - name: jessebot
+    url: https://jessebot.work
 dependencies:
   - name: postgresql
     version: 15.5.0
