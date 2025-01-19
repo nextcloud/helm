@@ -2,6 +2,56 @@ apiVersion: v1
 entries:
   nextcloud:
   - apiVersion: v2
+    appVersion: 30.0.5
+    created: "2025-01-19T14:05:18.995517699Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 15.5.0
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.2.0
+    - condition: redis.enabled
+      name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 19.6.4
+    - alias: collabora
+      condition: collabora.enabled
+      name: collabora-online
+      repository: https://collaboraonline.github.io/online
+      version: 1.1.20
+    description: A file sharing server that puts the control and security of your
+      own data back into your hands.
+    digest: 75de676f75bca66f017a2aff5bba3f43ad6f0a5f6c8b42eca499975527fe9fe2
+    home: https://nextcloud.com/
+    icon: https://cdn.rawgit.com/docker-library/docs/defa5ffc7123177acd60ddef6e16bddf694cc35f/nextcloud/logo.svg
+    keywords:
+    - nextcloud
+    - storage
+    - http
+    - web
+    - php
+    maintainers:
+    - email: skjnldsv@protonmail.com
+      name: skjnldsv
+    - email: christian.ingenhaag@googlemail.com
+      name: chrisingenhaag
+    - email: jeff@billimek.com
+      name: billimek
+    - name: WrenIX
+      url: https://wrenix.eu
+    - name: jessebot
+      url: https://jessebot.work
+    name: nextcloud
+    sources:
+    - https://github.com/nextcloud/helm
+    - https://github.com/nextcloud/docker
+    urls:
+    - https://github.com/nextcloud/helm/releases/download/nextcloud-6.6.3/nextcloud-6.6.3.tgz
+    version: 6.6.3
+  - apiVersion: v2
     appVersion: 30.0.4
     created: "2025-01-06T18:19:43.59167202Z"
     dependencies:
@@ -7935,4 +7985,4 @@ entries:
     urls:
     - https://github.com/nextcloud/helm/releases/download/nextcloud-2.0.2/nextcloud-2.0.2.tgz
     version: 2.0.2
-generated: "2025-01-06T18:19:43.592613869Z"
+generated: "2025-01-19T14:05:18.996109489Z"
