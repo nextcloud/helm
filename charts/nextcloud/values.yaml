@@ -724,9 +724,9 @@ notifyPush:
     # @section -- Notify Push (Clientpush)
     pullSecrets: []
 
-  # -- option to set the redis_url per env (if a external redis is used) e.g.: `value: ""` or `valueFrom: {secretKeyRef:{name:"",key:""}}`
+  # -- option additional env (if a external redis is used, you need to set REDIS_URL)
   # @section -- Notify Push (Clientpush)
-  redisURLEnv:
+  extraEnv: []
 
   # -- Additional annotations for notify-push pods
   # @section -- Notify Push (Clientpush)

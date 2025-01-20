@@ -506,32 +506,32 @@ The nextcloud deployment includes a series of different probes you can use to de
 We include an optional Client Push [nextcloud/notify_push](https://github.com/nextcloud/notify_push).
 
 
-| Parameter                              | Description                                                                                                                         | Default                |
-|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|------------------------|
-| `notifyPush.enabled`                   | Enable another deployment to handle notify_push (sometimes called ClientPush)                                                       | `false`                |
-| `notifyPush.autoSetup`                 | Setup notify_push on nextcloud per docker-entrypoint-hooks before start                                                             | `false`                |
-| `notifyPush.replicaCount`              | Number of notify-push pod replicas to deploy                                                                                        | `1`                    |
-| `notifyPush.image.registry`            | notify-push image registry                                                                                                          | `docker.io`            |
-| `notifyPush.image.repository`          | notify-push image name                                                                                                              | `miles170/notify_push` |
-| `notifyPush.image.tag`                 | notify-push image tag                                                                                                               | `v0.7.0`               |
-| `notifyPush.image.pullPolicy`          | notify-push image pull policy                                                                                                       | `IfNotPresent`         |
-| `notifyPush.image.pullSecrets`         | notify-push image pull secrets                                                                                                      | `[]`                   |
-| `notifyPush.redisURLEnv`               | option to set the redis_url per env (if a external redis is used) e.g.: `value: ""` or `valueFrom: {secretKeyRef:{name:"",key:""}}` | `""`                   |
-| `notifyPush.podAnnotations`            | Additional annotations for notify-push pods                                                                                         | `{}`                   |
-| `notifyPush.podLabels`                 | Additional labels for notify-push pods                                                                                              | `{}`                   |
-| `notifyPush.podSecurityContext`        | Optional security context for the notify-push pod                                                                                   | `nil`                  |
-| `notifyPush.securityContext`           | Optional security context for the notify-push container                                                                             | `nil`                  |
-| `notifyPush.resources`                 | notify-push resources                                                                                                               | `{}`                   |
-| `notifyPush.service.type`              | notify-push: Kubernetes Service type                                                                                                | `ClusterIP`            |
-| `notifyPush.service.loadBalancerIP`    | Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank                                                    | `nil`                  |
-| `notifyPush.service.nodePort`          | notify-push: NodePort for service type NodePort                                                                                     | `nil`                  |
-| `notifyPush.service.annotations`       | Additional annotations for service notify-push                                                                                      | `{}`                   |
-| `notifyPush.service.labels`            | Additional labels for service notify-push                                                                                           | `{}`                   |
-| `notifyPush.ingress.path`              | Add path in default ingress to notify_push service                                                                                  | `/push`                |
-| `notifyPush.ingress.pathType`          | PathType for additional path in default ingress for notify-push path                                                                | `Prefix`               |
+| Parameter                              | Description                                                                      | Default                |
+|----------------------------------------|----------------------------------------------------------------------------------|------------------------|
+| `notifyPush.enabled`                   | Enable another deployment to handle notify_push (sometimes called ClientPush)    | `false`                |
+| `notifyPush.autoSetup`                 | Setup notify_push on nextcloud per docker-entrypoint-hooks before start          | `false`                |
+| `notifyPush.replicaCount`              | Number of notify-push pod replicas to deploy                                     | `1`                    |
+| `notifyPush.image.registry`            | notify-push image registry                                                       | `docker.io`            |
+| `notifyPush.image.repository`          | notify-push image name                                                           | `miles170/notify_push` |
+| `notifyPush.image.tag`                 | notify-push image tag                                                            | `v0.7.0`               |
+| `notifyPush.image.pullPolicy`          | notify-push image pull policy                                                    | `IfNotPresent`         |
+| `notifyPush.image.pullSecrets`         | notify-push image pull secrets                                                   | `[]`                   |
+| `notifyPush.extraEnv`                  | option additional env (if a external redis is used, you need to set REDIS_URL)   | `""`                   |
+| `notifyPush.podAnnotations`            | Additional annotations for notify-push pods                                      | `{}`                   |
+| `notifyPush.podLabels`                 | Additional labels for notify-push pods                                           | `{}`                   |
+| `notifyPush.podSecurityContext`        | Optional security context for the notify-push pod                                | `nil`                  |
+| `notifyPush.securityContext`           | Optional security context for the notify-push container                          | `nil`                  |
+| `notifyPush.resources`                 | notify-push resources                                                            | `{}`                   |
+| `notifyPush.service.type`              | notify-push: Kubernetes Service type                                             | `ClusterIP`            |
+| `notifyPush.service.loadBalancerIP`    | Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank | `nil`                  |
+| `notifyPush.service.nodePort`          | notify-push: NodePort for service type NodePort                                  | `nil`                  |
+| `notifyPush.service.annotations`       | Additional annotations for service notify-push                                   | `{}`                   |
+| `notifyPush.service.labels`            | Additional labels for service notify-push                                        | `{}`                   |
+| `notifyPush.ingress.path`              | Add path in default ingress to notify_push service                               | `/push`                |
+| `notifyPush.ingress.pathType`          | PathType for additional path in default ingress for notify-push path             | `Prefix`               |
 
 > [!Note]
-> notify-push needs an redis (redis.enabled=true or notifyPush.redisURLEnv={...})
+> notify-push needs an redis (`redis.enabled=true` or `notifyPush.extraEnv=[{name:"REDIS_URL",...}]` )
 
 ### Collabora Configuration
 
