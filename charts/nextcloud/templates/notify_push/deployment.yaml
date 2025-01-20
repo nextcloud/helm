@@ -47,17 +47,14 @@ spec:
             - name: METRICS_PORT
               value: "9867"
             {{- include "nextcloud.env.database" . | nindent 12 }}
-            {{- with .Values.notifyPush.redisURLEnv }}
-            - name: "REDIS_URL"
-              {{- toYaml . | nindent 14 }}
-            {{- else }}
-            {{- if not .Values.redis.enabled }}
-            {{- fail "notify-push needs an redis (redis.enabled=true or notifyPush.redisURLEnv={...})" }}
-            {{- end }}
+            {{- if .Values.redis.enabled }}
             {{- include "nextcloud.env.redis" . | nindent 12 }}
             {{- end }}
             - name: NEXTCLOUD_URL # deployment.namespace.svc.cluster.local
               value: "http{{ if .Values.notifyPush.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            {{- with .Values.notifyPush.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 7867
