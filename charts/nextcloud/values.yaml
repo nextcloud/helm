@@ -682,6 +682,41 @@ dnsConfig: {}
 #   - name: ndots
 #     value: "1"
 
+
+## Deployment to execute nextcloud-assistant related background tasks
+## ref: https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
+##
+aiWorker:
+  enabled: false
+
+  # Number of replicas to be deployed
+  replicaCount: 1
+
+  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  securityContext: {}
+  #   runAsUser: 33
+  #   runAsGroup: 33
+  #   runAsNonRoot: true
+  #   readOnlyRootFilesystem: true
+
+  # Set affinity parameters. For example, you may need to define a podAffinity when using a storageClass that doesn't support ReadWriteMany
+  affinity: {}
+  #   podAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #       - labelSelector:
+  #           matchLabels:
+  #            app: nextcloud
+  #         topologyKey: "kubernetes.io/hostname"
+
+  # Set to true to use the hostname to check nextcloud for readiness
+  useHostName: true
+
+
+  deploymentAnnotations: {}
+  deploymentLabels: {}
+  podAnnotations: {}
+  podLabels: {}
+
 imaginary:
   # -- Start Imgaginary
   enabled: false

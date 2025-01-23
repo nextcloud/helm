@@ -1,0 +1,79 @@
+{{- if .Values.aiWorker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nextcloud.fullname" . }}-ai-worker
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}-ai-worker
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: app
+    {{- with .Values.aiWorker.deploymentLabels }}
+    {{- toYaml . | nindent 8 }}
+    {{- end }}
+  {{- with .Values.aiWorker.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.aiWorker.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextcloud.name" . }}-ai-worker
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}-ai-worker
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: app
+        {{- with .Values.aiWorker.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- with .Values.aiWorker.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      affinity:
+        {{- toYaml .Values.aiWorker.affinity | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.aiWorker.securityContext | nindent 8 }}
+      initContainers:
+      - name: wait-for-service
+        image: alpine/curl
+        command:
+          - sh
+          - -c
+          - >-
+            until curl -sf https://{{ if .Values.aiWorker.useHostName }}{{ .Values.nextcloud.host }}/status.php {{- else }} http://{{ template "nextcloud.fullname" . }}:{{ .Values.service.port }}/status.php;{{- end }}
+            do echo waiting for service; sleep 5;
+            done
+      containers:
+        - name: nextcloud-aiworker
+          image: {{ include "nextcloud.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - sh
+            - "-c"
+            - |-
+              set -e; while true; do php occ background-job:worker -v -t 60 "OC\TaskProcessing\SynchronousBackgroundJob"; done
+          volumeMounts:
+            {{- include "aiWorker.volumeMounts" . | trim | nindent 12 }}
+      volumes:
+        - name: nextcloud-main
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+        - name: nextcloud-data
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+        {{- end }}
+      restartPolicy: Always
+{{- end }}
