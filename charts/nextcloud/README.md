@@ -770,11 +770,21 @@ We provide a deployment that filters and prioritizes background jobs for AI task
 
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed) for more information.
 
-| Parameter              | Description                                                                            | Default           |
-|------------------------|----------------------------------------------------------------------------------------|-------------------|
-| `aiWorker.enabled`     | Start the ai-worker deployment                                                         | false             |
-| `aiWorker.replicaCount`| Number of ai-worker pod replicas to deploy                                             | 1                 |
-| `aiWorker.useHostName` | Set to `true` to use the host defined in nextcloud.host and `false` to use the service | false             |
+| Parameter                        | Description                                                                            | Default           |
+|----------------------------------|----------------------------------------------------------------------------------------|-------------------|
+| `aiWorker.enabled`               | Start the ai-worker deployment                                                         | `false`           |
+| `aiWorker.replicaCount`          | Number of ai-worker pod replicas to deploy                                             | `1`               |
+| `aiWorker.useHostName`           | Set to `true` to use the host defined in nextcloud.host and `false` to use the service | `false`           |
+| `aiWorker.resources`             | ai-worker resources                                                                    | `{}`              |
+| `aiWorker.securityContext`       | Optional security context for the ai-worker container                                  | `{}`              |
+| `aiWorker.podSecurityContext`    | Optional security context for the ai-worker container                                  | `{}`              |
+| `aiWorker.affinity`              | ai-worker pod affinity                                                                 | `{}`              |
+| `aiWorker.tolerations`           | ai-worker pod tolerations                                                              | `[]`              |
+| `aiWorker.deploymentAnnotations` | ai-worker deployment annotations                                                       | `{}`              |
+| `aiWorker.deploymentLabels`      | ai-worker deployment labels                                                            | `{}`              |                                                          
+| `aiWorker.podAnnotations`        | ai-worker pod annotations                                                              | `{}`              |
+| `aiWorker.podLabels`             | ai-worker pod labels                                                                   | `{}`              |
+
 
 # Backups
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).

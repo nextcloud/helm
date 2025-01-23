@@ -39,8 +39,14 @@ spec:
     spec:
       affinity:
         {{- toYaml .Values.aiWorker.affinity | nindent 8 }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.aiWorker.securityContext | nindent 8 }}
+      podSecurityContext:
+        {{- toYaml .Values.aiWorker.podSecurityContext | nindent 8 }}
       initContainers:
       - name: wait-for-service
         image: alpine/curl
@@ -60,6 +66,8 @@ spec:
             - "-c"
             - |-
               set -e; while true; do php occ background-job:worker -v -t 60 "OC\TaskProcessing\SynchronousBackgroundJob"; done
+          resources:
+            {{- toYaml .Values.aiWorker.resources | nindent 12 }}
           volumeMounts:
             {{- include "aiWorker.volumeMounts" . | trim | nindent 12 }}
       volumes:

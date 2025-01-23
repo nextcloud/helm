@@ -699,6 +699,10 @@ aiWorker:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
+  # Set podSecurityContext parameters. For example, you may need to define fsGroup directive
+  podSecurityContext: {}
+  #   fsGroup: 33
+
   # Set affinity parameters. For example, you may need to define a podAffinity when using a storageClass that doesn't support ReadWriteMany
   affinity: {}
   #   podAffinity:
@@ -708,8 +712,14 @@ aiWorker:
   #            app: nextcloud
   #         topologyKey: "kubernetes.io/hostname"
 
+  # Set tolerations parameters. For example, you may need to define a toleration for a specific node taint
+  tolerations: []
+
   # Set to true to use the hostname to check nextcloud for readiness
   useHostName: true
+
+  # ai-worker resources
+  resources: {}
 
 
   deploymentAnnotations: {}
