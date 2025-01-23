@@ -768,7 +768,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:down
 # Improve AI task pickup speed
 We provide a deployment that filters and prioritizes background jobs for AI tasks. This results in faster task processing and can be scaled according to your needs by increasing the number of replicas in the deployment.
 
-Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed) for more information.
+Check out the [official Nextcloud AI docs](https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed) for more information.
 
 | Parameter                        | Description                                                                            | Default           |
 |----------------------------------|----------------------------------------------------------------------------------------|-------------------|
