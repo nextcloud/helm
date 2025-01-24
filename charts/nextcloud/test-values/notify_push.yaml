@@ -1,3 +1,8 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: "nextcloud-notify-push.nextcloud.svc.cluster.local"
+
 redis:
   enabled: true
 
@@ -8,3 +13,4 @@ mariadb:
 
 notifyPush:
   enabled: true
+  autoSetup: true
