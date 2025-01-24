@@ -689,6 +689,11 @@ dnsConfig: {}
 aiWorker:
   enabled: false
 
+  image:
+    repository: alpine/curl
+    tag: latest
+    pullPolicy: IfNotPresent
+
   # Number of replicas to be deployed
   replicaCount: 1
 

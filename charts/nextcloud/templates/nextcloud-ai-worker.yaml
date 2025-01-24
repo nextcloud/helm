@@ -49,7 +49,7 @@ spec:
         {{- toYaml .Values.aiWorker.podSecurityContext | nindent 8 }}
       initContainers:
       - name: wait-for-service
-        image: alpine/curl
+        image: {{ .Values.aiWorker.image.repository }}:{{ .Values.aiWorker.image.tag }}
         command:
           - sh
           - -c
