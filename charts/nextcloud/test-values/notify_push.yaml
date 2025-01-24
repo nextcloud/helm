@@ -1,3 +1,11 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: "nextcloud.nextcloud.svc.cluster.local"
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
+
 redis:
   enabled: true
 
@@ -8,3 +16,4 @@ mariadb:
 
 notifyPush:
   enabled: true
+  autoSetup: true
