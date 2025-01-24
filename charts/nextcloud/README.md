@@ -41,7 +41,7 @@ helm install my-release nextcloud/nextcloud
 * [Running `occ` commands](#running-occ-commands)
     * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
     * [Downloading models for recognize](#downloading-models-for-recognize)
-* [Improve AI task pickup speed]()
+* [Improve AI task pickup speed](#improve-ai-task-pickup-speed)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
 * [Troubleshooting](#troubleshooting)
