@@ -546,6 +546,8 @@ We include an optional external preview provider from [h2non/imaginary](https://
 | `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
 | `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
 | `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
+| `imaginary.nodeSelector`               | Imaginary pod nodeSelector                                                                | `{}`              |
+| `imaginary.tolerations`                | Imaginary pod tolerations                                                | `[]`              |
 | `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
 | `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
 | `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |

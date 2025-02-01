@@ -85,4 +85,12 @@ spec:
       securityContext:
         {{- toYaml . | nindent 12 }}
       {{- end }}
+      {{- with .Values.imaginary.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imaginary.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 {{- end }}
