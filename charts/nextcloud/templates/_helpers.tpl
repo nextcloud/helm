@@ -398,37 +398,3 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end -}}
-
-
-{{/*
-Create volume mounts for the nextcloud-aiworker container.
-*/}}
-{{- define "aiWorker.volumeMounts" -}}
-- name: nextcloud-main
-  mountPath: /var/www/
-  subPath: {{ ternary "root" (printf "%s/root" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-- name: nextcloud-main
-  mountPath: /var/www/html
-  subPath: {{ ternary "html" (printf "%s/html" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-{{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
-- name: nextcloud-data
-  mountPath: {{ .Values.nextcloud.datadir }}
-  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.nextcloudData.subPath) (empty .Values.persistence.nextcloudData.subPath) }}
-{{- else }}
-- name: nextcloud-main
-  mountPath: {{ .Values.nextcloud.datadir }}
-  subPath: {{ ternary "data" (printf "%s/data" .Values.persistence.subPath) (empty .Values.persistence.subPath) }}
-{{- end }}
-- name: nextcloud-main
-  mountPath: /var/www/html/config
-  subPath: {{ ternary "config" (printf "%s/config" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-- name: nextcloud-main
-  mountPath: /var/www/html/custom_apps
-  subPath: {{ ternary "custom_apps" (printf "%s/custom_apps" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-- name: nextcloud-main
-  mountPath: /var/www/tmp
-  subPath: {{ ternary "tmp" (printf "%s/tmp" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-- name: nextcloud-main
-  mountPath: /var/www/html/themes
-  subPath: {{ ternary "themes" (printf "%s/themes" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
-{{- end }}

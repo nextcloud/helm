@@ -26,21 +26,21 @@ maintainers:
     url: https://wrenix.eu
   - name: jessebot
     url: https://jessebot.work
-dependencies:
-  - name: postgresql
-    version: 15.5.0
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: postgresql.enabled
-  - name: mariadb
-    version: 18.2.0
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: mariadb.enabled
-  - name: redis
-    version: 19.6.4
-    repository: oci://registry-1.docker.io/bitnamicharts
-    condition: redis.enabled
-  - name: collabora-online
-    version: 1.1.20
-    repository: https://collaboraonline.github.io/online
-    condition: collabora.enabled
-    alias: collabora
+# dependencies:
+#   - name: postgresql
+#     version: 15.5.0
+#     repository: oci://registry-1.docker.io/bitnamicharts
+#     condition: postgresql.enabled
+#   - name: mariadb
+#     version: 18.2.0
+#     repository: oci://registry-1.docker.io/bitnamicharts
+#     condition: mariadb.enabled
+#   - name: redis
+#     version: 19.6.4
+#     repository: oci://registry-1.docker.io/bitnamicharts
+#     condition: redis.enabled
+#   - name: collabora-online
+#     version: 1.1.20
+#     repository: https://collaboraonline.github.io/online
+#     condition: collabora.enabled
+#     alias: collabora
