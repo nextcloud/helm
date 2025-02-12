@@ -1,7 +1,10 @@
 fullnameOverride: nextcloud
 
 nextcloud:
-  host: "nextcloud-notify-push.nextcloud.svc.cluster.local"
+  host: "ingress-nginx-controller.ingress-nginx.svc"
+
+ingress:
+  enabled: true
 
 redis:
   enabled: true
