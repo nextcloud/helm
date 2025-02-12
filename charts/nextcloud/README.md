@@ -781,7 +781,7 @@ Check out the [official Nextcloud AI docs](https://docs.nextcloud.com/server/lat
 | `aiWorker.affinity`              | ai-worker pod affinity                                                                 | `{}`              |
 | `aiWorker.tolerations`           | ai-worker pod tolerations                                                              | `[]`              |
 | `aiWorker.deploymentAnnotations` | ai-worker deployment annotations                                                       | `{}`              |
-| `aiWorker.deploymentLabels`      | ai-worker deployment labels                                                            | `{}`              |                                                          
+| `aiWorker.deploymentLabels`      | ai-worker deployment labels                                                            | `{}`              |
 | `aiWorker.podAnnotations`        | ai-worker pod annotations                                                              | `{}`              |
 | `aiWorker.podLabels`             | ai-worker pod labels                                                                   | `{}`              |
 

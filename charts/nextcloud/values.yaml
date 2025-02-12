@@ -687,28 +687,40 @@ dnsConfig: {}
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
 ##
 aiWorker:
+  # -- Start / Deploy Worker for AI
+  # @section -- AI Worker
   enabled: false
 
   image:
+    # --
+    # @section -- AI Worker
     repository: alpine/curl
+    # --
+    # @section -- AI Worker
     tag: latest
+    # --
+    # @section -- AI Worker
     pullPolicy: IfNotPresent
 
-  # Number of replicas to be deployed
+  # -- Number of replicas to be deployed
+  # @section -- AI Worker
   replicaCount: 1
 
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # -- Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+  # @section -- AI Worker
   securityContext: {}
   #   runAsUser: 33
   #   runAsGroup: 33
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
-  # Set podSecurityContext parameters. For example, you may need to define fsGroup directive
+  # -- Set podSecurityContext parameters. For example, you may need to define fsGroup directive
+  # @section -- AI Worker
   podSecurityContext: {}
   #   fsGroup: 33
 
-  # Set affinity parameters. For example, you may need to define a podAffinity when using a storageClass that doesn't support ReadWriteMany
+  # -- Set affinity parameters. For example, you may need to define a podAffinity when using a storageClass that doesn't support ReadWriteMany
+  # @section -- AI Worker
   affinity: {}
   #   podAffinity:
   #     requiredDuringSchedulingIgnoredDuringExecution:
@@ -717,19 +729,29 @@ aiWorker:
   #            app: nextcloud
   #         topologyKey: "kubernetes.io/hostname"
 
-  # Set tolerations parameters. For example, you may need to define a toleration for a specific node taint
+  # -- Set tolerations parameters. For example, you may need to define a toleration for a specific node taint
+  # @section -- AI Worker
   tolerations: []
 
-  # Set to true to use the hostname to check nextcloud for readiness
+  # -- Set to true to use the hostname to check nextcloud for readiness
+  # @section -- AI Worker
   useHostName: true
 
-  # ai-worker resources
+  # -- ai-worker resources
+  # @section -- AI Worker
   resources: {}
 
-
+  # -- Annotations on Deployment
+  # @section -- AI Worker
   deploymentAnnotations: {}
+  # -- Labels on Deployment
+  # @section -- AI Worker
   deploymentLabels: {}
+  # -- Annotations on Pod
+  # @section -- AI Worker
   podAnnotations: {}
+  # -- Labels on Pod
+  # @section -- AI Worker
   podLabels: {}
 
 imaginary:
