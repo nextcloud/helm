@@ -1,10 +1,14 @@
 fullnameOverride: nextcloud
 
 nextcloud:
-  host: "nextcloud.nextcloud.svc.cluster.local"
+  host: "ingress-nginx-controller.ingress-nginx.svc"
   trustedDomains:
     - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'ingress-nginx-controller.ingress-nginx.svc'
     - 'nextcloud'
+
+ingress:
+  enabled: true
 
 redis:
   enabled: true
