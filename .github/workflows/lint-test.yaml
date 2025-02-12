@@ -109,6 +109,7 @@ jobs:
             helm_args: |
                 --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/notify_push.yaml"
             testNotifyPush: true
+            ingress: true
 
     steps:
       - name: Checkout
@@ -159,6 +160,11 @@ jobs:
              --timeout 5m0s \
              --values .github/tests/silo_test_values.yaml \
              ./silo/helm/silo
+
+      - name: Install Ingress
+        if: matrix.test_cases.ingress
+        run: |
+          kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
       - name: Run chart-testing (install ${{ matrix.test_cases.name }})
         id: install
