@@ -70,50 +70,7 @@ spec:
             {{- toYaml .Values.aiWorker.resources | nindent 12 }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-            {{- range $hook, $shell := .Values.nextcloud.hooks }}
-            {{- if $shell }}
-            - name: nextcloud-hooks
-              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
-              subPath: {{ $hook }}.sh
-              readOnly: true
-            {{- end }}
-            {{- end }}
       volumes:
-        - name: nextcloud-main
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
-        - name: nextcloud-data
-          persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
-        {{- end }}
-        {{- if .Values.nextcloud.configs }}
-        - name: nextcloud-config
-          configMap:
-            name: {{ template "nextcloud.fullname" . }}-config
-        {{- end }}
-        {{- if .Values.nextcloud.phpConfigs }}
-        - name: nextcloud-phpconfig
-          configMap:
-            name: {{ template "nextcloud.fullname" . }}-phpconfig
-        {{- end }}
-        {{- if .Values.nginx.enabled }}
-        - name: nextcloud-nginx-config
-          configMap:
-            name: {{ template "nextcloud.fullname" . }}-nginxconfig
-        {{- end }}
-        {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
-        - name: nextcloud-hooks
-          configMap:
-            name: {{ template "nextcloud.fullname" . }}-hooks
-            defaultMode: 0o755
-        {{- end }}
-        {{- with .Values.nextcloud.extraVolumes }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "nextcloud.volumes" . | trim | nindent 8 }}
       restartPolicy: Always
 {{- end }}
