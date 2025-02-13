@@ -778,10 +778,11 @@ metrics:
     # Optional: becomes NEXTCLOUD_INFO_APPS env var in the nextcloud-exporter container.
     # Enables gathering of apps-related metrics. Defaults to false
     apps: false
+    update: false
 
   image:
     repository: xperimental/nextcloud-exporter
-    tag: 0.6.2
+    tag: 0.8.0
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName
@@ -862,6 +863,27 @@ metrics:
     ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
     ##
     labels: {}
+
+  rules:
+    # -- Deploy Prometheus Rules (Alerts) for the exporter
+    # @section -- Metrics
+    enabled: false
+    # -- Label on Prometheus Rules CRD Manifest
+    # @section -- Metrics
+    labels: {}
+    defaults:
+      # -- Add Default Rules
+      # @section -- Metrics
+      enabled: true
+      # -- Label on the rules (the severity is already set)
+      # @section -- Metrics
+      labels: {}
+      # -- Filter on metrics on alerts (default just for this helm-chart)
+      # @section -- Metrics
+      filter: ""
+    # -- Add own Rules to Prometheus Rules
+    # @section -- Metrics
+    additionalRules: []
 
 
 rbac:

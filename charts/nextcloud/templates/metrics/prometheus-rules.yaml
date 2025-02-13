@@ -1,0 +1,61 @@
+{{- if .Values.metrics.rules.enabled }}
+{{- $fullname := include "nextcloud.fullname" . }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $fullname }}
+  labels:
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- with .Values.metrics.rules.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    {{- with .Values.metrics.rules.defaults }}
+    {{- if .enabled }}
+    {{- $filter := .filter | default (printf `namespace="%s",job=~"^%s.*"` $.Release.Namespace $fullname) }}
+    - name: {{ $fullname }}-Defaults
+      rules:
+        - alert: "nextcloud: not reachable"
+          expr: 'avg(nextcloud_up{ {{ $filter }} }) without(endpoint,container,pod,instance) < 1'
+          for: 5m
+          labels:
+            severity: "critical"
+            {{- with .labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            {{`
+            summary: "Nextcloud in {{ $labels.namespace }} is not reachable by exporter"
+            `}}
+        - alert: "nextcloud: outdated version"
+          expr: 'sum(nextcloud_system_update_available{ {{ $filter }} }) without(endpoint,container,pod,instance) > 0'
+          labels:
+            severity: "warning"
+            {{- with .labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            {{`
+            summary: "Nextcloud in {{ $labels.namespace }} is outdated"
+            `}}
+        - alert: "nextcloud: outdated apps"
+          expr: 'sum(nextcloud_apps_updates_available_total{ {{ $filter }} }) without(endpoint,container,pod,instance) > 0'
+          labels:
+            severity: "warning"
+            {{- with .labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            {{`
+            summary: "Nextcloud in {{ $labels.namespace }} has {{ $value }} outdated Apps"
+            `}}
+    {{- end }}
+    {{- end }}{{/* end-with prometheus.rules.default */}}
+    {{- with .Values.metrics.rules.additionalRules }}
+    - name: {{ $fullname }}-Additional
+      rules:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}
+
