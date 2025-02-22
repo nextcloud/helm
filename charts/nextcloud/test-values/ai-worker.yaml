@@ -1,0 +1,21 @@
+podLabels:
+  workload: nextcloud
+internalDatabase:
+  enabled: true
+persistence:
+  enabled: true
+aiWorker:
+  enabled: true
+  replicaCount: 1
+  securityContext:
+    runAsUser: 33
+    runAsGroup: 33
+    runAsNonRoot: false
+  useHostName: false
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              workload: nextcloud
+          topologyKey: "kubernetes.io/hostname"

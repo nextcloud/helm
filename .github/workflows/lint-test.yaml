@@ -95,6 +95,10 @@ jobs:
             helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/imaginary.yaml"
             test: true
 
+          # test the helm chart with ai-worker enabled
+          - name: AI-Worker Enabled
+            helm_args: --namespace nextcloud --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/ai-worker.yaml"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
