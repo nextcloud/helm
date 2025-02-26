@@ -359,22 +359,20 @@ The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud 
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
 Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
-
-| Parameter                                 | Description                                          | Default                                     |
-|-------------------------------------------|------------------------------------------------------|---------------------------------------------|
-| `persistence.enabled`                     | Enable persistence using PVC                         | `false`                                     |
-| `persistence.annotations`                 | PVC annotations                                      | `{}`                                        |
-| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil` (uses alpha storage class annotation) |
-| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil` (uses alpha storage class annotation) |
-| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce`                             |
-| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`                                       |
-| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`                                     |
-| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`                                        |
-| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce`                             |
-| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`                                       |
-
+| Parameter                                 | Description                                          | Default         |
+| ----------------------------------------- | ---------------------------------------------------- | --------------- |
+| `persistence.enabled`                     | Enable persistence using PVC                         | `false`         |
+| `persistence.annotations`                 | PVC annotations                                      | `{}`            |
+| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil`           |
+| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil`           |
+| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce` |
+| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`           |
+| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`         |
+| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`            |
+| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil`           |
+| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil`           |
+| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce` |
+| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`           |
 
 ### Metrics Configurations
 
