@@ -1,8 +1,8 @@
 apiVersion: v2
 name: nextcloud
-version: 6.6.6
+version: 7.0.0
 # renovate: image=docker.io/library/nextcloud
-appVersion: 30.0.6
+appVersion: 31.0.0
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
   - nextcloud
@@ -28,15 +28,15 @@ maintainers:
     url: https://jessebot.work
 dependencies:
   - name: postgresql
-    version: 15.5.0
+    version: 16.4.14
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: postgresql.enabled
   - name: mariadb
-    version: 18.2.0
+    version: 20.4.1
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: mariadb.enabled
   - name: redis
-    version: 19.6.4
+    version: 20.9.0
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
   - name: collabora-online
