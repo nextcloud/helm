@@ -248,38 +248,6 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
         {{- end }}{{/* end-if nginx.enabled */}}
-        {{- if .Values.cronjob.enabled }}
-        - name: {{ .Chart.Name }}-cron
-          image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - /cron.sh
-          {{- with .Values.cronjob.lifecycle }}
-          lifecycle:
-            {{- with .postStartCommand }}
-            postStart:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-            {{- with .preStopCommand }}
-            preStop:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-          {{- end }}
-          env:
-            {{- include "nextcloud.env" . | nindent 12 }}
-          resources:
-            {{- toYaml .Values.cronjob.resources | nindent 12 }}
-          {{- with .Values.cronjob.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-        {{- end }}{{/* end-if cronjob.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

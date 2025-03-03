@@ -1,0 +1,161 @@
+---
+{{- if .Values.cronjob.enabled }}
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "nextcloud.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+    helm.sh/chart: {{ include "nextcloud.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: app
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: app
+        {{- if .Values.redis.enabled }}
+        {{ template "nextcloud.redis.fullname" . }}-client: "true"
+        {{- end }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
+        php-config-hash: {{ toJson .Values.nextcloud.phpConfigs | sha256sum }}
+        {{- if .Values.nginx.enabled }}
+        nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
+        {{- end }}
+        hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+            helm.sh/chart: {{ include "nextcloud.chart" . }}
+            app.kubernetes.io/instance: {{ .Release.Name }}
+            app.kubernetes.io/managed-by: {{ .Release.Service }}
+            app.kubernetes.io/component: app
+        spec:
+          {{- with .Values.image.pullSecrets }}
+          imagePullSecrets:
+            {{- range . }}
+            - name: {{ . }}
+            {{- end}}
+          {{- end }}
+          containers:
+          - name: {{ .Chart.Name }}-cron
+            image: {{ include "nextcloud.image" . }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command:
+              - php
+              - -f
+              - /var/www/html/cron.php
+            {{- with .Values.cronjob.lifecycle }}
+            lifecycle:
+              {{- with .postStartCommand }}
+              postStart:
+                exec:
+                  command:
+                    {{- toYaml . | nindent 20 }}
+              {{- end }}
+              {{- with .preStopCommand }}
+              preStop:
+                exec:
+                  command:
+                    {{- toYaml . | nindent 20 }}
+              {{- end }}
+            {{- end }}
+            env:
+              {{- include "nextcloud.env" . | nindent 14 }}
+            resources:
+              {{- toYaml .Values.cronjob.resources | nindent 14 }}
+            {{- with .Values.cronjob.securityContext }}
+            securityContext:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            volumeMounts:
+              {{- include "nextcloud.volumeMounts" . | trim | nindent 14 }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumes:
+            - name: nextcloud-main
+              {{- if .Values.persistence.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+              {{- else }}
+              emptyDir: {}
+              {{- end }}
+            {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+            - name: nextcloud-data
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+            {{- end }}
+            {{- if .Values.nextcloud.configs }}
+            - name: nextcloud-config
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-config
+            {{- end }}
+            {{- if .Values.nextcloud.phpConfigs }}
+            - name: nextcloud-phpconfig
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-phpconfig
+            {{- end }}
+            {{- if .Values.nginx.enabled }}
+            - name: nextcloud-nginx-config
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-nginxconfig
+            {{- end }}
+            {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+            - name: nextcloud-hooks
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-hooks
+                defaultMode: 0o755
+            {{- end }}
+            {{- with .Values.nextcloud.extraVolumes }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          securityContext:
+            {{- with .Values.securityContext }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.nextcloud.podSecurityContext }}
+            {{- toYaml . | nindent 12 }}
+            {{- else }}
+            {{- if .Values.nginx.enabled }}
+            # Will mount configuration files as www-data (id: 82) for nextcloud
+            fsGroup: 82
+            {{- else }}
+            # Will mount configuration files as www-data (id: 33) for nextcloud
+            fsGroup: 33
+            {{- end }}
+            {{- end }}{{/* end-with podSecurityContext */}}
+          restartPolicy: OnFailure
+          {{- if .Values.rbac.enabled }}
+          serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+          {{- end }}
+          {{- with .Values.dnsConfig }}
+          dnsConfig:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}{{/* end-if cronjob.enabled */}}
