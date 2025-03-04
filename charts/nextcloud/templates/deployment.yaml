@@ -25,26 +25,16 @@ spec:
     {{- include "nextcloud.deployment.template.metadata" . | nindent 4 }}
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.lifecycle }}
-          lifecycle:
-            {{- with .postStartCommand }}
-            postStart:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
+        {{- $containerName := .Chart.Name }}
+        {{- include "nextcloud.container" ( dict "containerName" $containerName "rootContext" $ "context" .Values ) | nindent 8 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
             {{- end }}
-            {{- with .preStopCommand }}
-            preStop:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
             {{- end }}
-          {{- end }}
-          env:
-            {{- include "nextcloud.env" . | nindent 12 }}
           {{- if not .Values.nginx.enabled }}
           ports:
             - name: http
@@ -99,22 +89,6 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}{{/* end-if not nginx.enabled */}}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.nextcloud.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-            {{- range $hook, $shell := .Values.nextcloud.hooks }}
-            {{- if $shell }}
-            - name: nextcloud-hooks
-              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
-              subPath: {{ $hook }}.sh
-              readOnly: true
-            {{- end }}
-            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"

@@ -18,36 +18,8 @@ spec:
         {{- include "nextcloud.deployment.template.metadata" . | nindent 8 }}
         spec:
           containers:
-          - name: {{ .Chart.Name }}-cron
-            image: {{ include "nextcloud.image" . }}
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command:
-              {{- toYaml .Values.cronjob.command | nindent 14 }}
-            {{- with .Values.cronjob.lifecycle }}
-            lifecycle:
-              {{- with .postStartCommand }}
-              postStart:
-                exec:
-                  command:
-                    {{- toYaml . | nindent 20 }}
-              {{- end }}
-              {{- with .preStopCommand }}
-              preStop:
-                exec:
-                  command:
-                    {{- toYaml . | nindent 20 }}
-              {{- end }}
-            {{- end }}
-            env:
-              {{- include "nextcloud.env" . | nindent 14 }}
-            resources:
-              {{- toYaml .Values.cronjob.resources | nindent 14 }}
-            {{- with .Values.cronjob.securityContext }}
-            securityContext:
-              {{- toYaml . | nindent 14 }}
-            {{- end }}
-            volumeMounts:
-              {{- include "nextcloud.volumeMounts" . | trim | nindent 14 }}
+            {{- $containerName := printf "%s-cron" .Chart.Name }}
+            {{- include "nextcloud.container" ( dict "containerName" $containerName "rootContext" $ "context" .Values.cronjob ) | nindent 10 }}
           {{- include "nextcloud.pod.commons" . | nindent 10 }}
           restartPolicy: OnFailure
 {{- end }}{{/* end-if cronjob.enabled */}}
