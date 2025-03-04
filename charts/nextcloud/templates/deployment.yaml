@@ -277,38 +277,4 @@ spec:
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
         {{- end }}{{/* end-if any database-initContainer */}}
       {{- end }}{{/* end-if any initContainer */}}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{ include "nextcloud.volumes" . | nindent 6 }}
-      securityContext:
-        {{- with .Values.securityContext }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-        {{- with .Values.nextcloud.podSecurityContext }}
-        {{- toYaml . | nindent 8 }}
-        {{- else }}
-        {{- if .Values.nginx.enabled }}
-        # Will mount configuration files as www-data (id: 82) for nextcloud
-        fsGroup: 82
-        {{- else }}
-        # Will mount configuration files as www-data (id: 33) for nextcloud
-        fsGroup: 33
-        {{- end }}
-        {{- end }}{{/* end-with podSecurityContext */}}
-      {{- if .Values.rbac.enabled }}
-      serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
-      {{- end }}
-      {{- with .Values.dnsConfig }}
-      dnsConfig:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "nextcloud.pod.commons" . | nindent 6 }}

@@ -487,3 +487,45 @@ metadata:
     {{- end }}
 {{- end -}}
 
+{{/*
+Create common pod definitions for nextcloud deployment and cronjob.
+*/}}
+{{- define "nextcloud.pod.commons" -}}
+{{- with .Values.nodeSelector }}
+nodeSelector:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.affinity }}
+affinity:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.tolerations }}
+tolerations:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{ include "nextcloud.volumes" .  }}
+# Actually it does not make much sense to define securityContext and podSecurityContext on a pod with only one container 
+# except for backward compatibility when the cronjob was a sidecar container.
+securityContext:
+  {{- with .Values.securityContext }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.nextcloud.podSecurityContext }}
+  {{- toYaml . | nindent 2 }}
+  {{- else }}
+  {{- if .Values.nginx.enabled }}
+  # Will mount configuration files as www-data (id: 82) for nextcloud
+  fsGroup: 82
+  {{- else }}
+  # Will mount configuration files as www-data (id: 33) for nextcloud
+  fsGroup: 33
+  {{- end }}
+  {{- end }}{{/* end-with podSecurityContext */}}
+{{- if .Values.rbac.enabled }}
+serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+{{- end }}
+{{- with .Values.dnsConfig }}
+dnsConfig:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}

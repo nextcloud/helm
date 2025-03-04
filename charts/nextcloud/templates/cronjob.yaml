@@ -56,42 +56,6 @@ spec:
             {{- end }}
             volumeMounts:
               {{- include "nextcloud.volumeMounts" . | trim | nindent 14 }}
-          {{- with .Values.nodeSelector }}
-          nodeSelector:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.affinity }}
-          affinity:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.tolerations }}
-          tolerations:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- include "nextcloud.volumes" . | nindent 10 }}
-          # Actually it does not make much sense to define securityContext and podSecurityContext on a pod with only one container 
-          # except for backward compatibility when the cronjob was a sidecar container.
-          securityContext:
-            {{- with .Values.securityContext }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-            {{- with .Values.nextcloud.podSecurityContext }}
-            {{- toYaml . | nindent 12 }}
-            {{- else }}
-            {{- if .Values.nginx.enabled }}
-            # Will mount configuration files as www-data (id: 82) for nextcloud
-            fsGroup: 82
-            {{- else }}
-            # Will mount configuration files as www-data (id: 33) for nextcloud
-            fsGroup: 33
-            {{- end }}
-            {{- end }}{{/* end-with podSecurityContext */}}
-          {{- if .Values.rbac.enabled }}
-          serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
-          {{- end }}
-          {{- with .Values.dnsConfig }}
-          dnsConfig:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+          {{- include "nextcloud.pod.commons" . | nindent 10 }}
           restartPolicy: OnFailure
 {{- end }}{{/* end-if cronjob.enabled */}}
