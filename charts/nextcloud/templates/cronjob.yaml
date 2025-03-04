@@ -22,9 +22,7 @@ spec:
             image: {{ include "nextcloud.image" . }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             command:
-              - php
-              - -f
-              - /var/www/html/cron.php
+              {{- toYaml .Values.cronjob.command | nindent 14 }}
             {{- with .Values.cronjob.lifecycle }}
             lifecycle:
               {{- with .postStartCommand }}
