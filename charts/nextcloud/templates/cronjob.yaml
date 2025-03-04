@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ template "nextcloud.fullname" . }}
+  name: {{ template "nextcloud.fullname" . }}-cron
   labels:
     {{- include "nextcloud.pods.labels" . | nindent 4 }}
 spec:
