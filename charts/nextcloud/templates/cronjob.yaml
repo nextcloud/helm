@@ -6,46 +6,16 @@ kind: CronJob
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: app
+    {{- include "nextcloud.pods.labels" . | nindent 4 }}
 spec:
   schedule: "*/5 * * * *"
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 5
   jobTemplate:
-    metadata:
-      labels:
-        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/component: app
-        {{- if .Values.redis.enabled }}
-        {{ template "nextcloud.redis.fullname" . }}-client: "true"
-        {{- end }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-      annotations:
-        nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
-        php-config-hash: {{ toJson .Values.nextcloud.phpConfigs | sha256sum }}
-        {{- if .Values.nginx.enabled }}
-        nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
-        {{- end }}
-        hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
-        {{- with .Values.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+    {{- include "nextcloud.deployment.template.metadata" . | nindent 4 }}
     spec:
       template:
-        metadata:
-          labels:
-            app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-            helm.sh/chart: {{ include "nextcloud.chart" . }}
-            app.kubernetes.io/instance: {{ .Release.Name }}
-            app.kubernetes.io/managed-by: {{ .Release.Service }}
-            app.kubernetes.io/component: app
+        {{- include "nextcloud.deployment.template.metadata" . | nindent 8 }}
         spec:
           {{- with .Values.image.pullSecrets }}
           imagePullSecrets:
@@ -135,6 +105,8 @@ spec:
             {{- with .Values.nextcloud.extraVolumes }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          # Actually it does not make much sense to define securityContext and podSecurityContext on a pod with only one container 
+          # except for backward compatibility when the cronjob was a sidecar container.
           securityContext:
             {{- with .Values.securityContext }}
             {{- toYaml . | nindent 12 }}

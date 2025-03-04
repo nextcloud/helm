@@ -398,3 +398,46 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Create match labels for the nextcloud container as well as the cronjob container.
+*/}}
+{{- define "nextcloud.pods.matchlabels" -}}
+app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: app
+{{- end -}}
+
+{{/*
+Create match labels for the nextcloud deployment as well as the cronjob.
+*/}}
+{{- define "nextcloud.pods.labels" -}}
+{{ include "nextcloud.pods.matchlabels" . }}
+helm.sh/chart: {{ include "nextcloud.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Create metadata for the nextcloud deployment template as well as the cronjob template.
+*/}}
+{{- define "nextcloud.deployment.template.metadata" -}}
+metadata:
+  labels:
+    {{- include "nextcloud.pods.matchlabels" . | nindent 4 }}
+    {{- if .Values.redis.enabled }}
+    {{ include "nextcloud.redis.fullname" . }}-client: "true"
+    {{- end }}
+    {{- with .Values.podLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
+    php-config-hash: {{ toJson .Values.nextcloud.phpConfigs | sha256sum }}
+    {{- if .Values.nginx.enabled }}
+    nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
+    {{- end }}
+    hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
+    {{- with .Values.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end -}}
