@@ -86,7 +86,6 @@ spec:
             fsGroup: 33
             {{- end }}
             {{- end }}{{/* end-with podSecurityContext */}}
-          restartPolicy: OnFailure
           {{- if .Values.rbac.enabled }}
           serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
           {{- end }}
@@ -94,4 +93,5 @@ spec:
           dnsConfig:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          restartPolicy: OnFailure
 {{- end }}{{/* end-if cronjob.enabled */}}

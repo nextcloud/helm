@@ -225,10 +225,6 @@ spec:
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
@@ -281,6 +277,10 @@ spec:
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
         {{- end }}{{/* end-if any database-initContainer */}}
       {{- end }}{{/* end-if any initContainer */}}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
