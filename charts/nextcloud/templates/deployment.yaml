@@ -24,12 +24,6 @@ spec:
   template:
     {{- include "nextcloud.deployment.template.metadata" . | nindent 4 }}
     spec:
-      {{- with .Values.image.pullSecrets }}
-      imagePullSecrets:
-        {{- range . }}
-        - name: {{ . }}
-        {{- end}}
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: {{ include "nextcloud.image" . }}

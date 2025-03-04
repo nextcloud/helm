@@ -491,6 +491,12 @@ metadata:
 Create common pod definitions for nextcloud deployment and cronjob.
 */}}
 {{- define "nextcloud.pod.commons" -}}
+{{- with .Values.image.pullSecrets }}
+imagePullSecrets:
+  {{- range . }}
+  - name: {{ . }}
+  {{- end}}
+{{- end }}
 {{- with .Values.nodeSelector }}
 nodeSelector:
   {{- toYaml . | nindent 2 }}
