@@ -399,6 +399,51 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
 {{- end }}
 {{- end -}}
 
+
+{{/*
+Create volumes for the nextcloud deployment as well as the cronjob.
+*/}}
+{{- define "nextcloud.volumes" -}}
+volumes:
+  - name: nextcloud-main
+    {{- if .Values.persistence.enabled }}
+    persistentVolumeClaim:
+      claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ include "nextcloud.fullname" . }}-nextcloud{{- end }}
+    {{- else }}
+    emptyDir: {}
+    {{- end }}
+  {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+  - name: nextcloud-data
+    persistentVolumeClaim:
+      claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ include "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+  {{- end }}
+  {{- if .Values.nextcloud.configs }}
+  - name: nextcloud-config
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-config
+  {{- end }}
+  {{- if .Values.nextcloud.phpConfigs }}
+  - name: nextcloud-phpconfig
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-phpconfig
+  {{- end }}
+  {{- if .Values.nginx.enabled }}
+  - name: nextcloud-nginx-config
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-nginxconfig
+  {{- end }}
+  {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+  - name: nextcloud-hooks
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-hooks
+      defaultMode: 0o755
+  {{- end }}
+  {{- with .Values.nextcloud.extraVolumes }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end -}}
+
+
 {{/*
 Create match labels for the nextcloud container as well as the cronjob container.
 */}}
@@ -441,3 +486,4 @@ metadata:
     {{- toYaml . | nindent 4 }}
     {{- end }}
 {{- end -}}
+
