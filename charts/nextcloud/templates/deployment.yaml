@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    {{- include "nextcloud.pods.labels" . | nindent 4 }}
+    {{- include "nextcloud.pods.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -20,9 +20,9 @@ spec:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "nextcloud.pods.matchlabels" . | nindent 6 }}
+      {{- include "nextcloud.pods.matchlabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 6 }}
   template:
-    {{- include "nextcloud.deployment.template.metadata" . | nindent 4 }}
+    {{- include "nextcloud.deployment.template.metadata" ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     spec:
       containers:
         {{- $containerName := .Chart.Name }}

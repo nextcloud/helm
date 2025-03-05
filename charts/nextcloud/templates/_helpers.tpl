@@ -446,43 +446,57 @@ volumes:
 
 {{/*
 Create match labels for the nextcloud container as well as the cronjob container.
+Parameters:
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
 */}}
 {{- define "nextcloud.pods.matchlabels" -}}
-app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-app.kubernetes.io/component: app
+app.kubernetes.io/name: {{ include "nextcloud.name" .rootContext }}
+app.kubernetes.io/instance: {{ .rootContext.Release.Name }}
+app.kubernetes.io/component: {{ .component }}
 {{- end -}}
 
 {{/*
 Create match labels for the nextcloud deployment as well as the cronjob.
+Parameters:
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
 */}}
 {{- define "nextcloud.pods.labels" -}}
-{{ include "nextcloud.pods.matchlabels" . }}
-helm.sh/chart: {{ include "nextcloud.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{ include "nextcloud.pods.matchlabels" ( dict "component" .component "rootContext" .rootContext) }}
+helm.sh/chart: {{ include "nextcloud.chart" .rootContext }}
+app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
 {{- end -}}
 
 {{/*
 Create metadata for the nextcloud deployment template as well as the cronjob template.
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
 */}}
 {{- define "nextcloud.deployment.template.metadata" -}}
 metadata:
   labels:
-    {{- include "nextcloud.pods.matchlabels" . | nindent 4 }}
-    {{- if .Values.redis.enabled }}
-    {{ include "nextcloud.redis.fullname" . }}-client: "true"
+    {{- include "nextcloud.pods.matchlabels"  ( dict "component" .component  "rootContext" .rootContext) | nindent 4 }}
+    {{- if .rootContext.Values.redis.enabled }}
+    {{ include "nextcloud.redis.fullname" .rootContext }}-client: "true"
     {{- end }}
-    {{- with .Values.podLabels }}
+    {{- with .rootContext.Values.podLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    nextcloud-config-hash: {{ print (toJson .Values.nextcloud.defaultConfigs) "-" (toJson .Values.nextcloud.configs) | sha256sum }}
-    php-config-hash: {{ toJson .Values.nextcloud.phpConfigs | sha256sum }}
-    {{- if .Values.nginx.enabled }}
-    nginx-config-hash: {{ print .Values.nginx.config.default "-" .Values.nginx.config.custom | sha256sum }}
+    nextcloud-config-hash: {{ print (toJson .rootContext.Values.nextcloud.defaultConfigs) "-" (toJson .rootContext.Values.nextcloud.configs) | sha256sum }}
+    php-config-hash: {{ toJson .rootContext.Values.nextcloud.phpConfigs | sha256sum }}
+    {{- if .rootContext.Values.nginx.enabled }}
+    nginx-config-hash: {{ print .rootContext.Values.nginx.config.default "-" .rootContext.Values.nginx.config.custom | sha256sum }}
     {{- end }}
-    hooks-hash: {{ toYaml .Values.nextcloud.hooks | sha256sum }}
-    {{- with .Values.podAnnotations }}
+    hooks-hash: {{ toYaml .rootContext.Values.nextcloud.hooks | sha256sum }}
+    {{- with .rootContext.Values.podAnnotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 {{- end -}}
