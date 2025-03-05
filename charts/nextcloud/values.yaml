@@ -561,8 +561,13 @@ collabora:
 ##
 cronjob:
   enabled: false
+  ## Command that is executed in the CronJob pod
+  command:
+  - php
+  - -f
+  - /var/www/html/cron.php
 
-  ## Cronjob sidecar resource requests and limits
+  ## Cronjob resource requests and limits
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
   resources: {}

@@ -1,0 +1,25 @@
+---
+{{- if .Values.cronjob.enabled }}
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-cron
+  labels:
+    {{- include "nextcloud.pods.labels"  ( dict "component" "cronjob"  "rootContext" $ ) | nindent 4 }}
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    {{- include "nextcloud.deployment.template.metadata" ( dict "component" "cronjob"  "rootContext" $ ) | nindent 4 }}
+    spec:
+      template:
+        {{- include "nextcloud.deployment.template.metadata" ( dict "component" "cronjob"  "rootContext" $ ) | nindent 8 }}
+        spec:
+          containers:
+            {{- $containerName := printf "%s-cron" .Chart.Name }}
+            {{- include "nextcloud.container" ( dict "containerName" $containerName "rootContext" $ "context" .Values.cronjob ) | nindent 10 }}
+          {{- include "nextcloud.pod.commons" . | nindent 10 }}
+          restartPolicy: OnFailure
+{{- end }}{{/* end-if cronjob.enabled */}}

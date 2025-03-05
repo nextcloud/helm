@@ -398,3 +398,199 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end -}}
+
+
+{{/*
+Create volumes for the nextcloud deployment as well as the cronjob.
+*/}}
+{{- define "nextcloud.volumes" -}}
+volumes:
+  - name: nextcloud-main
+    {{- if .Values.persistence.enabled }}
+    persistentVolumeClaim:
+      claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ include "nextcloud.fullname" . }}-nextcloud{{- end }}
+    {{- else }}
+    emptyDir: {}
+    {{- end }}
+  {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+  - name: nextcloud-data
+    persistentVolumeClaim:
+      claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ include "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+  {{- end }}
+  {{- if .Values.nextcloud.configs }}
+  - name: nextcloud-config
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-config
+  {{- end }}
+  {{- if .Values.nextcloud.phpConfigs }}
+  - name: nextcloud-phpconfig
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-phpconfig
+  {{- end }}
+  {{- if .Values.nginx.enabled }}
+  - name: nextcloud-nginx-config
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-nginxconfig
+  {{- end }}
+  {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+  - name: nextcloud-hooks
+    configMap:
+      name: {{ include "nextcloud.fullname" . }}-hooks
+      defaultMode: 0o755
+  {{- end }}
+  {{- with .Values.nextcloud.extraVolumes }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end -}}
+
+
+{{/*
+Create match labels for the nextcloud container as well as the cronjob container.
+Parameters:
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.pods.matchlabels" -}}
+app.kubernetes.io/name: {{ include "nextcloud.name" .rootContext }}
+app.kubernetes.io/instance: {{ .rootContext.Release.Name }}
+app.kubernetes.io/component: {{ .component }}
+{{- end -}}
+
+{{/*
+Create match labels for the nextcloud deployment as well as the cronjob.
+Parameters:
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.pods.labels" -}}
+{{ include "nextcloud.pods.matchlabels" ( dict "component" .component "rootContext" .rootContext) }}
+helm.sh/chart: {{ include "nextcloud.chart" .rootContext }}
+app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
+{{- end -}}
+
+{{/*
+Create metadata for the nextcloud deployment template as well as the cronjob template.
+- component: app or cronjob
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.deployment.template.metadata" -}}
+metadata:
+  labels:
+    {{- include "nextcloud.pods.matchlabels"  ( dict "component" .component  "rootContext" .rootContext) | nindent 4 }}
+    {{- if .rootContext.Values.redis.enabled }}
+    {{ include "nextcloud.redis.fullname" .rootContext }}-client: "true"
+    {{- end }}
+    {{- with .rootContext.Values.podLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    nextcloud-config-hash: {{ print (toJson .rootContext.Values.nextcloud.defaultConfigs) "-" (toJson .rootContext.Values.nextcloud.configs) | sha256sum }}
+    php-config-hash: {{ toJson .rootContext.Values.nextcloud.phpConfigs | sha256sum }}
+    {{- if .rootContext.Values.nginx.enabled }}
+    nginx-config-hash: {{ print .rootContext.Values.nginx.config.default "-" .rootContext.Values.nginx.config.custom | sha256sum }}
+    {{- end }}
+    hooks-hash: {{ toYaml .rootContext.Values.nextcloud.hooks | sha256sum }}
+    {{- with .rootContext.Values.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end -}}
+
+{{/*
+Create common pod definitions for nextcloud deployment and cronjob.
+*/}}
+{{- define "nextcloud.pod.commons" -}}
+{{- with .Values.image.pullSecrets }}
+imagePullSecrets:
+  {{- range . }}
+  - name: {{ . }}
+  {{- end}}
+{{- end }}
+{{- with .Values.nodeSelector }}
+nodeSelector:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.affinity }}
+affinity:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.tolerations }}
+tolerations:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{ include "nextcloud.volumes" .  }}
+# Actually it does not make much sense to define securityContext and podSecurityContext on a pod with only one container 
+# except for backward compatibility when the cronjob was a sidecar container.
+securityContext:
+  {{- with .Values.securityContext }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.nextcloud.podSecurityContext }}
+  {{- toYaml . | nindent 2 }}
+  {{- else }}
+  {{- if .Values.nginx.enabled }}
+  # Will mount configuration files as www-data (id: 82) for nextcloud
+  fsGroup: 82
+  {{- else }}
+  # Will mount configuration files as www-data (id: 33) for nextcloud
+  fsGroup: 33
+  {{- end }}
+  {{- end }}{{/* end-with podSecurityContext */}}
+{{- if .Values.rbac.enabled }}
+serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+{{- end }}
+{{- with .Values.dnsConfig }}
+dnsConfig:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end -}}
+
+
+{{/*
+Create nextcloud container definition for deployment and cronjob.
+Pass these parameters in the dict:
+- containerName: name of the container
+- context: Pointer to the context in the values.yaml where "resources, lifecycle, securityContext" can be found
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.container" -}}
+- name: {{ .containerName }}
+  image: {{ include "nextcloud.image" .rootContext }}
+  imagePullPolicy: {{ .rootContext.Values.image.pullPolicy }}
+  {{- if .context.command }}
+  command:
+    {{- toYaml .context.command | nindent 4 }}
+  {{- end }}
+  {{- with .context.lifecycle }}
+  lifecycle:
+    {{- with .postStartCommand }}
+    postStart:
+      exec:
+        command:
+          {{- toYaml . | nindent 10 }}
+    {{- end }}
+    {{- with .preStopCommand }}
+    preStop:
+      exec:
+        command:
+          {{- toYaml . | nindent 10 }}
+    {{- end }}
+  {{- end }}
+  env:
+    {{- include "nextcloud.env" .rootContext | nindent 4 }}
+  resources:
+    {{- toYaml .context.resources | nindent 4 }}
+  {{- with .context.securityContext }}
+  securityContext:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  volumeMounts:
+    {{- include "nextcloud.volumeMounts" .rootContext | trim | nindent 4 }}
+{{- end -}}
