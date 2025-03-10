@@ -20,11 +20,11 @@ spec:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
     matchLabels:
-      {{- include "nextcloud.pods.matchlabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 6 }}
+      {{- include "nextcloud.selectorLabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "nextcloud.pods.matchlabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 8 }}
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 8 }}
         {{- if .Values.redis.enabled }}
         {{ template "nextcloud.redis.fullname" . }}-client: "true"
         {{- end }}

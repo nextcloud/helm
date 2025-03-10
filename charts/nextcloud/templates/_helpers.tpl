@@ -408,7 +408,7 @@ Parameters:
                   Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
                   However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
 */}}
-{{- define "nextcloud.pods.matchlabels" -}}
+{{- define "nextcloud.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "nextcloud.name" .rootContext }}
 app.kubernetes.io/instance: {{ .rootContext.Release.Name }}
 {{- if .component }}
@@ -425,7 +425,7 @@ Parameters:
                   However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
 */}}
 {{- define "nextcloud.labels" -}}
-{{ include "nextcloud.pods.matchlabels" ( dict "component" .component "rootContext" .rootContext) }}
+{{ include "nextcloud.selectorLabels" ( dict "component" .component "rootContext" .rootContext) }}
 helm.sh/chart: {{ include "nextcloud.chart" .rootContext }}
 app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
 {{- end -}}
