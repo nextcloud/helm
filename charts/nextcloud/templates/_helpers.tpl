@@ -428,4 +428,7 @@ Parameters:
 {{ include "nextcloud.selectorLabels" ( dict "component" .component "rootContext" .rootContext) }}
 helm.sh/chart: {{ include "nextcloud.chart" .rootContext }}
 app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
+{{- with .rootContext.Chart.AppVersion }}
+app.kubernetes.io/version: {{ quote . }}
+{{- end }}
 {{- end -}}
