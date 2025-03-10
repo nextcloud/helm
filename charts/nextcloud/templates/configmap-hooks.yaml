@@ -5,7 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-hooks
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:
   {{- range $hook, $shell := .Values.nextcloud.hooks }}
   {{- if $shell }}

@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-config
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:
   {{- range $filename, $content := .Values.nextcloud.configs }}
   {{ $filename }}: |-

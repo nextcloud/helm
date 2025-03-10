@@ -5,7 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-nginxconfig
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:
   {{- if .Values.nginx.config.default }}
   default.conf: |-

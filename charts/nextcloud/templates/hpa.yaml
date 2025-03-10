@@ -5,7 +5,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
 spec:
   scaleTargetRef:
     kind: Deployment

@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

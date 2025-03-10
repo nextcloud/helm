@@ -5,7 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-phpconfig
   labels:
-    {{- include "nextcloud.pods.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:
   {{- range $key, $value := .Values.nextcloud.phpConfigs }}
   {{ $key }}: |-
