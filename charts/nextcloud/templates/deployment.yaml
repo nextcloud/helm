@@ -69,6 +69,22 @@ spec:
           {{- end }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.nextcloud.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
+            {{- end }}
+            {{- end }}
           {{- if not .Values.nginx.enabled }}
           ports:
             - name: http
@@ -123,22 +139,6 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}{{/* end-if not nginx.enabled */}}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.nextcloud.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-            {{- range $hook, $shell := .Values.nextcloud.hooks }}
-            {{- if $shell }}
-            - name: nextcloud-hooks
-              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
-              subPath: {{ $hook }}.sh
-              readOnly: true
-            {{- end }}
-            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
