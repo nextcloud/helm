@@ -432,3 +432,48 @@ app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
 app.kubernetes.io/version: {{ quote . }}
 {{- end }}
 {{- end -}}
+
+{{/*
+Create nextcloud container definition for deployment and cronjob.
+Pass these parameters in the dict:
+- containerName: name of the container
+- context: Pointer to the context in the values.yaml where "lifecycle, resources" can be found
+- securityContext: Pointer to the securityContext in the values.yaml
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.container" -}}
+- name: {{ .containerName }}
+  image: {{ include "nextcloud.image" .rootContext }}
+  imagePullPolicy: {{ .rootContext.Values.image.pullPolicy }}
+  {{- if .context.command }}
+  command:
+    {{- toYaml .context.command | nindent 4 }}
+  {{- end }}
+  {{- with .context.lifecycle }}
+  lifecycle:
+    {{- with .postStartCommand }}
+    postStart:
+      exec:
+        command:
+          {{- toYaml . | nindent 10 }}
+    {{- end }}
+    {{- with .preStopCommand }}
+    preStop:
+      exec:
+        command:
+          {{- toYaml . | nindent 10 }}
+    {{- end }}
+  {{- end }}
+  env:
+    {{- include "nextcloud.env" .rootContext | nindent 4 }}
+  resources:
+    {{- toYaml .context.resources | nindent 4 }}
+  {{- with .securityContext }}
+  securityContext:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  volumeMounts:
+    {{- include "nextcloud.volumeMounts" .rootContext | trim | nindent 4 }}
+{{- end -}}
