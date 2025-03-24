@@ -26,9 +26,7 @@ server {
     {{- end }}
     {{- end }}
 
-    # set max upload size
-    client_max_body_size 10G;
-    fastcgi_buffers 64 4K;
+    {{- .Values.nginx.config.serverBlockCustom | nindent 4 }}
 
     # Enable gzip but do not remove ETag headers
     gzip on;

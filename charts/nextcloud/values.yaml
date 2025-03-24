@@ -353,6 +353,13 @@ nginx:
       "X-Robots-Tag": "noindex, nofollow"
       "X-XSS-Protection": "1; mode=block"
 
+    # Added in server block of default config.
+    serverBlockCustom: |
+      # set max upload size
+      client_max_body_size 10G;
+      fastcgi_buffers 64 4K;
+      fastcgi_read_timeout 3600s;
+
     custom:
     # custom: |-
     #     worker_processes  1;..
