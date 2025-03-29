@@ -1,0 +1,109 @@
+{{- if .Values.whiteboard.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nextcloud.whiteboard.fullname" . }}
+  labels:
+    {{- include "nextcloud.labels"  ( dict "component" "whiteboard"  "rootContext" $ ) | nindent 4 }}
+spec:
+  replicas: {{ .Values.whiteboard.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: whiteboard
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.whiteboard.podAnnotations | nindent 8 }}
+      labels:
+        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: whiteboard
+        {{- with .Values.whiteboard.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.whiteboard.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: whiteboard
+          {{- with .Values.whiteboard.image }}
+          image: "{{ .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          env:
+            {{- if not .Values.whiteboard.nextcloudUrl }}
+            - name: NEXTCLOUD_URL
+              value: "http{{ if .Values.whiteboard.nextcloudHttps }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            {{- else }}
+            - name: NEXTCLOUD_URL
+              value: {{ .Values.whiteboard.nextcloudUrl }}
+            {{- end }}
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.whiteboard.existingSecret.secretName | default (include "nextcloud.whiteboard.fullname" .) }}
+                  key: {{ .Values.whiteboard.existingSecret.jwtSecretKeyKey | default "whiteboard-jwt-secret-key" }}
+          ports:
+            - name: http
+              containerPort: 3002
+          volumeMounts:
+            - name: whiteboard-backup
+              mountPath: /app/backup
+          {{- with .Values.whiteboard.readinessProbe }}
+          {{- if .enabled }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.whiteboard.livenessProbe }}
+          {{- if .enabled }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            failureThreshold: {{ .failureThreshold }}
+            successThreshold: {{ .successThreshold }}
+            periodSeconds: {{ .periodSeconds }}
+            timeoutSeconds: {{ .timeoutSeconds }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.whiteboard.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.whiteboard.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: whiteboard-backup
+          emptyDir:
+            size: 500Mi
+      {{- with .Values.whiteboard.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+      {{- with .Values.whiteboard.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.whiteboard.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

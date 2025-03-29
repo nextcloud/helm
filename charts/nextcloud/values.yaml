@@ -756,6 +756,112 @@ imaginary:
     # -- Additional labels for service imaginary
     labels: {}
 
+whiteboard:
+  # -- Start Whiteboard Backend
+  enabled: false
+  # -- Number of whiteboard pod replicas to deploy
+  replicaCount: 1
+  # -- Hostname of the whiteboard backend service
+  host: whiteboard.kube.home
+  # -- Set to true if the whiteboard backend uses https (used to configure the whiteboard URL in Nextcloud)
+  https: false
+
+  # Optional: becomes NEXTCLOUD_URL env var in the whiteboard backend container.
+  # Without it, we will use the full name of the nextcloud service
+  nextcloudUrl: ""
+  # The whiteboard backend needs to know how you serve Nextcloud either http or https
+  nextcloudHttps: false
+
+  image:
+    # -- Whiteboard image registry
+    registry: ghcr.io
+    # -- Whiteboard image name
+    repository: nextcloud-releases/whiteboard
+    # -- Whiteboard image tag
+    tag: v1.0.5
+    # -- Whiteboard image pull policy
+    pullPolicy: IfNotPresent
+    # -- Whiteboard image pull secrets
+    pullSecrets: []
+
+  existingSecret:
+    # set to true to to get whiteboard JWT secret key from an existin secret
+    # will fall back to the value provided in jwtSecretKey if not enabled
+    enabled: false
+    # name of existing Kubernetes Secret with whiteboard JWT secret key
+    secretName: ""
+    # Key in existing secret with JWT secret key
+    jwtSecretKeyKey: "whiteboard-jwt-secret-key"
+  # -- Whiteboard JWT secret key - if not provided, a random key will be generated
+  jwtSecretKey: ""
+
+  # -- Additional annotations for whiteboard
+  podAnnotations: {}
+  # -- Additional labels for whiteboard
+  podLabels: {}
+  # -- Whiteboard pod nodeSelector
+  nodeSelector: {}
+  # -- Whiteboard pod tolerations
+  tolerations: []
+
+  # -- whiteboard resources
+  resources: {}
+
+  # -- Optional security context for the Whiteboard container
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  # -- Optional security context for the Whiteboard pod (applies to all containers in the pod)
+  podSecurityContext: {}
+  # runAsNonRoot: true
+  # seccompProfile:
+  #   type: RuntimeDefault
+
+  readinessProbe:
+    enabled: false
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+  livenessProbe:
+    enabled: false
+    failureThreshold: 3
+    successThreshold: 1
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  service:
+    # -- Whiteboard: Kubernetes Service type
+    type: ClusterIP
+    port: 3002
+    # -- Whiteboard: LoadBalancerIp for service type LoadBalancer
+    loadBalancerIP:
+    # -- Whiteboard: NodePort for service type NodePort
+    nodePort:
+    # -- Additional annotations for service whiteboard
+    annotations: {}
+    # -- Additional labels for service whiteboard
+    labels: {}
+
+  ingress:
+    enabled: false
+    # className: nginx
+    annotations: {}
+    #  kubernetes.io/tls-acme: "true"
+    #  cert-manager.io/cluster-issuer: letsencrypt-prod
+    # tls:
+    #   - secretName: whiteboard-tls
+    #     hosts:
+    #       - whiteboard.kube.home
+    labels: {}
+    path: /
+    pathType: Prefix
+
 ## Prometheus Exporter / Metrics
 ##
 metrics:

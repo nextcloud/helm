@@ -32,6 +32,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified whiteboard app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "nextcloud.whiteboard.fullname" -}}
+{{- printf "%s-whiteboard" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "nextcloud.chart" -}}
@@ -216,7 +224,7 @@ Create environment variables used to configure the nextcloud container as well a
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
       key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
 {{- end }}
-{{/*
+{{- /*
 Redis env vars
 */}}
 {{- if .Values.redis.enabled }}
@@ -237,7 +245,7 @@ Redis env vars
 {{- end }}
 {{- end }}
 {{- end }}{{/* end if redis.enabled */}}
-{{/*
+{{- /*
 S3 as primary object store env vars
 */}}
 {{- if .Values.nextcloud.objectStore.s3.enabled }}
@@ -312,7 +320,7 @@ S3 as primary object store env vars
   value: {{ .Values.nextcloud.objectStore.s3.sse_c_key | quote }}
 {{- end }}
 {{- end }}{{/* end if nextcloud.objectStore.s3.enabled */}}
-{{/*
+{{- /*
 Swift as primary object store env vars
 */}}
 {{- if .Values.nextcloud.objectStore.swift.enabled }}
@@ -336,7 +344,19 @@ Swift as primary object store env vars
   value: {{ .Values.nextcloud.objectStore.swift.url | quote }}
 - name: OBJECTSTORE_SWIFT_CONTAINER_NAME
   value: {{ .Values.nextcloud.objectStore.swift.container | quote }}
-{{- end }}{{/* end if nextcloud.objectStore.s3.enabled */}}
+{{- end }}{{/* end if nextcloud.objectStore.swift.enabled */}}
+{{- /*
+Whiteboard env vars
+*/}}
+{{- if .Values.whiteboard.enabled }}
+- name: WHITEBOARD_URL
+  value: "http{{ if .Values.whiteboard.https }}s{{ end }}://{{ .Values.whiteboard.host }}"
+- name: WHITEBOARD_JWT_SECRET_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.whiteboard.existingSecret.secretName | default (include "nextcloud.whiteboard.fullname" .) }}
+      key: {{ .Values.whiteboard.existingSecret.jwtSecretKeyKey | default "whiteboard-jwt-secret-key" }}
+{{- end }}{{/* end if nextcloud.whiteboard.enabled */}}
 {{- if .Values.nextcloud.extraEnv }}
 {{ toYaml .Values.nextcloud.extraEnv }}
 {{- end }}
