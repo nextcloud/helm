@@ -538,15 +538,15 @@ We include an optional external preview provider from [h2non/imaginary](https://
 |----------------------------------------|-----------------------------------------------------------------------------------------|-------------------|
 | `imaginary.enabled`                    | Start Imaginary                                                                         | `false`           |
 | `imaginary.replicaCount`               | Number of imaginary pod replicas to deploy                                              | `1`               |
-| `imaginary.image.registry`             | Imaginary image name                                                                    | `docker.io`       |
-| `imaginary.image.repository`           | Imaginary image name                                                                    | `h2non/imaginary` |
+| `imaginary.image.registry`             | Imaginary image registry                                                                | `docker.io`       |
+| `imaginary.image.repository`           | Imaginary image repository                                                              | `h2non/imaginary` |
 | `imaginary.image.tag`                  | Imaginary image tag                                                                     | `1.2.4`           |
 | `imaginary.image.pullPolicy`           | Imaginary image pull policy                                                             | `IfNotPresent`    |
 | `imaginary.image.pullSecrets`          | Imaginary image pull secrets                                                            | `nil`             |
 | `imaginary.podAnnotations`             | Additional annotations for imaginary                                                    | `{}`              |
 | `imaginary.podLabels`                  | Additional labels for imaginary                                                         | `{}`              |
-| `imaginary.nodeSelector`               | Imaginary pod nodeSelector                                                                | `{}`              |
-| `imaginary.tolerations`                | Imaginary pod tolerations                                                | `[]`              |
+| `imaginary.nodeSelector`               | Imaginary pod nodeSelector                                                              | `{}`              |
+| `imaginary.tolerations`                | Imaginary pod tolerations                                                               | `[]`              |
 | `imaginary.resources`                  | imaginary resources                                                                     | `{}`              |
 | `imaginary.securityContext`            | Optional security context for the Imaginary container                                   | `nil`             |
 | `imaginary.podSecurityContext`         | Optional security context for the Imaginary pod (applies to all containers in the pod)  | `nil`             |
@@ -567,6 +567,50 @@ nextcloud:
 imaginary:
   enabled: true
 ```
+
+
+### Whiteboard
+
+The chart can optionally also deploy the whiteboard backend to use with the [Nextcloud Whiteboard](https://github.com/nextcloud/whiteboard) app.
+
+| Parameter                                   | Description                                                                                          | Default                         |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------- |
+| `whiteboard.enabled`                        | Start Whiteboard                                                                                     | `false`                         |
+| `whiteboard.replicaCount`                   | Number of whiteboard pod replicas to deploy                                                          | `1`                             |
+| `whiteboard.host`                           | Whiteboard host domain                                                                               | `whiteboard.kube.home`          |
+| `whiteboard.https`                          | Defines if https is used to connect to Whiteboard. Used to configure the whiteboard URL in Nextcloud | `false`                         |
+| `whiteboard.nextcloudUrl`                   | Nextcloud Server URL to connect Whiteboard to. If not provided, defaults to service name             | `""`                            |
+| `whiteboard.nextcloudHttps`                 | Defines if https is used to connect from Whiteboard to Nextcloud when using the default URL          | `false` (uses http)             |
+| `whiteboard.image.registry`                 | Whiteboard image registry                                                                            | `ghcr.io`                       |
+| `whiteboard.image.repository`               | Whiteboard image repository                                                                          | `nextcloud-releases/whiteboard` |
+| `whiteboard.image.tag`                      | Whiteboard image tag                                                                                 | `v1.0.5`                        |
+| `whiteboard.image.pullPolicy`               | Whiteboard image pull policy                                                                         | `IfNotPresent`                  |
+| `whiteboard.image.pullSecrets`              | Whiteboard image pull secrets                                                                        | `nil`                           |
+| `whiteboard.existingSecret.enabled`         | Whether to use an existing secret or not                                                             | `false`                         |
+| `whiteboard.existingSecret.secretName`      | Name of the existing secret                                                                          | `nil`                           |
+| `whiteboard.existingSecret.jwtSecretKeyKey` | Name of the key that contains the JWT secret key                                                     | `nil`                           |
+| `whiteboard.jwtSecretKey`                   | JWT secret key if no existing secret is used                                                         | random value                    |
+| `whiteboard.podAnnotations`                 | Additional annotations for whiteboard                                                                | `{}`                            |
+| `whiteboard.podLabels`                      | Additional labels for whiteboard                                                                     | `{}`                            |
+| `whiteboard.nodeSelector`                   | Whiteboard pod nodeSelector                                                                          | `{}`                            |
+| `whiteboard.tolerations`                    | Whiteboard pod tolerations                                                                           | `[]`                            |
+| `whiteboard.resources`                      | whiteboard resources                                                                                 | `{}`                            |
+| `whiteboard.securityContext`                | Optional security context for the Whiteboard container                                               | `nil`                           |
+| `whiteboard.podSecurityContext`             | Optional security context for the Whiteboard pod (applies to all containers in the pod)              | `nil`                           |
+| `whiteboard.service.type`                   | Whiteboard: Kubernetes Service type                                                                  | `ClusterIP`                     |
+| `whiteboard.service.loadBalancerIP`         | Whiteboard: LoadBalancerIp for service type LoadBalancer                                             | `nil`                           |
+| `whiteboard.service.nodePort`               | Whiteboard: NodePort for service type NodePort                                                       | `nil`                           |
+| `whiteboard.service.annotations`            | Additional annotations for service whiteboard                                                        | `{}`                            |
+| `whiteboard.service.labels`                 | Additional labels for service whiteboard                                                             | `{}`                            |
+| `whiteboard.ingress.className`              | Name of the ingress class to use                                                                     | `nil`                           |
+| `whiteboard.ingress.enabled`                | Enable use of ingress controllers                                                                    | `false`                         |
+| `whiteboard.ingress.servicePort`            | Ingress' backend servicePort                                                                         | `http`                          |
+| `whiteboard.ingress.annotations`            | An array of service annotations                                                                      | `nil`                           |
+| `whiteboard.ingress.labels`                 | An array of service labels                                                                           | `nil`                           |
+| `whiteboard.ingress.path`                   | The `Path` to use in Ingress' `paths`                                                                | `/`                             |
+| `whiteboard.ingress.pathType`               | The `PathType` to use in Ingress' `paths`                                                            | `Prefix`                        |
+| `whiteboard.ingress.tls`                    | Ingress TLS configuration                                                                            | `[]`                            |
+
 
 ## Cron jobs
 

@@ -85,6 +85,12 @@ spec:
               readOnly: true
             {{- end }}
             {{- end }}
+            {{- if .Values.whiteboard.enabled }}
+            - name: whiteboard-hook
+              mountPath: /docker-entrypoint-hooks.d/before-starting/configure-whiteboard.sh
+              subPath: configure-whiteboard.sh
+              readOnly: true
+            {{- end }}
           {{- if not .Values.nginx.enabled }}
           ports:
             - name: http
@@ -366,6 +372,12 @@ spec:
         - name: nextcloud-nginx-config
           configMap:
             name: {{ template "nextcloud.fullname" . }}-nginxconfig
+        {{- end }}
+        {{- if .Values.whiteboard.enabled }}
+        - name: whiteboard-hook
+          configMap:
+            name: {{ template "nextcloud.whiteboard.fullname" . }}-hook
+            defaultMode: 0o755
         {{- end }}
         {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
         - name: nextcloud-hooks

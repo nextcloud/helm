@@ -1,0 +1,15 @@
+{{- if .Values.whiteboard.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.whiteboard.fullname" . }}-hook
+  labels:
+    {{- include "nextcloud.labels"  ( dict "component" "whiteboard"  "rootContext" $ ) | nindent 4 }}
+data:
+  configure-whiteboard.sh: |
+    #!/bin/sh
+    echo "Configuring whiteboard..."
+    ./occ config:app:set whiteboard collabBackendUrl --value="${WHITEBOARD_URL}"
+    ./occ config:app:set whiteboard jwt_secret_key --value="${WHITEBOARD_JWT_SECRET_KEY}"
+{{- end }}
