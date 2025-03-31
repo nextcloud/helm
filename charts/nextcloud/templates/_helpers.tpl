@@ -405,3 +405,37 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end -}}
+
+
+{{/*
+Create match labels for the nextcloud container as well as the cronjob container.
+Parameters:
+- component (optional): app/cronjob/...
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "nextcloud.name" .rootContext }}
+app.kubernetes.io/instance: {{ .rootContext.Release.Name }}
+{{- if .component }}
+app.kubernetes.io/component: {{ .component }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create match labels for the nextcloud deployment as well as the cronjob.
+Parameters:
+- component (optional): app/cronjob/...
+- rootContext: $ (Inside a template the scope changes, i.e. you cannot access variables of the parent context or its parents.
+                  Unfortunately this is also the case for the root context, this means .Values, .Release, .Chart cannot be accessed.
+                  However the other templates need values from the objects. That's why the caller has to pass on reference to the root context which this template in turn passes on.)
+*/}}
+{{- define "nextcloud.labels" -}}
+{{ include "nextcloud.selectorLabels" ( dict "component" .component "rootContext" .rootContext) }}
+helm.sh/chart: {{ include "nextcloud.chart" .rootContext }}
+app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
+{{- with .rootContext.Chart.AppVersion }}
+app.kubernetes.io/version: {{ quote . }}
+{{- end }}
+{{- end -}}

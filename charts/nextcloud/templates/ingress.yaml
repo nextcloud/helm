@@ -5,11 +5,7 @@ kind: Ingress
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: app
+    {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.ingress.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}

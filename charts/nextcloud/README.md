@@ -190,6 +190,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.global.storageClass`                                 | PVC Storage Class  for both Redis&reg; master and replica Persistent Volumes                        | `''`                       |
 | `redis.master.persistence.enabled`                          | Enable persistence on Redis&reg; master nodes using Persistent Volume Claims                        | `true`                     |
 | `redis.replica.persistence.enabled`                         | Enable persistence on Redis&reg; replica nodes using Persistent Volume Claims                       | `true`                     |
+| `cronjob.command`                                           | The command the cronjob container executes                                                          | `/cron.sh`                 |
 | `cronjob.enabled`                                           | Whether to enable/disable cron jobs sidecar                                                         | `false`                    |
 | `cronjob.lifecycle.postStartCommand`                        | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                      |
 | `cronjob.lifecycle.preStopCommand`                          | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                          | `nil`                      |

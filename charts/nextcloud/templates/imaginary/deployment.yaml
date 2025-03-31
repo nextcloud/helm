@@ -5,26 +5,18 @@ kind: Deployment
 metadata:
   name: {{ template "nextcloud.fullname" . }}-imaginary
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: imaginary
+    {{- include "nextcloud.labels"  ( dict "component" "imaginary"  "rootContext" $ ) | nindent 4 }}
 spec:
   replicas: {{ .Values.imaginary.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/component: imaginary
+      {{- include "nextcloud.selectorLabels"  ( dict "component" "imaginary"  "rootContext" $ ) | nindent 6 }}
   template:
     metadata:
       annotations:
         {{- toYaml .Values.imaginary.podAnnotations | nindent 8 }}
       labels:
-        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/component: imaginary
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "imaginary"  "rootContext" $ ) | nindent 8 }}
         {{- with .Values.imaginary.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
