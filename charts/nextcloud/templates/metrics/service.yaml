@@ -5,11 +5,7 @@ kind: Service
 metadata:
   name: {{ template "nextcloud.fullname" . }}-metrics
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: metrics
+    {{- include "nextcloud.labels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.metrics.service.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -29,7 +25,5 @@ spec:
       port: 9205
       targetPort: metrics
   selector:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/component: metrics
+    {{- include "nextcloud.selectorLabels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
 {{- end }}

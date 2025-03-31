@@ -5,26 +5,18 @@ kind: Deployment
 metadata:
   name: {{ template "nextcloud.fullname" . }}-metrics
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: metrics
+    {{- include "nextcloud.labels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
 spec:
   replicas: {{ .Values.metrics.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/component: metrics
+      {{- include "nextcloud.selectorLabels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 6 }}
   template:
     metadata:
       annotations:
         {{- toYaml .Values.metrics.podAnnotations | nindent 8 }}
       labels:
-        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/component: metrics
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 8 }}
         {{- with .Values.metrics.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

@@ -581,6 +581,10 @@ cronjob:
   #   runAsNonRoot: true
   #   readOnlyRootFilesystem: true
 
+  # The command the cronjob container executes.
+  command:
+  - /cron.sh
+
 service:
   type: ClusterIP
   port: 8080
