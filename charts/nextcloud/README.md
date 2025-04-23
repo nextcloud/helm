@@ -191,6 +191,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.global.storageClass`                                 | PVC Storage Class  for both Redis&reg; master and replica Persistent Volumes                        | `''`                       |
 | `redis.master.persistence.enabled`                          | Enable persistence on Redis&reg; master nodes using Persistent Volume Claims                        | `true`                     |
 | `redis.replica.persistence.enabled`                         | Enable persistence on Redis&reg; replica nodes using Persistent Volume Claims                       | `true`                     |
+| `cronjob.command`                                           | The command the cronjob container executes                                                          | `/cron.sh`                 |
 | `cronjob.enabled`                                           | Whether to enable/disable cron jobs sidecar                                                         | `false`                    |
 | `cronjob.lifecycle.postStartCommand`                        | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                      |
 | `cronjob.lifecycle.preStopCommand`                          | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                          | `nil`                      |
@@ -360,22 +361,20 @@ The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud 
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
 Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
-
-| Parameter                                 | Description                                          | Default                                     |
-|-------------------------------------------|------------------------------------------------------|---------------------------------------------|
-| `persistence.enabled`                     | Enable persistence using PVC                         | `false`                                     |
-| `persistence.annotations`                 | PVC annotations                                      | `{}`                                        |
-| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil` (uses alpha storage class annotation) |
-| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil` (uses alpha storage class annotation) |
-| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce`                             |
-| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`                                       |
-| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`                                     |
-| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`                                        |
-| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil` (uses alpha storage class annotation) |
-| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce`                             |
-| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`                                       |
-
+| Parameter                                 | Description                                          | Default         |
+| ----------------------------------------- | ---------------------------------------------------- | --------------- |
+| `persistence.enabled`                     | Enable persistence using PVC                         | `false`         |
+| `persistence.annotations`                 | PVC annotations                                      | `{}`            |
+| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil`           |
+| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil`           |
+| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce` |
+| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`           |
+| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`         |
+| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`            |
+| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil`           |
+| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil`           |
+| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce` |
+| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`           |
 
 ### Metrics Configurations
 
@@ -505,25 +504,25 @@ The nextcloud deployment includes a series of different probes you can use to de
 
 This section provides options to enable and configure the Collabora Online server within your deployment. Please ensure to review the [Collabora Online Helm chart documentation](https://github.com/CollaboraOnline/online/tree/master/kubernetes/helm/collabora-online) for additional details and recommended values.
 
-| Parameter                              | Description                                                                                        | Default                                                                                             |
-|----------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `collabora.enabled`                    | Enable or disable the Collabora Online integration                                                 | `false`                                                                                             |
-| `collabora.autoscaling.enabled`        | Enable or disable autoscaling for the Collabora Online pods                                        | `false`                                                                                             |
-| `collabora.collabora.aliasgroups`      | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                             | `[]`                                                                                                |
-| `collabora.collabora.extra_params`     | Additional parameters for the Collabora Online service                                             | `"--o:ssl.enabled=false"`                                                                           |
-| `collabora.collabora.server_name`      | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `null`                                                                                              |
-| `collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                           | `false`                                                                                             |
-| `collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                     | `""`                                                                                                |
-| `collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                           | `"username"`                                                                                        |
-| `collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                           | `"password"`                                                                                        |
-| `collabora.collabora.username`         | Admin username for Collabora Online                                                                | `admin`                                                                                             |
-| `collabora.collabora.password`         | Admin password for Collabora Online                                                                | `examplepass`                                                                                       |
-| `collabora.ingress.enabled`            | Enable or disable ingress for Collabora Online                                                     | `false`                                                                                             |
-| `collabora.ingress.className`          | Class name for the ingress controller                                                              | `""`                                                                                                |
-| `collabora.ingress.annotations`        | Annotations for the ingress resource                                                               | `{}`                                                                                                |
-| `collabora.ingress.hosts`              | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
-| `collabora.ingress.tls`                | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
-| `collabora.resources`                  | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
+| Parameter                                        | Description                                                                                        | Default                                                                                             |
+|--------------------------------------------------|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| `collabora.enabled`                              | Enable or disable the Collabora Online integration                                                 | `false`                                                                                             |
+| `collabora.autoscaling.enabled`                  | Enable or disable autoscaling for the Collabora Online pods                                        | `false`                                                                                             |
+| `collabora.collabora.aliasgroups`                | List of HTTPS nextcloud domains if Collabora is behind a reverse proxy                             | `[]`                                                                                                |
+| `collabora.collabora.extra_params`               | Additional parameters for the Collabora Online service                                             | `"--o:ssl.enabled=false"`                                                                           |
+| `collabora.collabora.server_name`                | Specify the server name when the hostname is not directly reachable (e.g., behind a reverse proxy) | `null`                                                                                              |
+| `collabora.collabora.existingSecret.enabled`     | Enable using existing secret for admin login credentials                                           | `false`                                                                                             |
+| `collabora.collabora.existingSecret.secretName`  | Name of the existing secret containing admin login credentials                                     | `""`                                                                                                |
+| `collabora.collabora.existingSecret.usernameKey` | Key in the secret for the admin username                                                           | `"username"`                                                                                        |
+| `collabora.collabora.existingSecret.passwordKey` | Key in the secret for the admin password                                                           | `"password"`                                                                                        |
+| `collabora.collabora.username`                   | Admin username for Collabora Online                                                                | `admin`                                                                                             |
+| `collabora.collabora.password`                   | Admin password for Collabora Online                                                                | `examplepass`                                                                                       |
+| `collabora.ingress.enabled`                      | Enable or disable ingress for Collabora Online                                                     | `false`                                                                                             |
+| `collabora.ingress.className`                    | Class name for the ingress controller                                                              | `""`                                                                                                |
+| `collabora.ingress.annotations`                  | Annotations for the ingress resource                                                               | `{}`                                                                                                |
+| `collabora.ingress.hosts`                        | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
+| `collabora.ingress.tls`                          | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
+| `collabora.resources`                            | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
 > **Note**:
 >
 > You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work.

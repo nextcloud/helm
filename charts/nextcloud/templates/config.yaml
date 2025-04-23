@@ -4,10 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-config
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:
   {{- range $filename, $content := .Values.nextcloud.configs }}
   {{ $filename }}: |-

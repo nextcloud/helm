@@ -4,11 +4,7 @@ kind: Deployment
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    helm.sh/chart: {{ include "nextcloud.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: app
+    {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -24,15 +20,11 @@ spec:
     {{- toYaml .Values.nextcloud.strategy | nindent 4 }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
-      app.kubernetes.io/component: app
+      {{- include "nextcloud.selectorLabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app.kubernetes.io/component: app
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 8 }}
         {{- if .Values.redis.enabled }}
         {{ template "nextcloud.redis.fullname" . }}-client: "true"
         {{- end }}
@@ -77,6 +69,22 @@ spec:
           {{- end }}
           env:
             {{- include "nextcloud.env" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.nextcloud.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- range $hook, $shell := .Values.nextcloud.hooks }}
+            {{- if $shell }}
+            - name: nextcloud-hooks
+              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
+              subPath: {{ $hook }}.sh
+              readOnly: true
+            {{- end }}
+            {{- end }}
           {{- if not .Values.nginx.enabled }}
           ports:
             - name: http
@@ -131,22 +139,6 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}{{/* end-if not nginx.enabled */}}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.nextcloud.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
-            {{- range $hook, $shell := .Values.nextcloud.hooks }}
-            {{- if $shell }}
-            - name: nextcloud-hooks
-              mountPath: /docker-entrypoint-hooks.d/{{ $hook }}/helm.sh
-              subPath: {{ $hook }}.sh
-              readOnly: true
-            {{- end }}
-            {{- end }}
         {{- if .Values.nginx.enabled }}
         - name: {{ .Chart.Name }}-nginx
           image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
@@ -253,7 +245,7 @@ spec:
           image: {{ include "nextcloud.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - /cron.sh
+            {{- toYaml .Values.cronjob.command | nindent 12 }}
           {{- with .Values.cronjob.lifecycle }}
           lifecycle:
             {{- with .postStartCommand }}
