@@ -344,6 +344,39 @@ Swift as primary object store env vars
 
 
 {{/*
+Volumes for a pod, which needs access to nextcloud data.
+*/}}
+{{- define "nextcloud.volumes" -}}
+- name: nextcloud-main
+  {{- if .Values.persistence.enabled }}
+  persistentVolumeClaim:
+    claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+  {{- else }}
+  emptyDir: {}
+  {{- end }}
+{{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+- name: nextcloud-data
+  persistentVolumeClaim:
+    claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+{{- end }}
+{{- if .Values.nextcloud.configs }}
+- name: nextcloud-config
+  configMap:
+    name: {{ template "nextcloud.fullname" . }}-config
+{{- end }}
+{{- if .Values.nextcloud.phpConfigs }}
+- name: nextcloud-phpconfig
+  configMap:
+    name: {{ template "nextcloud.fullname" . }}-phpconfig
+{{- end }}
+{{- with .Values.nextcloud.extraVolumes }}
+{{- toYaml . }}
+{{- end }}
+{{- end -}}
+
+
+
+{{/*
 Create volume mounts for the nextcloud container as well as the cron sidecar container.
 */}}
 {{- define "nextcloud.volumeMounts" -}}
@@ -374,11 +407,13 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
 - name: nextcloud-main
   mountPath: /var/www/html/themes
   subPath: {{ ternary "themes" (printf "%s/themes" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
+
 {{- range $key, $value := .Values.nextcloud.configs }}
 - name: nextcloud-config
   mountPath: /var/www/html/config/{{ $key }}
   subPath: {{ $key }}
-{{- end }}
+{{- end }}{{/* end-range configs */}}
+
 {{- if .Values.nextcloud.configs }}
 {{- range $key, $value := .Values.nextcloud.defaultConfigs }}
 {{- if $value }}
@@ -387,16 +422,19 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   subPath: {{ $key }}
 {{- end }}
 {{- end }}
-{{- end }}
-{{- if .Values.nextcloud.extraVolumeMounts }}
-{{ toYaml .Values.nextcloud.extraVolumeMounts }}
-{{- end }}
+{{- end }}{{/* end-if .configs (also defaultConfigs beside config, see above) */}}
+
+{{- with .Values.nextcloud.extraVolumeMounts }}
+{{ toYaml . }}
+{{- end }}{{/* end-with extraVolumes*/}}
+
 {{- $nginxEnabled := .Values.nginx.enabled -}}
 {{- range $key, $value := .Values.nextcloud.phpConfigs }}
 - name: nextcloud-phpconfig
   mountPath: {{ $nginxEnabled | ternary (printf "/usr/local/etc/php-fpm.d/%s" $key | quote) (printf "/usr/local/etc/php/conf.d/%s" $key | quote) }}
   subPath: {{ $key }}
-{{- end }}
+{{- end }}{{/* end-range phpconfig (with nginx) */}}
+
 {{- end -}}
 
 

@@ -41,6 +41,7 @@ helm install my-release nextcloud/nextcloud
 * [Running `occ` commands](#running-occ-commands)
     * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
     * [Downloading models for recognize](#downloading-models-for-recognize)
+* [Improve AI task pickup speed](#improve-ai-task-pickup-speed)
 * [Backups](#backups)
 * [Upgrades](#upgrades)
 * [Troubleshooting](#troubleshooting)
@@ -763,6 +764,26 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
 ```
+# Improve AI task pickup speed
+We provide a deployment that filters and prioritizes background jobs for AI tasks. This results in faster task processing and can be scaled according to your needs by increasing the number of replicas in the deployment.
+
+Check out the [official Nextcloud AI docs](https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed) for more information.
+
+| Parameter                        | Description                                                                            | Default           |
+|----------------------------------|----------------------------------------------------------------------------------------|-------------------|
+| `aiWorker.enabled`               | Start the ai-worker deployment                                                         | `false`           |
+| `aiWorker.replicaCount`          | Number of ai-worker pod replicas to deploy                                             | `1`               |
+| `aiWorker.useHostName`           | Set to `true` to use the host defined in nextcloud.host and `false` to use the service | `false`           |
+| `aiWorker.resources`             | ai-worker resources                                                                    | `{}`              |
+| `aiWorker.securityContext`       | Optional security context for the ai-worker container                                  | `{}`              |
+| `aiWorker.podSecurityContext`    | Optional security context for the ai-worker container                                  | `{}`              |
+| `aiWorker.affinity`              | ai-worker pod affinity                                                                 | `{}`              |
+| `aiWorker.tolerations`           | ai-worker pod tolerations                                                              | `[]`              |
+| `aiWorker.deploymentAnnotations` | ai-worker deployment annotations                                                       | `{}`              |
+| `aiWorker.deploymentLabels`      | ai-worker deployment labels                                                            | `{}`              |
+| `aiWorker.podAnnotations`        | ai-worker pod annotations                                                              | `{}`              |
+| `aiWorker.podLabels`             | ai-worker pod labels                                                                   | `{}`              |
+
 
 # Backups
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).
