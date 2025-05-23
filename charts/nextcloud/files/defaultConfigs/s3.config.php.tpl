@@ -4,6 +4,7 @@ if (getenv('OBJECTSTORE_S3_BUCKET')) {
   $use_path = getenv('OBJECTSTORE_S3_USEPATH_STYLE');
   $use_legacyauth = getenv('OBJECTSTORE_S3_LEGACYAUTH');
   $autocreate = getenv('OBJECTSTORE_S3_AUTOCREATE');
+  $verify_bucket_exists = getenv('OBJECTSTORE_S3_VERIFY_BUCKET_EXISTS');
   $CONFIG = array(
     'objectstore' => array(
       'class' => '\OC\Files\ObjectStore\S3',
@@ -19,7 +20,9 @@ if (getenv('OBJECTSTORE_S3_BUCKET')) {
         // required for some non Amazon S3 implementations
         'use_path_style' => $use_path == true && strtolower($use_path) !== 'false',
         // required for older protocol versions
-        'legacy_auth' => $use_legacyauth == true && strtolower($use_legacyauth) !== 'false'
+        'legacy_auth' => $use_legacyauth == true && strtolower($use_legacyauth) !== 'false',
+        // Who knows what I'm doing here
+        'verify_bucket_exists' => strtolower($verify_bucket_exists) !== 'false'
       )
     )
   );

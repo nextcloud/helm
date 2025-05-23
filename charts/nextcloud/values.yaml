@@ -138,6 +138,8 @@ nextcloud:
       # autocreate the bucket
       autoCreate: false
       # optonal parameter: you probably want to keep this as default
+      verifyExists: false
+      # optional parameter: you probably want to keep this as default, potentially overrides verifyExists
       storageClass: "STANDARD"
       # server side encryption key. learn more: https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#s3-sse-c-encryption-support
       sse_c_key: ""
