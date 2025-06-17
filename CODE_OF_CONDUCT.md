@@ -4,6 +4,6 @@ Our code of conduct offers some guidance to ensure Nextcloud participants can co
 
 The Code of Conduct is shared by all contributors and users who engage with the Nextcloud team and its community services. It presents a summary of the shared values and “common sense” thinking in our community.
 
-You can find our full code of conduct on our website: https://nextcloud.com/code-of-conduct/
+You can find our full code of conduct on our website: https://nextcloud.com/contribute/code-of-conduct/
 
 Please, keep our CoC in mind when you contribute! That way, everyone can be a part of our community in a productive, positive, creative and fun way.
