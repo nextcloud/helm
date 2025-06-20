@@ -49,34 +49,8 @@ spec:
         {{- end}}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.lifecycle }}
-          lifecycle:
-            {{- with .postStartCommand }}
-            postStart:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-            {{- with .preStopCommand }}
-            preStop:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-          {{- end }}
-          env:
-            {{- include "nextcloud.env" . | nindent 12 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.nextcloud.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+        {{- $containerName := .Chart.Name }}
+        {{- include "nextcloud.container" ( dict "containerName" $containerName "securityContext" .Values.nextcloud.securityContext "rootContext" $ "context" .Values ) | nindent 8 }}
             {{- range $hook, $shell := .Values.nextcloud.hooks }}
             {{- if $shell }}
             - name: nextcloud-hooks
@@ -241,36 +215,8 @@ spec:
             {{- end }}
         {{- end }}{{/* end-if nginx.enabled */}}
         {{- if .Values.cronjob.enabled }}
-        - name: {{ .Chart.Name }}-cron
-          image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            {{- toYaml .Values.cronjob.command | nindent 12 }}
-          {{- with .Values.cronjob.lifecycle }}
-          lifecycle:
-            {{- with .postStartCommand }}
-            postStart:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-            {{- with .preStopCommand }}
-            preStop:
-              exec:
-                command:
-                  {{- toYaml . | nindent 18 }}
-            {{- end }}
-          {{- end }}
-          env:
-            {{- include "nextcloud.env" . | nindent 12 }}
-          resources:
-            {{- toYaml .Values.cronjob.resources | nindent 12 }}
-          {{- with .Values.cronjob.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+        {{- $containerName := printf "%s-cron" .Chart.Name }}
+        {{- include "nextcloud.container" ( dict "containerName" $containerName "securityContext" .Values.cronjob.securityContext "rootContext" $ "context" .Values.cronjob ) | nindent 8 }}
         {{- end }}{{/* end-if cronjob.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}
