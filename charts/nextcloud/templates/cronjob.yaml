@@ -33,7 +33,7 @@ spec:
               image: {{ include "nextcloud.image" . }}
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command:
-                {{- toYaml .Values.cronjob.command | nindent 16 }}
+                {{- toYaml .Values.cronjob.commandCronJob | nindent 16 }}
               {{- with .Values.cronjob.lifecycle }}
               lifecycle:
                 {{- with .postStartCommand }}
