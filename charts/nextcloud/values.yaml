@@ -611,6 +611,7 @@ cronjob:
 
   # Use a CronJob instead of crond sidecar container
   # crond does not work when not running as root user
+  # Note: requires `persistence.enabled=true`
   useCronJobInsteadOfCrond: false
   labels: {}
   annotations: {}
