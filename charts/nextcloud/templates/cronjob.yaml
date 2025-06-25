@@ -1,0 +1,136 @@
+---
+{{- if and .Values.cronjob.enabled .Values.cronjob.useCronJobInsteadOfCrond }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-cron
+  labels:
+    {{- include "nextcloud.labels"  ( dict "component" "cron" "rootContext" $ ) | nindent 4 }}
+    {{- with .Values.cronjob.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.cronjob.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "cron" "rootContext" $ ) | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: {{ .Chart.Name }}-cron
+              image: {{ include "nextcloud.image" . }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command:
+                {{- toYaml .Values.cronjob.command | nindent 16 }}
+              {{- with .Values.cronjob.lifecycle }}
+              lifecycle:
+                {{- with .postStartCommand }}
+                postStart:
+                  exec:
+                    command:
+                      {{- toYaml . | nindent 24 }}
+                {{- end }}
+                {{- with .preStopCommand }}
+                preStop:
+                  exec:
+                    command:
+                      {{- toYaml . | nindent 24 }}
+                {{- end }}
+              {{- end }}
+              env:
+                {{- include "nextcloud.env" . | nindent 16 }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+                  {{- with .Values.cronjob.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                {{- include "nextcloud.volumeMounts" . | trim | nindent 16 }}
+            {{- with .Values.nextcloud.extraSidecarContainers }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumes:
+            - name: nextcloud-main
+              {{- if .Values.persistence.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+              {{- else }}
+              emptyDir: {}
+              {{- end }}
+            {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+            - name: nextcloud-data
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+            {{- end }}
+            {{- if .Values.nextcloud.configs }}
+            - name: nextcloud-config
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-config
+            {{- end }}
+            {{- if .Values.nextcloud.phpConfigs }}
+            - name: nextcloud-phpconfig
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-phpconfig
+            {{- end }}
+            {{- if .Values.nginx.enabled }}
+            - name: nextcloud-nginx-config
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-nginxconfig
+            {{- end }}
+            {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+            - name: nextcloud-hooks
+              configMap:
+                name: {{ template "nextcloud.fullname" . }}-hooks
+                defaultMode: 0o755
+            {{- end }}
+            {{- with .Values.nextcloud.extraVolumes }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          securityContext:
+            {{- with .Values.securityContext }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.nextcloud.podSecurityContext }}
+            {{- toYaml . | nindent 12 }}
+            {{- else }}
+            {{- if .Values.nginx.enabled }}
+            # Will mount configuration files as www-data (id: 82) for nextcloud
+            fsGroup: 82
+            {{- else }}
+            # Will mount configuration files as www-data (id: 33) for nextcloud
+            fsGroup: 33
+            {{- end }}
+            {{- end }}{{/* end-with podSecurityContext */}}
+          {{- if .Values.rbac.enabled }}
+          serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+          {{- end }}
+          {{- with .Values.dnsConfig }}
+          dnsConfig:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
