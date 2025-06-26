@@ -52,8 +52,8 @@ spec:
               env:
                 {{- include "nextcloud.env" . | nindent 16 }}
               resources:
-                {{- toYaml .Values.resources | nindent 16 }}
-                  {{- with .Values.cronjob.securityContext }}
+                {{- toYaml .Values.cronjob.resources | nindent 16 }}
+              {{- with .Values.cronjob.securityContext }}
               securityContext:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
