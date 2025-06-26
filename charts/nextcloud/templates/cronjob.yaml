@@ -27,7 +27,7 @@ spec:
     spec:
       template:
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           containers:
             - name: {{ .Chart.Name }}-cron
               image: {{ include "nextcloud.image" . }}
