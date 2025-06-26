@@ -615,6 +615,23 @@ cronjob:
   useCronJobInsteadOfCrond: false
   labels: {}
   annotations: {}
+  affinity: {}
+    # Often RWO volumes are used.
+    # Depending on your provider two pods on the same node can still write to the same volume.
+    # Following config ensures that the cronjob pod is scheduled on a different node than the nextcloud pod.
+    # podAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     - labelSelector:
+    #         matchExpressions:
+    #           - key: app.kubernetes.io/name
+    #             operator: In
+    #             values:
+    #               - nextcloud
+    #           - key: app.kubernetes.io/component
+    #             operator: In
+    #             values:
+    #               - app
+    #       topologyKey: kubernetes.io/hostname
   commandCronJob:
     - php
     - -f
