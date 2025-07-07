@@ -1035,3 +1035,22 @@ rbac:
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
+
+# Allows users to inject additional Kubernetes manifests (YAML) to be rendered with the release.
+# Each item should be a string containing valid YAML. Example:
+# extraManifests:
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: Middleware
+#     metadata:
+#       name: my-middleware
+#     spec:
+#       ...
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: IngressRoute
+#     metadata:
+#       name: my-ingressroute
+#     spec:
+#       ...
+extraManifests: []
