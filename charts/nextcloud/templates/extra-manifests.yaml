@@ -1,0 +1,10 @@
+{{- /*
+  Renders extra manifests provided by the user in values.yaml under extraManifests.
+  Each item should be a string containing valid YAML (can be multi-document).
+*/ -}}
+{{- if .Values.extraManifests }}
+{{- range $manifest := .Values.extraManifests }}
+---
+{{ tpl $manifest $ }}
+{{- end }}
+{{- end }}
