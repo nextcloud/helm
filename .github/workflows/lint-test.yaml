@@ -5,7 +5,7 @@ on:
     paths:
 jobs:
   changes:
-    runs-on: ubuntu-latest-low
+    runs-on: ubuntu-latest
 
     outputs:
       src: ${{ steps.changes.outputs.src}}
@@ -22,7 +22,7 @@ jobs:
               - 'charts/nextcloud/templates/**'
 
   lint:
-    runs-on: ubuntu-latest-low
+    runs-on: ubuntu-latest
     needs: changes
     if: needs.changes.outputs.src != 'false'
     steps:
@@ -162,7 +162,7 @@ jobs:
             exit $EXIT
 
   summary:
-    runs-on: ubuntu-latest-low
+    runs-on: ubuntu-latest
     needs: [changes, test]
     if: always()
     steps:

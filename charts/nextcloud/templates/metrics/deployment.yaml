@@ -64,6 +64,8 @@ spec:
               value: {{ .Values.metrics.tlsSkipVerify | quote }}
             - name: NEXTCLOUD_INFO_APPS
               value: {{ .Values.metrics.info.apps | quote }}
+            - name: NEXTCLOUD_INFO_UPDATE
+              value: {{ .Values.metrics.info.update | quote }}
           ports:
             - name: metrics
               containerPort: 9205
