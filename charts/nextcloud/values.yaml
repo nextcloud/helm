@@ -618,7 +618,7 @@ cronjob:
   affinity: {}
     # Often RWO volumes are used.
     # Depending on your provider two pods on the same node can still write to the same volume.
-    # Following config ensures that the cronjob pod is scheduled on a different node than the nextcloud pod.
+    # Following config ensures that the cronjob pod is scheduled on the same node as the nextcloud pod.
     # podAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     - labelSelector:
@@ -636,6 +636,8 @@ cronjob:
     - php
     - -f
     - /var/www/html/cron.php
+    - --
+    - --verbose
 
 service:
   type: ClusterIP
