@@ -63,8 +63,7 @@ ingress:
 
 # Allow configuration of lifecycle hooks
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-lifecycle:
-  {}
+lifecycle: {}
   # postStartCommand: []
   # preStopCommand: []
 
@@ -594,8 +593,7 @@ cronjob:
 
   # Allow configuration of lifecycle hooks
   # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-  lifecycle:
-    {}
+  lifecycle: {}
     # postStartCommand: []
     # preStopCommand: []
   # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
@@ -606,7 +604,7 @@ cronjob:
   #   readOnlyRootFilesystem: true
 
   # The command the cronjob container executes.
-  command:
+  commandCrondSidecar:
     - /cron.sh
 
   # Use a CronJob instead of crond sidecar container
@@ -632,6 +630,9 @@ cronjob:
     #             values:
     #               - app
     #       topologyKey: kubernetes.io/hostname
+
+  # The command to run in the cronjob container
+  # Example to incerase memory limit: php -d memory_limit=2G ...
   commandCronJob:
     - php
     - -f
@@ -686,8 +687,7 @@ persistence:
     accessMode: ReadWriteOnce
     size: 8Gi
 
-resources:
-  {}
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

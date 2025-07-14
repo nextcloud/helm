@@ -4,6 +4,9 @@ This Helm-Chart increase there major version on every breaking change (or major 
 
 Here we list all major versions and their breaking changes for migration.
 
+## v8
+- `cronjob.command` was renamed to `cronjob.commandCrondSidecar` to avoid confusion with the cronjob command. Please update your `values.yaml` accordingly.
+
 ## v7
 
 - update redis to v20 (see [CHANGELOG](https://github.com/bitnami/charts/blob/main/bitnami/redis/CHANGELOG.md#2000-2024-08-09))
