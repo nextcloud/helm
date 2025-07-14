@@ -14,9 +14,10 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: "*/5 * * * *"
+  schedule: {{ .Values.cronjob.schedule | quote }}
   concurrencyPolicy: Forbid
-  failedJobsHistoryLimit: 5
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
   jobTemplate:
     metadata:
       labels:
@@ -27,6 +28,7 @@ spec:
     spec:
       template:
         spec:
+          backoffLimit: {{ .Values.cronjob.backoffLimit }}
           restartPolicy: Never
           containers:
             - name: {{ .Chart.Name }}-cron
