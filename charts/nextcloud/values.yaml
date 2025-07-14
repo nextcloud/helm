@@ -611,7 +611,11 @@ cronjob:
   # crond does not work when not running as root user
   # Note: requires `persistence.enabled=true`
   useCronJobInsteadOfCrond: false
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
   labels: {}
+  backoffLimit: 1
   annotations: {}
   affinity: {}
     # Often RWO volumes are used.
