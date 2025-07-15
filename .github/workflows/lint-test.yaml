@@ -95,6 +95,11 @@ jobs:
             helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/imaginary.yaml"
             test: true
 
+          # test the helm chart with extra manifests
+          - name: Extra Manifests Enabled
+            helm_args: --helm-extra-set-args "--values charts/nextcloud/test-values/extra-manifests.yaml"
+            test: true
+            
     steps:
       - name: Checkout
         uses: actions/checkout@v6
