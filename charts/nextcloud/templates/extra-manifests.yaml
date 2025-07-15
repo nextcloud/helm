@@ -1,10 +1,14 @@
 {{- /*
   Renders extra manifests provided by the user in values.yaml under extraManifests.
-  Each item should be a string containing valid YAML (can be multi-document).
+  Each item can be a string (YAML block) or a YAML object.
 */ -}}
 {{- if .Values.extraManifests }}
 {{- range $manifest := .Values.extraManifests }}
 ---
+{{- if kindIs "string" $manifest }}
 {{ tpl $manifest $ }}
+{{- else }}
+{{ toYaml $manifest | nindent 0 }}
+{{- end }}
 {{- end }}
 {{- end }}
