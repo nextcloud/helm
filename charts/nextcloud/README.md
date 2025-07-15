@@ -248,6 +248,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                                                      |
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                                                      |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                                                         |
+| `extraManifests`                                            | List of additional Kubernetes manifests to render with the release. Each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
 
 ### Ingress
 #### Ingress Sticky-Sessions
@@ -798,7 +799,13 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:down
 
 ## Injecting Additional Manifests (`extraManifests`)
 
-You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value. This allows you to deploy custom resources alongside Nextcloud in a single Helm release.
+You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
+
+Each item in the list can be either:
+- a string containing valid YAML (multi-line block, e.g. with `|`), or
+- a YAML object (inline YAML structure).
+
+These manifests will be rendered as part of the Helm release.
 
 **Example usage in `values.yaml`:**
 
@@ -811,16 +818,13 @@ extraManifests:
       name: my-middleware
     spec:
       ...
-  - |
-    apiVersion: traefik.containo.us/v1alpha1
+  - apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
       name: my-ingressroute
     spec:
       ...
 ```
-
-Each item in the list should be a string containing valid YAML. These manifests will be rendered as part of the Helm release.
 
 # Backups
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).
