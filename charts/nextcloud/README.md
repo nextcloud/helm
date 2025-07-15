@@ -15,6 +15,7 @@ helm install my-release nextcloud/nextcloud
 * [Prerequisites](#prerequisites)
 * [Installing the Chart](#installing-the-chart)
 * [Uninstalling the Chart](#uninstalling-the-chart)
+* [Upgrade / Breaking Changes](#upgrade--breaking-changes)
 * [Configuration](#configuration)
     * [Ingress](#ingress)
         * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
@@ -96,6 +97,11 @@ helm delete my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
+
+## Upgrade / Breaking Changes
+
+There is a Changelog of breaking changes here: [CHANGELOG.md](./CHANGELOG.md).
+You should read it bevore updating.
 
 ## Configuration
 
