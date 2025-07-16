@@ -64,8 +64,9 @@ ingress:
 # Allow configuration of lifecycle hooks
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
 lifecycle: {}
-  # postStartCommand: []
-  # preStopCommand: []
+# lifecycle:
+#   postStartCommand: []
+#   preStopCommand: []
 
 phpClientHttpsFix:
   enabled: false
@@ -586,63 +587,86 @@ collabora:
 cronjob:
   enabled: false
 
-  ## Cronjob sidecar resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources: {}
+  # Either 'sidecar' or 'cronjob'
+  type: sidecar
 
-  # Allow configuration of lifecycle hooks
-  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-  lifecycle: {}
-    # postStartCommand: []
-    # preStopCommand: []
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
-  securityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  # Runs crond as a sidecar container in the Nextcloud pod
+  # Note: crond requires root
+  sidecar:
+    ## Cronjob sidecar resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
+    resources: {}
 
-  # The command the cronjob container executes.
-  commandCrondSidecar:
-    - /cron.sh
+    # Allow configuration of lifecycle hooks
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+    lifecycle: {}
+    # lifecycle:
+    #   postStartCommand: []
+    #   preStopCommand: []
+    # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+    #   runAsUser: 33
+    #   runAsGroup: 33
+    #   runAsNonRoot: true
+    #   readOnlyRootFilesystem: true
 
-  # Use a CronJob instead of crond sidecar container
-  # crond does not work when not running as root user
-  # Note: requires `persistence.enabled=true`
-  useCronJobInsteadOfCrond: false
-  schedule: "*/5 * * * *"
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 5
-  labels: {}
-  backoffLimit: 1
-  annotations: {}
-  affinity: {}
-    # Often RWO volumes are used.
-    # Depending on your provider two pods on the same node can still write to the same volume.
+    # The command the cronjob container executes.
+    command:
+      - /cron.sh
+
+  # Uses a Kubernetes CronJob to execute the Nextcloud cron tasks
+  # Note: can run as non-root user. Should run as same user as the Nextcloud pod.
+  cronjob:
+    # Use a CronJob instead of crond sidecar container
+    # crond does not work when not running as root user
+    # Note: requires `persistence.enabled=true`
+    schedule: "*/5 * * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 5
+    labels: {}
+    annotations: {}
+    backoffLimit: 1
+    affinity: {}
+    # Often RWO volumes are used. But the cronjob pod needs access to the same volume as the nextcloud pod.
+    # Depending on your provider two pods on the same node can still access the same volume.
     # Following config ensures that the cronjob pod is scheduled on the same node as the nextcloud pod.
-    # podAffinity:
-    #   requiredDuringSchedulingIgnoredDuringExecution:
-    #     - labelSelector:
-    #         matchExpressions:
-    #           - key: app.kubernetes.io/name
-    #             operator: In
-    #             values:
-    #               - nextcloud
-    #           - key: app.kubernetes.io/component
-    #             operator: In
-    #             values:
-    #               - app
-    #       topologyKey: kubernetes.io/hostname
+    # affinity:
+    #   podAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       - labelSelector:
+    #           matchExpressions:
+    #             - key: app.kubernetes.io/name
+    #               operator: In
+    #               values:
+    #                 - nextcloud
+    #             - key: app.kubernetes.io/component
+    #               operator: In
+    #               values:
+    #                 - app
+    #         topologyKey: kubernetes.io/hostname
 
-  # The command to run in the cronjob container
-  # Example to incerase memory limit: php -d memory_limit=2G ...
-  commandCronJob:
-    - php
-    - -f
-    - /var/www/html/cron.php
-    - --
-    - --verbose
+    ## Resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
+    resources: {}
+    # Allow configuration of lifecycle hooks
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+    # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+    #   runAsUser: 33
+    #   runAsGroup: 33
+    #   runAsNonRoot: true
+    #   readOnlyRootFilesystem: true
+
+    # The command to run in the cronjob container
+    # Example to incerase memory limit: php -d memory_limit=2G ...
+    command:
+      - php
+      - -f
+      - /var/www/html/cron.php
+      - --
+      - --verbose
 
 service:
   type: ClusterIP
@@ -692,16 +716,17 @@ persistence:
     size: 8Gi
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# resources:
+#   limits:
+#    cpu: 100m
+#    memory: 128Mi
+#   requests:
+#    cpu: 100m
+#    memory: 128Mi
 
 ## Liveness and readiness probe values
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
