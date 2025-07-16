@@ -240,13 +240,14 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
         {{- end }}{{/* end-if nginx.enabled */}}
-        {{- if and .Values.cronjob.enabled (not .Values.cronjob.useCronJobInsteadOfCrond) }}
-        - name: {{ .Chart.Name }}-cron
+        {{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "sidecar") }}
+        {{- with .Values.cronjob.sidecar }}
+        - name: {{ $.Chart.Name }}-cron
           image: {{ include "nextcloud.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command:
-            {{- toYaml .Values.cronjob.commandCrondSidecar | nindent 12 }}
-          {{- with .Values.cronjob.lifecycle }}
+            {{- toYaml .command | nindent 12 }}
+          {{- with .lifecycle }}
           lifecycle:
             {{- with .postStartCommand }}
             postStart:
@@ -262,15 +263,16 @@ spec:
             {{- end }}
           {{- end }}
           env:
-            {{- include "nextcloud.env" . | nindent 12 }}
+            {{- include "nextcloud.env" $ | nindent 12 }}
           resources:
-            {{- toYaml .Values.cronjob.resources | nindent 12 }}
-          {{- with .Values.cronjob.securityContext }}
+            {{- toYaml .resources | nindent 12 }}
+          {{- with .securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- include "nextcloud.volumeMounts" . | trim | nindent 12 }}
+            {{- include "nextcloud.volumeMounts" $ | trim | nindent 12 }}
+        {{- end }}
         {{- end }}{{/* end-if cronjob.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
         {{- toYaml . | nindent 8 }}

@@ -1,81 +1,65 @@
 ---
-{{- if and .Values.cronjob.enabled .Values.cronjob.useCronJobInsteadOfCrond }}
+{{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "cronjob") }}
+{{- with .Values.cronjob.cronjob }}{{/* begin with cronjob */}}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ template "nextcloud.fullname" . }}-cron
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "cron" "rootContext" $ ) | nindent 4 }}
-    {{- with .Values.cronjob.labels }}
+    {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.cronjob.annotations }}
+  {{- with .annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: {{ .Values.cronjob.schedule | quote }}
+  schedule: {{ .schedule | quote }}
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
-  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .failedJobsHistoryLimit }}
   jobTemplate:
     metadata:
       labels:
         {{- include "nextcloud.selectorLabels"  ( dict "component" "cron" "rootContext" $ ) | nindent 8 }}
-        {{- with .Values.podLabels }}
+        {{- with $.Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      backoffLimit: {{ .Values.cronjob.backoffLimit }}
+      backoffLimit: {{ .backoffLimit }}
       template:
         spec:
           restartPolicy: Never
           containers:
-            - name: {{ .Chart.Name }}-cron
-              image: {{ include "nextcloud.image" . }}
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
+            - name: {{ $.Chart.Name }}-cron
+              image: {{ include "nextcloud.image" $ }}
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
               command:
-                {{- toYaml .Values.cronjob.commandCronJob | nindent 16 }}
-              {{- with .Values.cronjob.lifecycle }}
-              lifecycle:
-                {{- with .postStartCommand }}
-                postStart:
-                  exec:
-                    command:
-                      {{- toYaml . | nindent 24 }}
-                {{- end }}
-                {{- with .preStopCommand }}
-                preStop:
-                  exec:
-                    command:
-                      {{- toYaml . | nindent 24 }}
-                {{- end }}
-              {{- end }}
+                {{- toYaml .commandCronJob | nindent 16 }}
               env:
-                {{- include "nextcloud.env" . | nindent 16 }}
+                {{- include "nextcloud.env" $ | nindent 16 }}
               resources:
-                {{- toYaml .Values.cronjob.resources | nindent 16 }}
-              {{- with .Values.cronjob.securityContext }}
+                {{- toYaml .resources | nindent 16 }}
+              {{- with .securityContext }}
               securityContext:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
               volumeMounts:
-                {{- include "nextcloud.volumeMounts" . | trim | nindent 16 }}
-            {{- with .Values.nextcloud.extraSidecarContainers }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          {{- with .Values.nodeSelector }}
+                {{- include "nextcloud.volumeMounts" $ | trim | nindent 16 }}
+          {{- with $.Values.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.cronjob.affinity }}
+          {{- with .affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.tolerations }}
+          {{- with $.Values.tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+{{- end }}{{/* end with cronjob */}}
           volumes:
             - name: nextcloud-main
               {{- if .Values.persistence.enabled }}
