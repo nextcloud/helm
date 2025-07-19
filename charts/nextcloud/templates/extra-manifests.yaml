@@ -8,7 +8,7 @@
 {{- if kindIs "string" $manifest }}
 {{ tpl $manifest $ }}
 {{- else }}
-{{ toYaml $manifest | nindent 0 }}
+{{ toYaml $manifest }}
 {{- end }}
 {{- end }}
 {{- end }}
