@@ -248,7 +248,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                                                      |
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                                                      |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                                                         |
-| `extraManifests`                                            | List of additional Kubernetes manifests to render with the release. Each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
+| `extraManifests`                                            | Map or List of additional Kubernetes manifests to render with the release. If a List is provided, each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
 
 ### Ingress
 #### Ingress Sticky-Sessions
@@ -801,9 +801,11 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:down
 
 You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
 
-Each item in the list can be either:
-- a string containing valid YAML (multi-line block, e.g. with `|`), or
-- a YAML object (inline YAML structure).
+`extraManifests` is either:
+- a map of manifest names to their YAML definitions
+- a list of YAML definitions, where each itemin the list can be either:
+  - a string containing valid YAML (multi-line block, e.g. with `|`), or
+  - a YAML object (inline YAML structure).
 
 These manifests will be rendered as part of the Helm release.
 
@@ -819,6 +821,22 @@ extraManifests:
     spec:
       ...
   - apiVersion: traefik.containo.us/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: my-ingressroute
+    spec:
+      ...
+# Or as a map:
+extraManifests:
+  my-middleware:
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: my-middleware
+    spec:
+      ...
+  my-ingressroute:
+    apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
       name: my-ingressroute
