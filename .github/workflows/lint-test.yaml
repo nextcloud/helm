@@ -99,6 +99,9 @@ jobs:
           - name: Extra Manifests Enabled
             helm_args: --helm-extra-set-args "--values charts/nextcloud/test-values/extra-manifests.yaml"
             test: true
+          - name: Extra Manifests using a map Enabled
+            helm_args: --helm-extra-set-args "--values charts/nextcloud/test-values/extra-manifests-map.yaml"
+            test: true
             
     steps:
       - name: Checkout
