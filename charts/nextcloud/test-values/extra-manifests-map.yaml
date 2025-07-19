@@ -1,0 +1,15 @@
+extraManifests:
+  my-config-map:
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: custom-config
+    data:
+      customKey: customValue
+  my-secret:
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: custom-secret
+    data:
+      secretKey: secretValue

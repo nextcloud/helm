@@ -1,14 +1,23 @@
 {{- /*
   Renders extra manifests provided by the user in values.yaml under extraManifests.
-  Each item can be a string (YAML block) or a YAML object.
+  extraManifests can be a map (keyed by manifest name) or a list of manifests.
+  If a map, each key is the name of the manifest.
+  If an array, each item is a manifest, which can be a string (YAML block) or a YAML object.
 */ -}}
 {{- if .Values.extraManifests }}
-{{- range $manifest := .Values.extraManifests }}
+  {{- if kindIs "map" .Values.extraManifests }}
+    {{- range $manifest := values .Values.extraManifests }}
+---
+{{ toYaml $manifest }}
+    {{- end }}
+  {{- else if kindIs "slice" .Values.extraManifests }}
+    {{- range $manifest := .Values.extraManifests }}
 ---
 {{- if kindIs "string" $manifest }}
 {{ tpl $manifest $ }}
 {{- else }}
 {{ toYaml $manifest }}
 {{- end }}
-{{- end }}
+    {{- end }}
+  {{- end }}
 {{- end }}
