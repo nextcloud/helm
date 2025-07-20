@@ -11,4 +11,4 @@ extraManifests:
     metadata:
       name: custom-secret
     data:
-      secretKey: secretValue
+      secretKey: c2VjcmV0VmFsdWU=
