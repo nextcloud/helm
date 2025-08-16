@@ -40,10 +40,7 @@ server {
     {{- end }}
     {{- end }}
 
-    # set max upload size and increase upload timeout:
-    client_max_body_size 512M;
-    client_body_timeout 300s;
-    fastcgi_buffers 64 4K;
+    {{- .Values.nginx.config.serverBlockCustom | nindent 4 }}
 
     # Enable gzip but do not remove ETag headers
     gzip on;
