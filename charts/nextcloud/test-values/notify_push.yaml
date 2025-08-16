@@ -1,0 +1,19 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: "ingress-nginx-controller.ingress-nginx.svc"
+
+ingress:
+  enabled: true
+
+redis:
+  enabled: true
+
+internalDatabase:
+  enabled: false
+mariadb:
+  enabled: true
+
+notifyPush:
+  enabled: true
+  autoSetup: true
