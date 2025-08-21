@@ -150,6 +150,8 @@ nextcloud:
         accessKey: ""
         # key in nextcloud.objectStore.s3.existingSecret to use for s3 secretAccessKey
         secretKey: ""
+        # key in nextcloud.objectStore.s3.existingSecret to use for the s3 sessionToken
+        sessionTokenKey: ""
         # key in nextcloud.objectStore.s3.existingSecret to use for the s3 bucket
         bucket: ""
         # key in nextcloud.objectStore.s3.existingSecret to use for the s3 sse_c_key

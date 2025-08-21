@@ -324,39 +324,40 @@ Read more in the official [docs](https://docs.nextcloud.com/server/latest/admin_
 Here are all the values you can currently configure in this helm chart to configure an Object Store as your Primary Storage.
 
 
-| Parameter                                       | Description                                                           | Default     |
-|-------------------------------------------------|-----------------------------------------------------------------------|-------------|
-| `nextcloud.objectStore.s3.enabled`              | enable configuring S3 as a primary object store                       | `false`     |
-| `nextcloud.objectStore.s3.accessKey`            | accessKeyID for authing to S3, ignored if using existingSecret        | `''`        |
-| `nextcloud.objectStore.s3.secretKey`            | secretAccessKey for authing to S3, ignored if using existingSecret    | `''`        |
-| `nextcloud.objectStore.s3.legacyAuth`           | use legacy authentication for S3                                      | `false`     |
-| `nextcloud.objectStore.s3.host`                 | endpoint URL to connect to. Only required if not using AWS            | `''`        |
-| `nextcloud.objectStore.s3.ssl`                  | Use TLS connection when connecting to S3                              | `true`      |
-| `nextcloud.objectStore.s3.port`                 | Port for S3 host to use                                               | `443`       |
-| `nextcloud.objectStore.s3.region`               | region to look for bucket in on the S3 host                           | `eu-west-1` |
-| `nextcloud.objectStore.s3.bucket`               | bucket on the S3 host                                                 | `''`        |
-| `nextcloud.objectStore.s3.prefix`               | optional object prefix                                                | `''`        |
-| `nextcloud.objectStore.s3.usePathStyle`         | set to true if you are not using DNS for your buckets                 | `false`     |
-| `nextcloud.objectStore.s3.autoCreate`           | auto-create the S3 bucket                                             | `false`     |
-| `nextcloud.objectStore.s3.storageClass`         | S3 storage class to use                                               | `STANDARD`  |
-| `nextcloud.objectStore.s3.sse_c_key`            | S3 server side encryption key.                                        | `''`        |
-| `nextcloud.objectStore.s3.existingSecret`       | Use an existing Kubernetes Secret to fetch auth credentials           | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.host`      | if using s3.existingSecret, secret key to use for the host            | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.accessKey` | if using s3.existingSecret, secret key to use for the accessKeyID     | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.secretKey` | if using s3.existingSecret, secret key to use for the secretAccessKey | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.bucket`    | if using s3.existingSecret, secret key to use for the bucket          | `''`        |
-| `nextcloud.objectStore.s3.secretKeys.sse_c_key` | if using s3.existingSecret, secret key to use for the sse_c_key       | `''`        |
-| `nextcloud.objectStore.swift.enabled`           | enable configuring Openstack Swift as a primary object store          | `false`     |
-| `nextcloud.objectStore.swift.user.domain`       | optional: swift user domain                                           | `'Default'` |
-| `nextcloud.objectStore.swift.user.name`         | Swift username                                                        | `''`        |
-| `nextcloud.objectStore.swift.user.password`     | Swift user password                                                   | `''`        |
-| `nextcloud.objectStore.swift.project.name`      | Swift project name                                                    | `''`        |
-| `nextcloud.objectStore.swift.project.domain`    | optional: swift project domain                                        | `'Default'` |
-| `nextcloud.objectStore.swift.url`               | Swift Identity / Keystone endpoint                                    | `''`        |
-| `nextcloud.objectStore.swift.region`            | Swift region                                                          | `''`        |
-| `nextcloud.objectStore.swift.service`           | Optional: service name, used on some swift implementations            | `'swift'`   |
-| `nextcloud.objectStore.swift.container`         | Swift container to store the data in                                  | `''`        |
-| `nextcloud.objectStore.swift.autoCreate`        | Autocreate the Swift container                                        | `false`     |
+| Parameter                                             | Description                                                           | Default     |
+|-------------------------------------------------------|-----------------------------------------------------------------------|-------------|
+| `nextcloud.objectStore.s3.enabled`                    | enable configuring S3 as a primary object store                       | `false`     |
+| `nextcloud.objectStore.s3.accessKey`                  | accessKeyID for authing to S3, ignored if using existingSecret        | `''`        |
+| `nextcloud.objectStore.s3.secretKey`                  | secretAccessKey for authing to S3, ignored if using existingSecret    | `''`        |
+| `nextcloud.objectStore.s3.legacyAuth`                 | use legacy authentication for S3                                      | `false`     |
+| `nextcloud.objectStore.s3.host`                       | endpoint URL to connect to. Only required if not using AWS            | `''`        |
+| `nextcloud.objectStore.s3.ssl`                        | Use TLS connection when connecting to S3                              | `true`      |
+| `nextcloud.objectStore.s3.port`                       | Port for S3 host to use                                               | `443`       |
+| `nextcloud.objectStore.s3.region`                     | region to look for bucket in on the S3 host                           | `eu-west-1` |
+| `nextcloud.objectStore.s3.bucket`                     | bucket on the S3 host                                                 | `''`        |
+| `nextcloud.objectStore.s3.prefix`                     | optional object prefix                                                | `''`        |
+| `nextcloud.objectStore.s3.usePathStyle`               | set to true if you are not using DNS for your buckets                 | `false`     |
+| `nextcloud.objectStore.s3.autoCreate`                 | auto-create the S3 bucket                                             | `false`     |
+| `nextcloud.objectStore.s3.storageClass`               | S3 storage class to use                                               | `STANDARD`  |
+| `nextcloud.objectStore.s3.sse_c_key`                  | S3 server side encryption key.                                        | `''`        |
+| `nextcloud.objectStore.s3.existingSecret`             | Use an existing Kubernetes Secret to fetch auth credentials           | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.host`            | if using s3.existingSecret, secret key to use for the host            | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.accessKey`       | if using s3.existingSecret, secret key to use for the accessKeyID     | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.secretKey`       | if using s3.existingSecret, secret key to use for the secretAccessKey | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.sessionTokenKey` | if using s3.existingSecret, secret key to use for the sessionTokenKey | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.bucket`          | if using s3.existingSecret, secret key to use for the bucket          | `''`        |
+| `nextcloud.objectStore.s3.secretKeys.sse_c_key`       | if using s3.existingSecret, secret key to use for the sse_c_key       | `''`        |
+| `nextcloud.objectStore.swift.enabled`                 | enable configuring Openstack Swift as a primary object store          | `false`     |
+| `nextcloud.objectStore.swift.user.domain`             | optional: swift user domain                                           | `'Default'` |
+| `nextcloud.objectStore.swift.user.name`               | Swift username                                                        | `''`        |
+| `nextcloud.objectStore.swift.user.password`           | Swift user password                                                   | `''`        |
+| `nextcloud.objectStore.swift.project.name`            | Swift project name                                                    | `''`        |
+| `nextcloud.objectStore.swift.project.domain`          | optional: swift project domain                                        | `'Default'` |
+| `nextcloud.objectStore.swift.url`                     | Swift Identity / Keystone endpoint                                    | `''`        |
+| `nextcloud.objectStore.swift.region`                  | Swift region                                                          | `''`        |
+| `nextcloud.objectStore.swift.service`                 | Optional: service name, used on some swift implementations            | `'swift'`   |
+| `nextcloud.objectStore.swift.container`               | Swift container to store the data in                                  | `''`        |
+| `nextcloud.objectStore.swift.autoCreate`              | Autocreate the Swift container                                        | `false`     |
 
 
 
