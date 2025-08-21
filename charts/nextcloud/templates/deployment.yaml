@@ -243,7 +243,7 @@ spec:
         {{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "sidecar") }}
         {{- with .Values.cronjob.sidecar }}
         - name: {{ $.Chart.Name }}-cron
-          image: {{ include "nextcloud.image" . }}
+          image: {{ include "nextcloud.image" $ }}
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
           command:
             {{- toYaml .command | nindent 12 }}
