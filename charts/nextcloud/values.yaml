@@ -414,7 +414,8 @@ externalDatabase:
 
 global:
   security:
-    allowInsecureImages: true #required for bitnamilegacy repos
+    # required for bitnamilegacy repos
+    allowInsecureImages: true
 
 ##
 ## MariaDB chart configuration
