@@ -23,6 +23,9 @@ spec:
   {{- with .Values.service.ipFamilyPolicy }}
   ipFamilyPolicy: {{ . }}
   {{- end }}
+  {{- with .Values.service.sessionAffinity }}
+  sessionAffinity: {{ . }}
+  {{- end }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.nextcloud.containerPort }}
