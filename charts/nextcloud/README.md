@@ -208,6 +208,8 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `service.nodePort`                                          | NodePort for service type NodePort                                                                  | `nil`                      |
 | `service.ipFamilies`                                        | Set ipFamilies as in k8s service objects                                                            | `nil`                      |
 | `service.ipFamyPolicy`                                      | define IP protocol bindings as in k8s service objects                                               | `nil`                      |
+| `service.sessionAffinity`                                   | Kubernetes service Session Affinity                                                                 | `nil`                     |
+| `service.sessionAffinityConfig`                                   | Kubernetes service Session Affinity configuration                                                            | `{}`                     |
 | `phpClientHttpsFix.enabled`                                 | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `false`                    |
 | `phpClientHttpsFix.protocol`                                | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `https`                    |
 | `resources`                                                 | CPU/Memory resource requests/limits                                                                 | `{}`                       |
