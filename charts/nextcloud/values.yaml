@@ -617,6 +617,10 @@ service:
   nodePort:
   # -- use additional annotation on service for nextcloud
   annotations: {}
+  # -- Set this to "ClientIP" to make sure that connections from the same client
+  # are passed to the same Nextcloud pod each time.
+  sessionAffinity: ""
+  sessionAffinityConfig: {}
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
