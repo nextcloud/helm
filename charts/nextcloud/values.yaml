@@ -490,6 +490,27 @@ postgresql:
       # storageClass: ""
 
 ##
+## External Redis configuration
+##
+externalRedis:
+  enabled: false
+
+  ## Redis host
+  host: ""
+
+  ## Redis port
+  port: "6379"
+
+  ## Redis password
+  password: ""
+
+  ## Use a existing secret
+  existingSecret:
+    enabled: false
+    # secretName: nameofsecret
+    passwordKey: redis-password
+
+##
 ## Redis chart configuration
 ## for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
 ##
@@ -608,6 +629,10 @@ service:
   nodePort:
   # -- use additional annotation on service for nextcloud
   annotations: {}
+  # -- Set this to "ClientIP" to make sure that connections from the same client
+  # are passed to the same Nextcloud pod each time.
+  sessionAffinity: ""
+  sessionAffinityConfig: {}
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
