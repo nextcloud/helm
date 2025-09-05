@@ -480,6 +480,27 @@ postgresql:
       # storageClass: ""
 
 ##
+## External Redis configuration
+##
+externalRedis:
+  enabled: false
+
+  ## Redis host
+  host: ""
+
+  ## Redis port
+  port: "6379"
+
+  ## Redis password
+  password: ""
+
+  ## Use a existing secret
+  existingSecret:
+    enabled: false
+    # secretName: nameofsecret
+    passwordKey: redis-password
+
+##
 ## Redis chart configuration
 ## for more options see https://github.com/bitnami/charts/tree/main/bitnami/redis
 ##

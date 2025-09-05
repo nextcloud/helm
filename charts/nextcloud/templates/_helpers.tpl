@@ -236,6 +236,23 @@ Redis env vars
   value: {{ .Values.redis.auth.password }}
 {{- end }}
 {{- end }}
+{{- else if .Values.externalRedis.enabled }}
+- name: REDIS_HOST
+  value: {{ .Values.externalRedis.host | quote }}
+- name: REDIS_HOST_PORT
+  value: {{ .Values.externalRedis.port | quote }}
+{{- if .Values.externalRedis.existingSecret.enabled }}
+{{- if and .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey }}
+- name: REDIS_HOST_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret.secretName | quote }}
+      key: {{ .Values.externalRedis.existingSecret.passwordKey | quote }}
+{{- end }}
+{{- else if .Values.externalRedis.password }}
+- name: REDIS_HOST_PASSWORD
+  value: {{ .Values.externalRedis.password | quote }}
+{{- end }}
 {{- end }}{{/* end if redis.enabled */}}
 {{/*
 S3 as primary object store env vars

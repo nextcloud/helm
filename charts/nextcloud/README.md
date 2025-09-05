@@ -196,6 +196,13 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `redis.global.storageClass`                                 | PVC Storage Class  for both Redis&reg; master and replica Persistent Volumes                        | `''`                       |
 | `redis.master.persistence.enabled`                          | Enable persistence on Redis&reg; master nodes using Persistent Volume Claims                        | `true`                     |
 | `redis.replica.persistence.enabled`                         | Enable persistence on Redis&reg; replica nodes using Persistent Volume Claims                       | `true`                     |
+| `externalRedis.enabled`                                     | Whether to use external Redis                                                                       | `false`                    |
+| `externalRedis.host`                                        | Redis host                                                                                          | `""`                       |
+| `externalRedis.port`                                        | Redis port                                                                                          | `"6379"`                   |
+| `externalRedis.password`                                    | Redis password                                                                                      | `""`                       |
+| `externalRedis.existingSecret.enabled`                      | Whether to use a existing secret or not                                                             | `false`                    |
+| `externalDatabase.existingSecret.secretName`                | Name of the existing secret                                                                         | `nil`                      |
+| `externalDatabase.existingSecret.passwordKey`               | Name of the key that contains the Redis password                                                    | `redis-password`           |
 | `cronjob.command`                                           | The command the cronjob container executes                                                          | `/cron.sh`                 |
 | `cronjob.enabled`                                           | Whether to enable/disable cron jobs sidecar                                                         | `false`                    |
 | `cronjob.lifecycle.postStartCommand`                        | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                      |
