@@ -600,7 +600,7 @@ To execute [background tasks](https://docs.nextcloud.com/server/latest/admin_man
 
 Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to ***Cron***.
 
-You can also set `cronjob.type` to `cronjob` to instead use Kubernetes CronJob. One advantage of this is that it can as non-root. CronD seems to require root.
+You can also set cronjob.type to cronjob to instead use a Kubernetes native CronJob. One advantage of this is that it can run as non-root when compared to the crond sidecar.
 
 
 ## Using the nextcloud docker image auto-configuration via env vars
