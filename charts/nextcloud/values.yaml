@@ -61,12 +61,12 @@ ingress:
   path: /
   pathType: Prefix
 
-
 # Allow configuration of lifecycle hooks
 # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
 lifecycle: {}
-  # postStartCommand: []
-  # preStopCommand: []
+# lifecycle:
+#   postStartCommand: []
+#   preStopCommand: []
 
 phpClientHttpsFix:
   enabled: false
@@ -316,7 +316,6 @@ nextcloud:
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
-
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
@@ -509,7 +508,7 @@ redis:
   enabled: false
   auth:
     enabled: true
-    password: 'changeme'
+    password: "changeme"
     # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
     existingSecret: ""
     # Password key to be retrieved from existing secret
@@ -572,8 +571,8 @@ collabora:
     hosts:
       - host: chart-example.local
         paths:
-        - path: /
-          pathType: ImplementationSpecific
+          - path: /
+            pathType: ImplementationSpecific
     tls: []
     #  - secretName: collabora-ingress-tls
     #    hosts:
@@ -582,33 +581,92 @@ collabora:
   # see collabora helm README.md for recommended values
   resources: {}
 
-
 ## Cronjob to execute Nextcloud background tasks
 ## ref: https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron
 ##
 cronjob:
   enabled: false
 
-  ## Cronjob sidecar resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources: {}
+  # Either 'sidecar' or 'cronjob'
+  type: sidecar
 
-  # Allow configuration of lifecycle hooks
-  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
-  lifecycle: {}
-    # postStartCommand: []
-    # preStopCommand: []
-  # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
-  securityContext: {}
-  #   runAsUser: 33
-  #   runAsGroup: 33
-  #   runAsNonRoot: true
-  #   readOnlyRootFilesystem: true
+  # Runs crond as a sidecar container in the Nextcloud pod
+  # Note: crond requires root
+  sidecar:
+    ## Cronjob sidecar resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
+    resources: {}
 
-  # The command the cronjob container executes.
-  command:
-  - /cron.sh
+    # Allow configuration of lifecycle hooks
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+    lifecycle: {}
+    # lifecycle:
+    #   postStartCommand: []
+    #   preStopCommand: []
+    # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+    #   runAsUser: 33
+    #   runAsGroup: 33
+    #   runAsNonRoot: true
+    #   readOnlyRootFilesystem: true
+
+    # The command the cronjob container executes.
+    command:
+      - /cron.sh
+
+  # Uses a Kubernetes CronJob to execute the Nextcloud cron tasks
+  # Note: can run as non-root user. Should run as same user as the Nextcloud pod.
+  cronjob:
+    # Use a CronJob instead of crond sidecar container
+    # crond does not work when not running as root user
+    # Note: requires `persistence.enabled=true`
+    schedule: "*/5 * * * *"
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 5
+    labels: {}
+    annotations: {}
+    backoffLimit: 1
+    affinity: {}
+    # Often RWO volumes are used. But the cronjob pod needs access to the same volume as the nextcloud pod.
+    # Depending on your provider two pods on the same node can still access the same volume.
+    # Following config ensures that the cronjob pod is scheduled on the same node as the nextcloud pod.
+    # affinity:
+    #   podAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       - labelSelector:
+    #           matchExpressions:
+    #             - key: app.kubernetes.io/name
+    #               operator: In
+    #               values:
+    #                 - nextcloud
+    #             - key: app.kubernetes.io/component
+    #               operator: In
+    #               values:
+    #                 - app
+    #         topologyKey: kubernetes.io/hostname
+
+    ## Resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
+    resources: {}
+    # Allow configuration of lifecycle hooks
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+    # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+    securityContext: {}
+    #   runAsUser: 33
+    #   runAsGroup: 33
+    #   runAsNonRoot: true
+    #   readOnlyRootFilesystem: true
+
+    # The command to run in the cronjob container
+    # Example to incerase memory limit: php -d memory_limit=2G ...
+    command:
+      - php
+      - -f
+      - /var/www/html/cron.php
+      - --
+      - --verbose
 
 service:
   type: ClusterIP
@@ -658,16 +716,17 @@ persistence:
     size: 8Gi
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# resources:
+#   limits:
+#    cpu: 100m
+#    memory: 128Mi
+#   requests:
+#    cpu: 100m
+#    memory: 128Mi
 
 ## Liveness and readiness probe values
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
@@ -693,7 +752,6 @@ startupProbe:
   timeoutSeconds: 5
   failureThreshold: 30
   successThreshold: 1
-
 
 ## Enable pod autoscaling using HorizontalPodAutoscaler
 ## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
@@ -916,14 +974,12 @@ metrics:
     # @section -- Metrics
     additionalRules: []
 
-
 rbac:
   enabled: false
   serviceaccount:
     create: true
     name: nextcloud-serviceaccount
     annotations: {}
-
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
