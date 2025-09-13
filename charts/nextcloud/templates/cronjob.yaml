@@ -36,7 +36,7 @@ spec:
               image: {{ include "nextcloud.image" $ }}
               imagePullPolicy: {{ $.Values.image.pullPolicy }}
               command:
-                {{- toYaml .commandCronJob | nindent 16 }}
+                {{- toYaml .command | nindent 16 }}
               env:
                 {{- include "nextcloud.env" $ | nindent 16 }}
               resources:
