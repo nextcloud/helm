@@ -411,6 +411,11 @@ externalDatabase:
     # hostKey: db-hostname-or-ip
     # databaseKey: db-name
 
+global:
+  security:
+    # required for bitnamilegacy repos
+    allowInsecureImages: true
+
 ##
 ## MariaDB chart configuration
 ## ref: https://github.com/bitnami/charts/tree/main/bitnami/mariadb
@@ -420,6 +425,9 @@ mariadb:
   # to satisfy the applications database requirements. if you want to deploy this bitnami mariadb, set this and externalDatabase to true
   # To use an ALREADY DEPLOYED mariadb database, set this to false and configure the externalDatabase parameters
   enabled: false
+
+  image:
+    repository: bitnamilegacy/mariadb
 
   # see: https://github.com/bitnami/charts/tree/main/bitnami/mariadb#global-parameters
   global:
@@ -454,6 +462,8 @@ mariadb:
 ##
 postgresql:
   enabled: false
+  image:
+    repository: bitnamilegacy/postgresql
   global:
     postgresql:
       # global.postgresql.auth overrides postgresql.auth
@@ -506,6 +516,8 @@ externalRedis:
 
 redis:
   enabled: false
+  image:
+    repository: bitnamilegacy/redis
   auth:
     enabled: true
     password: "changeme"
