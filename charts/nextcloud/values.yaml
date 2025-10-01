@@ -636,7 +636,10 @@ cronjob:
     schedule: "*/5 * * * *"
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 5
+    # Additional labels for cronjob
     labels: {}
+    # Additional labels for cronjob pod
+    podLabels: {}
     annotations: {}
     backoffLimit: 1
     affinity: {}
