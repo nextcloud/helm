@@ -1,8 +1,8 @@
 apiVersion: v2
 name: nextcloud
-version: 8.0.3
+version: 8.1.0
 # renovate: image=docker.io/library/nextcloud
-appVersion: 31.0.9
+appVersion: 32.0.0
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
   - nextcloud
