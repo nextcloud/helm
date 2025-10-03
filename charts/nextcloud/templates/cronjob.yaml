@@ -29,6 +29,11 @@ spec:
     spec:
       backoffLimit: {{ .backoffLimit }}
       template:
+        metadata:
+          labels:
+            {{- with (mergeOverwrite (dict) $.Values.podLabels .podLabels) }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
         spec:
           restartPolicy: Never
           containers:
