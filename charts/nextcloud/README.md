@@ -245,6 +245,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podLabels`                                                 | Labels to be added at 'pod' level                                                                   | not set                                                      |
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                                                      |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                                                         |
+| `topologySpreadConstraints`                                 | TopologySpreadConstraints for nextcloud pod and cronjob pod                                         | `{}`                                                         |
 
 ### Ingress
 #### Ingress Sticky-Sessions
@@ -561,27 +562,28 @@ This section provides options to enable and configure the Collabora Online serve
 
 We include an optional external preview provider from [h2non/imaginary](https://github.com/h2non/imaginary).
 
-| Parameter                          | Description                                                                            | Default           |
-| ---------------------------------- | -------------------------------------------------------------------------------------- | ----------------- |
-| `imaginary.enabled`                | Start Imaginary                                                                        | `false`           |
-| `imaginary.replicaCount`           | Number of imaginary pod replicas to deploy                                             | `1`               |
-| `imaginary.image.registry`         | Imaginary image name                                                                   | `docker.io`       |
-| `imaginary.image.repository`       | Imaginary image name                                                                   | `h2non/imaginary` |
-| `imaginary.image.tag`              | Imaginary image tag                                                                    | `1.2.4`           |
-| `imaginary.image.pullPolicy`       | Imaginary image pull policy                                                            | `IfNotPresent`    |
-| `imaginary.image.pullSecrets`      | Imaginary image pull secrets                                                           | `nil`             |
-| `imaginary.podAnnotations`         | Additional annotations for imaginary                                                   | `{}`              |
-| `imaginary.podLabels`              | Additional labels for imaginary                                                        | `{}`              |
-| `imaginary.nodeSelector`           | Imaginary pod nodeSelector                                                             | `{}`              |
-| `imaginary.tolerations`            | Imaginary pod tolerations                                                              | `[]`              |
-| `imaginary.resources`              | imaginary resources                                                                    | `{}`              |
-| `imaginary.securityContext`        | Optional security context for the Imaginary container                                  | `nil`             |
-| `imaginary.podSecurityContext`     | Optional security context for the Imaginary pod (applies to all containers in the pod) | `nil`             |
-| `imaginary.service.type`           | Imaginary: Kubernetes Service type                                                     | `ClusterIP`       |
-| `imaginary.service.loadBalancerIP` | Imaginary: LoadBalancerIp for service type LoadBalancer                                | `nil`             |
-| `imaginary.service.nodePort`       | Imaginary: NodePort for service type NodePort                                          | `nil`             |
-| `imaginary.service.annotations`    | Additional annotations for service imaginary                                           | `{}`              |
-| `imaginary.service.labels`         | Additional labels for service imaginary                                                | `{}`              |
+| Parameter                             | Description                                                                            | Default           |
+| ------------------------------------- | -------------------------------------------------------------------------------------- | ----------------- |
+| `imaginary.enabled`                   | Start Imaginary                                                                        | `false`           |
+| `imaginary.replicaCount`              | Number of imaginary pod replicas to deploy                                             | `1`               |
+| `imaginary.image.registry`            | Imaginary image name                                                                   | `docker.io`       |
+| `imaginary.image.repository`          | Imaginary image name                                                                   | `h2non/imaginary` |
+| `imaginary.image.tag`                 | Imaginary image tag                                                                    | `1.2.4`           |
+| `imaginary.image.pullPolicy`          | Imaginary image pull policy                                                            | `IfNotPresent`    |
+| `imaginary.image.pullSecrets`         | Imaginary image pull secrets                                                           | `nil`             |
+| `imaginary.podAnnotations`            | Additional annotations for imaginary                                                   | `{}`              |
+| `imaginary.podLabels`                 | Additional labels for imaginary                                                        | `{}`              |
+| `imaginary.nodeSelector`              | Imaginary pod nodeSelector                                                             | `{}`              |
+| `imaginary.tolerations`               | Imaginary pod tolerations                                                              | `[]`              |
+| `imaginary.topologySpreadConstraints` | Imaginary pod topologySpreadConstraints                                                | `[]`              |
+| `imaginary.resources`                 | imaginary resources                                                                    | `{}`              |
+| `imaginary.securityContext`           | Optional security context for the Imaginary container                                  | `nil`             |
+| `imaginary.podSecurityContext`        | Optional security context for the Imaginary pod (applies to all containers in the pod) | `nil`             |
+| `imaginary.service.type`              | Imaginary: Kubernetes Service type                                                     | `ClusterIP`       |
+| `imaginary.service.loadBalancerIP`    | Imaginary: LoadBalancerIp for service type LoadBalancer                                | `nil`             |
+| `imaginary.service.nodePort`          | Imaginary: NodePort for service type NodePort                                          | `nil`             |
+| `imaginary.service.annotations`       | Additional annotations for service imaginary                                           | `{}`              |
+| `imaginary.service.labels`            | Additional labels for service imaginary                                                | `{}`              |
 
 
 > [!Note]
