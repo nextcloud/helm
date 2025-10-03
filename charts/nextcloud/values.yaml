@@ -781,6 +781,8 @@ nodeSelector: {}
 
 tolerations: []
 
+topologySpreadConstraints: []
+
 affinity: {}
 
 dnsConfig: {}
@@ -816,6 +818,8 @@ imaginary:
   nodeSelector: {}
   # -- Imaginary pod tolerations
   tolerations: []
+  # -- Imaginary pod topologySpreadConstraints
+  topologySpreadConstraints: []
 
   # -- imaginary resources
   resources: {}
