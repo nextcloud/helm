@@ -70,6 +70,10 @@ spec:
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with $.Values.topologySpreadConstraints }}
+          topologySpreadConstraints:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 {{- end }}{{/* end with cronjob */}}
           volumes:
             - name: nextcloud-main
