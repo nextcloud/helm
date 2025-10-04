@@ -42,7 +42,7 @@ spec:
         - alert: "nextcloud: outdated apps"
           expr: 'sum(nextcloud_apps_updates_available_total{ {{ $filter }} }) without(endpoint,container,pod,instance) > 0'
           labels:
-            severity: "warning"
+            severity: "info"
             {{- with .labels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
