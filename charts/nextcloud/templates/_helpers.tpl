@@ -64,11 +64,7 @@ Create image name that is used in the deployment
 {{/*
 Create environment variables used to configure the nextcloud container as well as the cron sidecar container.
 */}}
-{{- define "nextcloud.env" -}}
-{{- if .Values.phpClientHttpsFix.enabled }}
-- name: OVERWRITEPROTOCOL
-  value: {{ .Values.phpClientHttpsFix.protocol | quote }}
-{{- end }}
+{{- define "nextcloud.env.database" -}}
 {{- if .Values.internalDatabase.enabled }}
 - name: SQLITE_DATABASE
   value: {{ .Values.internalDatabase.name | quote }}
@@ -87,6 +83,8 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+- name: DATABASE_URL
+  value: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST)/$(MYSQL_DATABASE)"
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
   value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
@@ -106,7 +104,9 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-{{- else }}
+- name: DATABASE_URL
+  value: "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DB)"
+{{- else }}{{/* mariadb.enable or postgresql.enabled -> now external */}}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
@@ -136,7 +136,9 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-  {{- else }}
+- name: DATABASE_URL
+  value: "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DB)"
+  {{- else }}{{/* external.type = postgresql  */}}
 - name: MYSQL_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
   valueFrom:
@@ -165,8 +167,72 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-  {{- end }}
+- name: DATABASE_URL
+  value: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST)/$(MYSQL_DATABASE)"
+  {{- end }}{{/* external.type = postgresql */}}
+{{- end }}{{/* not mariadb.enable or postgresql.enabled -> just external*/}}
 {{- end }}
+
+{{/*
+Redis env vars
+*/}}
+{{- define "nextcloud.env.redis" -}}
+{{- if .Values.redis.enabled }}
+- name: REDIS_HOST
+  value: {{ template "nextcloud.redis.fullname" . }}-master
+- name: REDIS_HOST_PORT
+  value: {{ .Values.redis.master.service.ports.redis | quote }}
+{{- if .Values.redis.auth.enabled }}
+{{- if and .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey }}
+- name: REDIS_HOST_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.redis.auth.existingSecret }}
+      key: {{ .Values.redis.auth.existingSecretPasswordKey }}
+{{- else }}
+- name: REDIS_HOST_PASSWORD
+  value: {{ .Values.redis.auth.password }}
+{{- end }}
+{{- end }}
+{{- else if .Values.externalRedis.enabled }}
+- name: REDIS_HOST
+  value: {{ .Values.externalRedis.host | quote }}
+- name: REDIS_HOST_PORT
+  value: {{ .Values.externalRedis.port | quote }}
+{{- if .Values.externalRedis.existingSecret.enabled }}
+{{- if and .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey }}
+- name: REDIS_HOST_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret.secretName | quote }}
+      key: {{ .Values.externalRedis.existingSecret.passwordKey | quote }}
+{{- end }}
+{{- else if .Values.externalRedis.password }}
+- name: REDIS_HOST_PASSWORD
+  value: {{ .Values.externalRedis.password | quote }}
+{{- end }}
+{{- end }}{{/* end-of redis-enabled*/}}
+{{- if or
+  (and .Values.redis.auth.enabled .Values.redis.auth.password)
+  (and .Values.redis.auth.enabled .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey)
+  (and .Values.externalRedis.enabled .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey)
+  (and .Values.externalRedis.enabled .Values.externalRedis.password)
+}}
+- name: REDIS_URL
+  value: "redis://:$(REDIS_HOST_PASSWORD)@$(REDIS_HOST):$(REDIS_HOST_PORT)"
+{{- else }}
+- name: REDIS_URL
+  value: "redis://$(REDIS_HOST):$(REDIS_HOST_PORT)"
+{{- end }}{{/* end-of redis-url*/}}
+{{- end }}{{/* end-of env.redis definition */}}
+
+{{- define "nextcloud.env" -}}
+{{- if .Values.phpClientHttpsFix.enabled }}
+- name: OVERWRITEPROTOCOL
+  value: {{ .Values.phpClientHttpsFix.protocol | quote }}
+{{- end }}
+{{- template "nextcloud.env.database" . }}
+{{- template "nextcloud.env.redis" . }}
 - name: NEXTCLOUD_ADMIN_USER
   valueFrom:
     secretKeyRef:
@@ -216,44 +282,6 @@ Create environment variables used to configure the nextcloud container as well a
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
       key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
 {{- end }}
-{{/*
-Redis env vars
-*/}}
-{{- if .Values.redis.enabled }}
-- name: REDIS_HOST
-  value: {{ template "nextcloud.redis.fullname" . }}-master
-- name: REDIS_HOST_PORT
-  value: {{ .Values.redis.master.service.ports.redis | quote }}
-{{- if .Values.redis.auth.enabled }}
-{{- if and .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey }}
-- name: REDIS_HOST_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.redis.auth.existingSecret }}
-      key: {{ .Values.redis.auth.existingSecretPasswordKey }}
-{{- else }}
-- name: REDIS_HOST_PASSWORD
-  value: {{ .Values.redis.auth.password }}
-{{- end }}
-{{- end }}
-{{- else if .Values.externalRedis.enabled }}
-- name: REDIS_HOST
-  value: {{ .Values.externalRedis.host | quote }}
-- name: REDIS_HOST_PORT
-  value: {{ .Values.externalRedis.port | quote }}
-{{- if .Values.externalRedis.existingSecret.enabled }}
-{{- if and .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey }}
-- name: REDIS_HOST_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.externalRedis.existingSecret.secretName | quote }}
-      key: {{ .Values.externalRedis.existingSecret.passwordKey | quote }}
-{{- end }}
-{{- else if .Values.externalRedis.password }}
-- name: REDIS_HOST_PASSWORD
-  value: {{ .Values.externalRedis.password | quote }}
-{{- end }}
-{{- end }}{{/* end if redis.enabled */}}
 {{/*
 S3 as primary object store env vars
 */}}
@@ -358,7 +386,6 @@ Swift as primary object store env vars
 {{ toYaml .Values.nextcloud.extraEnv }}
 {{- end }}
 {{- end -}}
-
 
 {{/*
 Create volume mounts for the nextcloud container as well as the cron sidecar container.
