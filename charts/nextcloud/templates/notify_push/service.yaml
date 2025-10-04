@@ -1,12 +1,12 @@
-{{- if .Values.metrics.enabled }}
-{{- with .Values.metrics.service }}
+{{- if .Values.notifyPush.enabled }}
+{{- with .Values.notifyPush.service }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "nextcloud.fullname" $ }}-metrics
+  name: {{ template "nextcloud.fullname" $ }}-notify-push
   labels:
-    {{- include "nextcloud.labels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "component" "notify-push"  "rootContext" $ ) | nindent 4 }}
     app.kubernetes.io/monitor: enabled
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}
@@ -23,8 +23,11 @@ spec:
   {{- end }}
   {{- end }}
   selector:
-    {{- include "nextcloud.selectorLabels"  ( dict "component" "metrics"  "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.selectorLabels"  ( dict "component" "notify-push"  "rootContext" $ ) | nindent 4 }}
   ports:
+    - name: http
+      port: 80
+      targetPort: http
     - name: metrics
       port: 9100
       targetPort: metrics
