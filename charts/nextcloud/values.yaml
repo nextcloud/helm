@@ -12,6 +12,7 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 podAnnotations: {}
+podLabels: {}
 deploymentAnnotations: {}
 deploymentLabels: {}
 
