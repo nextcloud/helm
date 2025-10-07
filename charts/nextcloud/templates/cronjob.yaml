@@ -31,7 +31,7 @@ spec:
       template:
         metadata:
           labels:
-            {{- with (mergeOverwrite (dict) $.Values.podLabels .podLabels) }}
+            {{- with (mergeOverwrite (dict) (default dict $.Values.podLabels) (default dict .podLabels)) }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
         spec:
