@@ -445,7 +445,7 @@ mariadb:
   architecture: standalone
 
   ## Enable persistence using Persistent Volume Claims
-  ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   primary:
     persistence:
@@ -606,7 +606,7 @@ cronjob:
   # Note: crond requires root
   sidecar:
     ## Cronjob sidecar resource requests and limits
-    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
     ##
     resources: {}
 
@@ -662,7 +662,7 @@ cronjob:
     #         topologyKey: kubernetes.io/hostname
 
     ## Resource requests and limits
-    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
     ##
     resources: {}
     # Allow configuration of lifecycle hooks
@@ -696,7 +696,7 @@ service:
   sessionAffinityConfig: {}
 
 ## Enable persistence using Persistent Volume Claims
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
 ##
 persistence:
   # Nextcloud Data (/var/www/html)
@@ -897,7 +897,7 @@ metrics:
     #   - myRegistrKeySecretName
 
   ## Metrics exporter resource requests and limits
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   ##
   resources: {}
 
@@ -960,12 +960,12 @@ metrics:
     jobLabel: ""
 
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
-    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#endpoint
     ##
     interval: 30s
 
     ## @param metrics.serviceMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
-    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#endpoint
     ##
     scrapeTimeout: ""
 
