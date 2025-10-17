@@ -174,6 +174,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.securityContext`                                 | Optional security context for the NextCloud container                                               | `nil`                                                        |
 | `nextcloud.podSecurityContext`                              | Optional security context for the NextCloud pod (applies to all containers in the pod)              | `nil`                                                        |
 | `nextcloud.postgreSqlInitContainer.securityContext`         | Set postgresql initContainer securityContext parameters.                                            | `{}`                                                         |
+| `nextcloud.priorityClassName`                               | Priority Class for nextcloud. Defaults to .priorityClassName                                        | `nil`                                                        |
 | `nginx.enabled`                                             | Enable nginx (requires you use php-fpm image)                                                       | `false`                                                      |
 | `nginx.image.repository`                                    | nginx Image name, e.g. use `nginxinc/nginx-unprivileged` for rootless container                     | `nginx`                                                      |
 | `nginx.image.tag`                                           | nginx Image tag                                                                                     | `alpine`                                                     |
@@ -209,6 +210,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.sidecar.lifecycle.postStartCommand`                | Specify deployment lifecycle hook postStartCommand for the cron jobs sidecar                        | `nil`                                                        |
 | `cronjob.sidecar.lifecycle.preStopCommand`                  | Specify deployment lifecycle hook preStopCommand for the cron jobs sidecar                          | `nil`                                                        |
 | `cronjob.sidecar.resources`                                 | CPU/Memory resource requests/limits for the cron jobs sidecar                                       | `{}`                                                         |
+| `cronjob.priorityClassName`                                 | Priority Class for cronjob. Defaults to .priorityClassName                                          | `nil`                                                        |
 | `cronjob.sidecar.securityContext`                           | Optional security context for cron jobs sidecar                                                     | `nil`                                                        |
 | `cronjob.cronjob.schedule`                                  | Cron job schedule                                                                                   | `*/5 * * * *`                                                |
 | `cronjob.cronjob.successfulJobsHistoryLimit`                | Number of successful jobs to keep in history                                                        | `3`                                                          |
@@ -232,6 +234,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `phpClientHttpsFix.enabled`                                 | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `false`                                                      |
 | `phpClientHttpsFix.protocol`                                | Sets OVERWRITEPROTOCOL for https ingress redirect                                                   | `https`                                                      |
 | `resources`                                                 | CPU/Memory resource requests/limits                                                                 | `{}`                                                         |
+| `priorityClassName`                                         | Priority Class for pods                                                                             | `nil`                                                        |
 | `rbac.enabled`                                              | Enable Role and rolebinding for priveledged PSP                                                     | `false`                                                      |
 | `rbac.serviceaccount.create`                                | Wether to create a serviceaccount or use an existing one (requires rbac)                            | `true`                                                       |
 | `rbac.serviceaccount.name`                                  | The name of the sevice account that the deployment will use (requires rbac)                         | `nextcloud-serviceaccount`                                   |
@@ -579,6 +582,7 @@ We include an optional external preview provider from [h2non/imaginary](https://
 | `imaginary.tolerations`               | Imaginary pod tolerations                                                              | `[]`              |
 | `imaginary.topologySpreadConstraints` | Imaginary pod topologySpreadConstraints                                                | `[]`              |
 | `imaginary.resources`                 | imaginary resources                                                                    | `{}`              |
+| `imaginary.priorityClassName`         | Imaginary pod Priority Class. Defaults to .priorityClassName                           | `nil`             |
 | `imaginary.securityContext`           | Optional security context for the Imaginary container                                  | `nil`             |
 | `imaginary.podSecurityContext`        | Optional security context for the Imaginary pod (applies to all containers in the pod) | `nil`             |
 | `imaginary.service.type`              | Imaginary: Kubernetes Service type                                                     | `ClusterIP`       |
