@@ -281,6 +281,9 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $.Values.nextcloud.priorityClassName | default $.Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
