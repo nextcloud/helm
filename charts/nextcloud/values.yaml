@@ -671,7 +671,7 @@ cronjob:
     ##
     resources: {}
 
-    # priorityClassName: priority class for the cron job. Overrides
+    # -- priorityClassName: priority class for the cron job. Overrides
     # .Values.priorityClassName
     priorityClassName: ""
 
