@@ -4,6 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "nextcloud.fullname" . }}-phpconfig
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
 data:

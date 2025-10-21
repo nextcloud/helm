@@ -5,6 +5,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ template "nextcloud.fullname" $ }}-cron
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "cron" "rootContext" $ ) | nindent 4 }}
     {{- with .labels }}
