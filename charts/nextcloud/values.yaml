@@ -703,6 +703,7 @@ persistence:
   # Nextcloud Data (/var/www/html)
   enabled: false
   annotations: {}
+  labels: {}
   ## nextcloud data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -725,6 +726,7 @@ persistence:
   nextcloudData:
     enabled: false
     subPath:
+    labels: {}
     annotations: {}
     # storageClass: "-"
     # existingClaim:
