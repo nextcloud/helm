@@ -1,10 +1,11 @@
 ---
 {{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "cronjob") }}
-{{- with .Values.cronjob.cronjob }}{{/* begin with cronjob */}}
+{{ range $index, $cronjob := append .Values.cronjob.additionalCronJobs .Values.cronjob.cronjob }}
+{{ with $cronjob }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ template "nextcloud.fullname" $ }}-cron
+  name: {{ template "nextcloud.fullname" $ }}-cron-{{ $index }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "cron" "rootContext" $ ) | nindent 4 }}
     {{- with .labels }}
@@ -77,49 +78,49 @@ spec:
 {{- end }}{{/* end with cronjob */}}
           volumes:
             - name: nextcloud-main
-              {{- if .Values.persistence.enabled }}
+              {{- if $.Values.persistence.enabled }}
               persistentVolumeClaim:
-                claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+                claimName: {{ if $.Values.persistence.existingClaim }}{{ $.Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
               {{- else }}
               emptyDir: {}
               {{- end }}
-            {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
+            {{- if and $.Values.persistence.nextcloudData.enabled $.Values.persistence.enabled }}
             - name: nextcloud-data
               persistentVolumeClaim:
-                claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+                claimName: {{ if $.Values.persistence.nextcloudData.existingClaim }}{{ $.Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
             {{- end }}
-            {{- if .Values.nextcloud.configs }}
+            {{- if $.Values.nextcloud.configs }}
             - name: nextcloud-config
               configMap:
                 name: {{ template "nextcloud.fullname" . }}-config
             {{- end }}
-            {{- if .Values.nextcloud.phpConfigs }}
+            {{- if $.Values.nextcloud.phpConfigs }}
             - name: nextcloud-phpconfig
               configMap:
                 name: {{ template "nextcloud.fullname" . }}-phpconfig
             {{- end }}
-            {{- if .Values.nginx.enabled }}
+            {{- if $.Values.nginx.enabled }}
             - name: nextcloud-nginx-config
               configMap:
                 name: {{ template "nextcloud.fullname" . }}-nginxconfig
             {{- end }}
-            {{- if not (values .Values.nextcloud.hooks | compact | empty) }}
+            {{- if not (values $.Values.nextcloud.hooks | compact | empty) }}
             - name: nextcloud-hooks
               configMap:
                 name: {{ template "nextcloud.fullname" . }}-hooks
                 defaultMode: 0o755
             {{- end }}
-            {{- with .Values.nextcloud.extraVolumes }}
+            {{- with $.Values.nextcloud.extraVolumes }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           securityContext:
-            {{- with .Values.securityContext }}
+            {{- with $.Values.securityContext }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-            {{- with .Values.nextcloud.podSecurityContext }}
+            {{- with $.Values.nextcloud.podSecurityContext }}
             {{- toYaml . | nindent 12 }}
             {{- else }}
-            {{- if .Values.nginx.enabled }}
+            {{- if $.Values.nginx.enabled }}
             # Will mount configuration files as www-data (id: 82) for nextcloud
             fsGroup: 82
             {{- else }}
@@ -127,11 +128,12 @@ spec:
             fsGroup: 33
             {{- end }}
             {{- end }}{{/* end-with podSecurityContext */}}
-          {{- if .Values.rbac.enabled }}
-          serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
+          {{- if $.Values.rbac.enabled }}
+          serviceAccountName: {{ $.Values.rbac.serviceaccount.name }}
           {{- end }}
-          {{- with .Values.dnsConfig }}
+          {{- with $.Values.dnsConfig }}
           dnsConfig:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+{{- end }}
 {{- end }}
