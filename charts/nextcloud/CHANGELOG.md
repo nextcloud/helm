@@ -4,6 +4,9 @@ This Helm-Chart increase there major version on every breaking change (or major 
 
 Here we list all major versions and their breaking changes for migration.
 
+## v9
+- move `metrics.serviceMonitor` to `prometheus.serviceMonitor`: It us used for nextcloud-exporter and notify-push
+
 ## v8
 - `cronjob.command` was renamed to `cronjob.sidecar.command` to avoid confusion with the cronjob command. Please update your `values.yaml` accordingly.
 
