@@ -683,7 +683,7 @@ cronjob:
       - /var/www/html/cron.php
       - --
       - --verbose
-
+  additionalCronJobs: []
 service:
   type: ClusterIP
   port: 8080

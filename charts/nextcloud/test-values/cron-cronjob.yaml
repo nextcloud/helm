@@ -1,3 +1,58 @@
 cronjob:
   enabled: true
   type: cronjob
+
+  additionalCronJobs:
+    - # Use a CronJob instead of crond sidecar container
+      # crond does not work when not running as root user
+      # Note: requires `persistence.enabled=true`
+      schedule: "*/5 * * * *"
+      successfulJobsHistoryLimit: 3
+      failedJobsHistoryLimit: 5
+      # -- Additional labels for cronjob
+      labels: { }
+      # -- Additional labels for cronjob pod
+      podLabels: { }
+      annotations: { }
+      backoffLimit: 1
+      affinity: { }
+      # Often RWO volumes are used. But the cronjob pod needs access to the same volume as the nextcloud pod.
+      # Depending on your provider two pods on the same node can still access the same volume.
+      # Following config ensures that the cronjob pod is scheduled on the same node as the nextcloud pod.
+      # affinity:
+      #   podAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchExpressions:
+      #             - key: app.kubernetes.io/name
+      #               operator: In
+      #               values:
+      #                 - nextcloud
+      #             - key: app.kubernetes.io/component
+      #               operator: In
+      #               values:
+      #                 - app
+      #         topologyKey: kubernetes.io/hostname
+
+      ## Resource requests and limits
+      ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+      ##
+      resources: { }
+      # Allow configuration of lifecycle hooks
+      # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
+      # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
+      securityContext: { }
+      #   runAsUser: 33
+      #   runAsGroup: 33
+      #   runAsNonRoot: true
+      #   readOnlyRootFilesystem: true
+
+      # The command to run in the cronjob container
+      # Example to incerase memory limit: php -d memory_limit=2G ...
+      command:
+        - php
+        - -f
+        - /var/www/html/occ.php
+        - --
+        - preview:pre-generate
+        - -vvv
