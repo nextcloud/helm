@@ -1,5 +1,7 @@
 # IDE resources
-.vscode
+.vscode/*
+!.vscode/extensions.json
+
 .idea
 .devcontainer/
 
