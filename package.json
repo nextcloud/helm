@@ -1,0 +1,21 @@
+{
+  "name": "nextcloud-helm",
+  "homepage": "https://github.com/nextcloud/helm",
+  "license": "AGPL-3.0",
+  "private": true,
+  "engineStrict": true,
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "readme:link": "markdown-link-check *.md",
+    "readme:lint": "markdownlint *.md -f",
+    "readme:parameters": "readme-generator -v values.yaml -r README.md"
+  },
+  "devDependencies": {
+    "@bitnami/readme-generator-for-helm": "^2.5.0",
+    "markdown-link-check": "^3.13.6",
+    "markdownlint-cli": "^0.45.0"
+  }
+}

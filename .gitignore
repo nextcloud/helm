@@ -5,3 +5,5 @@
 
 # Helm resources
 charts/*/charts
+
+node_modules
