@@ -43,9 +43,9 @@ Create image name that is used in the deployment
 */}}
 {{- define "nextcloud.image" -}}
 {{- if .Values.image.tag -}}
-{{- printf "%s/%s:%s" .Values.image.registry .Values.image.repository .Values.image.tag -}}
+{{- printf "%s/%s:%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository .Values.image.tag -}}
 {{- else -}}
-{{- printf "%s/%s:%s-%s" .Values.image.registry .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
+{{- printf "%s/%s:%s-%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
 {{- end -}}
 {{- end -}}
 

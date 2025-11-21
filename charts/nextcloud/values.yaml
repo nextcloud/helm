@@ -1,3 +1,12 @@
+global:
+  image:
+   # -- if set it will overwrite all registry entries
+    registry:
+
+  security:
+    # required for bitnamilegacy repos
+    allowInsecureImages: true
+
 ## ref: https://hub.docker.com/r/library/nextcloud/tags/
 ##
 image:
@@ -413,11 +422,6 @@ externalDatabase:
     passwordKey: db-password
     # hostKey: db-hostname-or-ip
     # databaseKey: db-name
-
-global:
-  security:
-    # required for bitnamilegacy repos
-    allowInsecureImages: true
 
 ##
 ## MariaDB chart configuration
