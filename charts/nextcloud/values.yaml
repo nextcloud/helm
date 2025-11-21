@@ -992,12 +992,12 @@ metrics:
     jobLabel: ""
 
     ## @param metrics.serviceMonitor.interval Interval at which metrics should be scraped
-    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#endpoint
+    #  ref: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
     ##
     interval: 30s
 
     ## @param metrics.serviceMonitor.scrapeTimeout Specify the timeout after which the scrape is ended
-    ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#endpoint
+    #  ref: https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint
     ##
     scrapeTimeout: ""
 
