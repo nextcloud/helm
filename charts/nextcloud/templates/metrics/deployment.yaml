@@ -29,7 +29,7 @@ spec:
       {{- end }}
       containers:
         - name: metrics-exporter
-          image: "{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
+          image: "{{ coalesce .Values.global.image.registry .Values.metrics.image.registry  }}/{{ .Values.metrics.image.repository }}:{{ .Values.metrics.image.tag }}"
           imagePullPolicy: {{ .Values.metrics.image.pullPolicy }}
           env:
             {{- if or .Values.metrics.token .Values.nextcloud.existingSecret.tokenKey }}
