@@ -327,6 +327,10 @@ nextcloud:
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
+  # -- priority class for nextcloud.
+  # Overrides .Values.priorityClassName
+  priorityClassName: ""
+
 nginx:
   ## You need to set an fpm version of the image for nextcloud if you want to use nginx!
   enabled: false
@@ -675,6 +679,11 @@ cronjob:
     ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
     ##
     resources: {}
+
+    # -- priority class for the cron job.
+    # Overrides .Values.priorityClassName
+    priorityClassName: ""
+
     # Allow configuration of lifecycle hooks
     # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
     # Set securityContext parameters. For example, you may need to define runAsNonRoot directive
@@ -754,6 +763,12 @@ resources: {}
 #   requests:
 #    cpu: 100m
 #    memory: 128Mi
+
+# -- Priority class for pods. This is the _default_
+# priority class for pods created by this deployment - it may be
+# overridden by more specific instances of priorityClassName -
+# e.g. cronjob.cronjob.priorityClassName
+priorityClassName: ""
 
 ## Liveness and readiness probe values
 ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes
@@ -836,6 +851,10 @@ imaginary:
 
   # -- imaginary resources
   resources: {}
+
+  # -- priority class for imaginary.
+  # Overrides .Values.priorityClassName
+  priorityClassName: ""
 
   # -- Optional security context for the Imaginary container
   securityContext:
