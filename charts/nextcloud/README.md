@@ -785,8 +785,8 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ myocccomand"
 
 Here are some examples below.
 
-### Putting Nextcloud into maintanence mode
-Some admin actions require you to put your Nextcloud instance into [maintanence mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups):
+### Putting Nextcloud into maintenance mode
+Some admin actions require you to put your Nextcloud instance into [maintenance mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups):
 
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
