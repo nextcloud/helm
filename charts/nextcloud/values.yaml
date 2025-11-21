@@ -317,8 +317,8 @@ nextcloud:
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
-  # priorityClassName: priority class for nextcloud. Overrides
-  # .Values.priorityClassName
+  # -- priority class for nextcloud.
+  # Overrides .Values.priorityClassName
   priorityClassName: ""
 
 nginx:
@@ -671,8 +671,8 @@ cronjob:
     ##
     resources: {}
 
-    # -- priorityClassName: priority class for the cron job. Overrides
-    # .Values.priorityClassName
+    # -- priority class for the cron job.
+    # Overrides .Values.priorityClassName
     priorityClassName: ""
 
     # Allow configuration of lifecycle hooks
@@ -755,7 +755,7 @@ resources: {}
 #    cpu: 100m
 #    memory: 128Mi
 
-# priorityClassName: Priority class for pods. This is the _default_
+# -- Priority class for pods. This is the _default_
 # priority class for pods created by this deployment - it may be
 # overridden by more specific instances of priorityClassName -
 # e.g. cronjob.cronjob.priorityClassName
@@ -843,8 +843,8 @@ imaginary:
   # -- imaginary resources
   resources: {}
 
-  # priorityClassName: priority class for imaginary. Overrides
-  # .Values.priorityClassName
+  # -- priority class for imaginary.
+  # Overrides .Values.priorityClassName
   priorityClassName: ""
 
   # -- Optional security context for the Imaginary container
