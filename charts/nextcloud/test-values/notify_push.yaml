@@ -1,0 +1,16 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: "nextcloud.nextcloud.svc.cluster.local"
+
+redis:
+  enabled: true
+
+internalDatabase:
+  enabled: false
+mariadb:
+  enabled: true
+
+notifyPush:
+  enabled: true
+  autoSetup: true
