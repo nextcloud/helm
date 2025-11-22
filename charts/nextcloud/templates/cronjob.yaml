@@ -31,7 +31,7 @@ spec:
       template:
         metadata:
           labels:
-            {{- include "nextcloud.selectorLabels"  ( dict "component" "cronjob" "rootContext" $ ) | nindent 10 }}
+            {{- include "nextcloud.selectorLabels"  ( dict "component" "cronjob" "rootContext" $ ) | nindent 12 }}
             {{- with (mergeOverwrite (dict) $.Values.podLabels .podLabels) }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
