@@ -6,7 +6,7 @@ kind: CronJob
 metadata:
   name: {{ template "nextcloud.fullname" $ }}-cron
   labels:
-    {{- include "nextcloud.labels"  ( dict "component" "cron" "rootContext" $ ) | nindent 4 }}
+    {{- include "nextcloud.labels"  ( dict "component" "cronjob" "rootContext" $ ) | nindent 4 }}
     {{- with .labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
@@ -22,7 +22,7 @@ spec:
   jobTemplate:
     metadata:
       labels:
-        {{- include "nextcloud.selectorLabels"  ( dict "component" "cron" "rootContext" $ ) | nindent 8 }}
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "cronjob" "rootContext" $ ) | nindent 8 }}
         {{- with $.Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -31,6 +31,7 @@ spec:
       template:
         metadata:
           labels:
+            {{- include "nextcloud.selectorLabels"  ( dict "component" "cronjob" "rootContext" $ ) | nindent 10 }}
             {{- with (mergeOverwrite (dict) $.Values.podLabels .podLabels) }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
