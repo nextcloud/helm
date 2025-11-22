@@ -102,7 +102,7 @@ jobs:
           - name: Extra Manifests using a map Enabled
             helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/extra-manifests-map.yaml"
             test: true
-            
+  
     steps:
       - name: Checkout
         uses: actions/checkout@v6

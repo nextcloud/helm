@@ -4,20 +4,11 @@
   If a map, each key is the name of the manifest.
   If an array, each item is a manifest, which can be a string (YAML block) or a YAML object.
 */ -}}
-{{- if .Values.extraManifests }}
-  {{- if kindIs "map" .Values.extraManifests }}
-    {{- range $manifest := values .Values.extraManifests }}
----
-{{ toYaml $manifest }}
-    {{- end }}
-  {{- else if kindIs "slice" .Values.extraManifests }}
-    {{- range $manifest := .Values.extraManifests }}
+{{- range $manifest := .Values.extraManifests }}
 ---
 {{- if kindIs "string" $manifest }}
 {{ tpl $manifest $ }}
 {{- else }}
-{{ toYaml $manifest }}
+{{ tpl (toYaml $manifest) $ }}
 {{- end }}
-    {{- end }}
-  {{- end }}
 {{- end }}
