@@ -1,8 +1,6 @@
 name: Lint and Test Charts
 
-on:
-  pull_request:
-    paths:
+on: [pull_request]
 jobs:
   changes:
     runs-on: ubuntu-latest-low
@@ -20,6 +18,7 @@ jobs:
               - 'charts/nextcloud/Chart.yaml'
               - 'charts/nextcloud/values.yaml'
               - 'charts/nextcloud/templates/**'
+              - 'charts/nextcloud/tests/**'
 
   lint:
     runs-on: ubuntu-latest-low
@@ -56,6 +55,13 @@ jobs:
         id: lint
         if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+
+      - name: Run helm unittest
+        id: unittest
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          helm plugin install https://github.com/helm-unittest/helm-unittest.git
+          helm unittest charts/nextcloud
 
   test:
     runs-on: ubuntu-24.04
