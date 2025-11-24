@@ -40,7 +40,7 @@ dependencies:
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
   - name: collabora-online
-    version: 1.1.20
+    version: 1.1.53
     repository: https://collaboraonline.github.io/online
     condition: collabora.enabled
     alias: collabora
