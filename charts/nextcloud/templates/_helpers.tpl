@@ -43,9 +43,9 @@ Create image name that is used in the deployment
 */}}
 {{- define "nextcloud.image" -}}
 {{- if .Values.image.tag -}}
-{{- printf "%s:%s" .Values.image.repository .Values.image.tag -}}
+{{- printf "%s/%s:%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository .Values.image.tag -}}
 {{- else -}}
-{{- printf "%s:%s-%s" .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
+{{- printf "%s/%s:%s-%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository .Chart.AppVersion .Values.image.flavor -}}
 {{- end -}}
 {{- end -}}
 
@@ -235,6 +235,23 @@ Redis env vars
 - name: REDIS_HOST_PASSWORD
   value: {{ .Values.redis.auth.password }}
 {{- end }}
+{{- end }}
+{{- else if .Values.externalRedis.enabled }}
+- name: REDIS_HOST
+  value: {{ .Values.externalRedis.host | quote }}
+- name: REDIS_HOST_PORT
+  value: {{ .Values.externalRedis.port | quote }}
+{{- if .Values.externalRedis.existingSecret.enabled }}
+{{- if and .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey }}
+- name: REDIS_HOST_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret.secretName | quote }}
+      key: {{ .Values.externalRedis.existingSecret.passwordKey | quote }}
+{{- end }}
+{{- else if .Values.externalRedis.password }}
+- name: REDIS_HOST_PASSWORD
+  value: {{ .Values.externalRedis.password | quote }}
 {{- end }}
 {{- end }}{{/* end if redis.enabled */}}
 {{/*

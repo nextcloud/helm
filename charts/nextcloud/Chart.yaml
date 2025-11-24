@@ -1,8 +1,8 @@
 apiVersion: v2
 name: nextcloud
-version: 7.0.2
+version: 8.5.10
 # renovate: image=docker.io/library/nextcloud
-appVersion: 31.0.8
+appVersion: 32.0.2
 description: A file sharing server that puts the control and security of your own data back into your hands.
 keywords:
   - nextcloud
@@ -40,7 +40,7 @@ dependencies:
     repository: oci://registry-1.docker.io/bitnamicharts
     condition: redis.enabled
   - name: collabora-online
-    version: 1.1.20
+    version: 1.1.53
     repository: https://collaboraonline.github.io/online
     condition: collabora.enabled
     alias: collabora
