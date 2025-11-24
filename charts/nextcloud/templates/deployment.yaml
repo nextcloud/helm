@@ -281,6 +281,9 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $.Values.nextcloud.priorityClassName | default $.Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
@@ -288,7 +291,7 @@ spec:
         {{- end }}
         {{- if .Values.mariadb.enabled }}
         - name: mariadb-isalive
-          image: {{ .Values.mariadb.image.registry | default "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
+          image: {{ coalesce .Values.global.image.registry .Values.mariadb.image.registry "docker.io" }}/{{ .Values.mariadb.image.repository }}:{{ .Values.mariadb.image.tag }}
           {{- with .Values.nextcloud.mariaDbInitContainer }}
           resources:
             {{- toYaml .resources | nindent 12 }}
@@ -312,7 +315,7 @@ spec:
             - {{ printf "until mysql --host=%s-mariadb --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --execute=\"SELECT 1;\"; do echo waiting for mysql; sleep 2; done;" .Release.Name }}
         {{- else if .Values.postgresql.enabled }}
         - name: postgresql-isready
-          image: {{ .Values.postgresql.image.registry | default "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
+          image: {{ coalesce .Values.global.image.registry .Values.postgresql.image.registry "docker.io"  }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}
           {{- with .Values.nextcloud.postgreSqlInitContainer }}
           resources:
             {{- toYaml .resources | nindent 12 }}
