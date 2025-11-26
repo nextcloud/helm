@@ -1,3 +1,11 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: nextcloud
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
+
 extraManifests:
   my-config-map: |
     apiVersion: v1
