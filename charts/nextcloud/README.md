@@ -11,47 +11,51 @@ helm install my-release nextcloud/nextcloud
 
 ## Quick Links
 
-* [Introduction](#introduction)
-* [Prerequisites](#prerequisites)
-* [Installing the Chart](#installing-the-chart)
-* [Uninstalling the Chart](#uninstalling-the-chart)
-* [Upgrade / Breaking Changes](#upgrade--breaking-changes)
-* [Configuration](#configuration)
-    * [Ingress](#ingress)
-        * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
-            * [NGINX Ingress-Controller](#nginx-ingress-controller)
-            * [Traefik Ingress-Controller](#traefik-ingress-controller)
-            * [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
-    * [Database Configurations](#database-configurations)
-    * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
-    * [Persistence Configurations](#persistence-configurations)
-    * [Metrics Configurations](#metrics-configurations)
-    * [Headers set on NGINX](#headers-set-on-nginx)
-    * [Probes Configurations](#probes-configurations)
-    * [Collabora Configuration](#collabora-configuration)
-    * [Imaginary](#imaginary)
-* [Cron jobs](#cron-jobs)
-* [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
-* [Multiple config.php file](#multiple-configphp-file)
-* [Using nginx](#using-nginx)
-    * [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
-* [Preserving Source IP](#preserving-source-ip)
-* [Hugepages](#hugepages)
-* [HPA (Clustering)](#hpa-clustering)
-* [Adjusting PHP ini values](#adjusting-php-ini-values)
-* [Running `occ` commands](#running-occ-commands)
-    * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
-    * [Downloading models for recognize](#downloading-models-for-recognize)
-* [Backups](#backups)
-* [Upgrades](#upgrades)
-* [Troubleshooting](#troubleshooting)
-    * [Logging](#logging)
-        * [Changing the logging behavior](#changing-the-logging-behavior)
-        * [Viewing the logs](#viewing-the-logs)
-            * [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
-            * [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
-            * [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
-        * [Sharing the logs](#sharing-the-logs)
+- [Nextcloud Helm Chart](#nextcloud-helm-chart)
+  - [TL;DR;](#tldr)
+  - [Quick Links](#quick-links)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Installing the Chart](#installing-the-chart)
+  - [Uninstalling the Chart](#uninstalling-the-chart)
+  - [Upgrade / Breaking Changes](#upgrade--breaking-changes)
+  - [Configuration](#configuration)
+    - [Ingress](#ingress)
+      - [Ingress Sticky-Sessions](#ingress-sticky-sessions)
+        - [NGINX Ingress-Controller](#nginx-ingress-controller)
+        - [Traefik Ingress-Controller](#traefik-ingress-controller)
+        - [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
+    - [Database Configurations](#database-configurations)
+    - [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
+    - [Persistence Configurations](#persistence-configurations)
+    - [Metrics Configurations](#metrics-configurations)
+    - [Headers set on NGINX](#headers-set-on-nginx)
+    - [Probes Configurations](#probes-configurations)
+    - [Collabora Configuration](#collabora-configuration)
+    - [Imaginary](#imaginary)
+  - [Cron jobs](#cron-jobs)
+  - [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
+  - [Multiple config.php file](#multiple-configphp-file)
+  - [Using nginx](#using-nginx)
+    - [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
+  - [Preserving Source IP](#preserving-source-ip)
+  - [Hugepages](#hugepages)
+  - [HPA (Clustering)](#hpa-clustering)
+  - [Adjusting PHP ini values](#adjusting-php-ini-values)
+  - [Running `occ` commands](#running-occ-commands)
+    - [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
+    - [Downloading models for recognize](#downloading-models-for-recognize)
+  - [Injecting Additional Manifests (`extraManifests`)](#injecting-additional-manifests-extramanifests)
+- [Backups](#backups)
+- [Upgrades](#upgrades)
+- [Troubleshooting](#troubleshooting)
+  - [Logging](#logging)
+    - [Changing the logging behavior](#changing-the-logging-behavior)
+    - [Viewing the logs](#viewing-the-logs)
+      - [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
+      - [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
+      - [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
+    - [Sharing the logs](#sharing-the-logs)
 
 ## Introduction
 
@@ -249,6 +253,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                                                      |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                                                         |
 | `topologySpreadConstraints`                                 | TopologySpreadConstraints for nextcloud pod and cronjob pod                                         | `{}`                                                         |
+| `extraManifests`                                            | Map or List of additional Kubernetes manifests to render with the release. If a List is provided, each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
 
 ### Ingress
 #### Ingress Sticky-Sessions
@@ -799,6 +804,53 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
+```
+
+## Injecting Additional Manifests (`extraManifests`)
+
+You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
+
+`extraManifests` is either:
+- a map of manifest names to their YAML definitions
+- a list of YAML definitions, where each itemin the list can be either:
+  - a string containing valid YAML (multi-line block, e.g. with `|`), or
+  - a YAML object (inline YAML structure).
+
+These manifests will be rendered as part of the Helm release.
+
+**Example usage in `values.yaml`:**
+
+```yaml
+extraManifests:
+  - |
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: my-middleware
+    spec:
+      ...
+  - apiVersion: traefik.containo.us/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: my-ingressroute
+    spec:
+      ...
+# Or as a map:
+extraManifests:
+  my-middleware:
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: my-middleware
+    spec:
+      ...
+  my-ingressroute:
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: my-ingressroute
+    spec:
+      ...
 ```
 
 # Backups
