@@ -24,7 +24,7 @@ spec:
   {{- end }}
   rules:
     {{- with .Values.route.additionalRules }}
-    {{- tpl (toYaml .Values.route.additionalRules) $ | nindent 4 }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
     {{- end }}
     - backendRefs:
         - name: {{ template "nextcloud.fullname" . }}
