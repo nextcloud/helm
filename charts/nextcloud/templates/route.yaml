@@ -1,8 +1,10 @@
 {{- if .Values.httpRoute.enabled }}
+{{- $fullName := include "nextcloud.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
 apiVersion: {{ .Values.httpRoute.apiVersion }}
 kind: {{ .Values.httpRoute.kind }}
 metadata:
-  name: {{ template "nextcloud.fullname" . }}
+  name: {{ $fullName }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
@@ -33,8 +35,8 @@ spec:
       {{- toYaml . | nindent 8 }}
     {{- end }}
     - backendRefs:
-        - name: {{ template "nextcloud.fullname" . }}
-          port: {{ .Values.service.port }}
+        - name: {{ $fullName }}
+          port: {{ $svcPort }}
           weight: 1
     {{- end }}
 {{- end }}
