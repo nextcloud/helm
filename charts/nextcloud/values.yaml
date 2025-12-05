@@ -29,8 +29,8 @@ deploymentLabels: {}
 # Number of replicas to be deployed
 replicaCount: 1
 
-route:
-  # -- enable an HTTPRoute resource for nextcloud .
+httpRoute:
+  # -- Enable an HTTPRoute resource for nextcloud .
   enabled: false
   # -- Set the route apiVersion
   apiVersion: gateway.networking.k8s.io/v1
@@ -41,25 +41,31 @@ route:
   annotations: {}
   # -- Route labels
   labels: {}
-
   # -- Route hostnames
   hostnames: []
   # -- Reference to parent gateways
   parentRefs: []
-  # -- Route matches
-  matches:
-    - path:
-        type: PathPrefix
-        value: "/"
-  # -- Route filters
-  filters: []
-
-  # -- Additional custom rules that can be added to the route
-  additionalRules: []
-    #     - type: RequestRedirect
-    #       requestRedirect:
-    #         scheme: https
-    #         statusCode: 301
+  # -- List of rules and filters applied.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "/"
+  #   filters:
+  #   - type: RequestHeaderModifier
+  #     requestHeaderModifier:
+  #       set:
+  #       - name: My-Overwrite-Header
+  #         value: this-is-the-only-value
+  #       remove:
+  #       - User-Agent
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /echo
+  #     headers:
+  #     - name: version
+  #       value: v2
 
 ## Allowing use of ingress controllers
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/

@@ -1,40 +1,40 @@
-{{- if .Values.route.enabled }}
-apiVersion: {{ .Values.route.apiVersion }}
-kind: {{ .Values.route.kind }}
+{{- if .Values.httpRoute.enabled }}
+apiVersion: {{ .Values.httpRoute.apiVersion }}
+kind: {{ .Values.httpRoute.kind }}
 metadata:
   name: {{ template "nextcloud.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
-    {{- with .Values.route.labels }}
+    {{- with .Values.httpRoute.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.route.annotations }}
+  {{- with .Values.httpRoute.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.route.parentRefs }}
+  {{- with .Values.httpRoute.parentRefs }}
   parentRefs:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with .Values.route.hostnames }}
+  {{- with .Values.httpRoute.hostnames }}
   hostnames:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
-    {{- with .Values.route.additionalRules }}
-    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- range .Values.httpRoute.rules }}
+    {{- with .matches }}
+    - matches:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .filters }}
+      filters:
+      {{- toYaml . | nindent 8 }}
     {{- end }}
     - backendRefs:
         - name: {{ template "nextcloud.fullname" . }}
           port: {{ .Values.service.port }}
-      {{- with .Values.route.filters }}
-      filters:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.route.matches }}
-      matches:
-        {{- tpl (toYaml .) $ | nindent 8 }}
-      {{- end }}
+          weight: 1
+    {{- end }}
 {{- end }}
