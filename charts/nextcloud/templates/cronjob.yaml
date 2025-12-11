@@ -30,7 +30,6 @@ spec:
       backoffLimit: {{ .backoffLimit }}
       {{- with .activeDeadlineSeconds }}
       activeDeadlineSeconds: {{ . }}
-      activeDeadlineSeconds: {{ .activeDeadlineSeconds }}
       {{- end }}
       template:
         metadata:
