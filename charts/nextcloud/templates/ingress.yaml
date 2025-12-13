@@ -35,6 +35,15 @@ spec:
               serviceName: {{ template "nextcloud.fullname" . }}
               servicePort: {{ .Values.service.port }}
               {{- end }}
+          {{- if .Values.notifyPush.enabled }}
+          - path: {{ .Values.notifyPush.ingress.path }}
+            pathType: {{ .Values.notifyPush.ingress.pathType }}
+            backend:
+              service:
+                name: {{ template "nextcloud.fullname" . }}-notify-push
+                port:
+                  name: http
+          {{- end }}
   {{- with .Values.ingress.tls }}
   tls:
     {{- toYaml . | nindent 4 }}
