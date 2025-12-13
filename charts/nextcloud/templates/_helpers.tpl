@@ -42,7 +42,10 @@ Create chart name and version as used by the chart label.
 Create image name that is used in the deployment
 */}}
 {{- define "nextcloud.image" -}}
+{{- if .Values.image.tag -}}
 {{- printf "%s/%s:%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository (include "nextcloud.version" .) -}}
+{{- else -}}
+{{- printf "%s/%s:%s-%s" (coalesce .Values.global.image.registry .Values.image.registry) .Values.image.repository (include "nextcloud.version" .) .Values.image.flavor -}}
 {{- end -}}
 
 {{/*
