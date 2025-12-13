@@ -92,7 +92,8 @@ jobs:
 
           # test the helm chart with imaginary
           - name: Imaginary Enabled
-            helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/imaginary.yaml"
+            helm_args: |
+                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/imaginary.yaml"
             test: true
 
           # test the helm chart with extra manifests
@@ -103,6 +104,12 @@ jobs:
             helm_args: --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/extra-manifests-map.yaml"
             test: true
   
+          # test the helm chart with notify push enabled
+          - name: Notify Push Enabled
+            helm_args: |
+                --namespace nextcloud --skip-clean-up --helm-extra-set-args "--create-namespace --values charts/nextcloud/test-values/notify_push.yaml"
+            testNotifyPush: true
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -167,6 +174,20 @@ jobs:
             kubectl logs --ignore-errors --prefix --tail=-1 --all-containers=true -l batch.kubernetes.io/job-name=test-nextcloud
             echo "Here's the logs from the nextcloud pod:"
             kubectl logs --ignore-errors --prefix -l app.kubernetes.io/name=nextcloud
+            exit $EXIT
+
+      - name: Run test for Notify Push
+        if: matrix.test_cases.testNotifyPush
+        # applies a kubernetes job that uploads a file and then checks log of finished pod
+        run: |
+            EXIT=0
+            kubectl config set-context --current --namespace=nextcloud
+            POD=$(kubectl get pods -o name --selector "app.kubernetes.io/component=app")
+            (kubectl wait --for=condition=Ready --timeout=2m "${POD}" && sleep 60) || EXIT=1
+            kubectl exec --stdin "${POD}"  -c nextcloud -- sh -c '
+              chsh -s /bin/sh www-data
+              su -l www-data -c "/var/www/html/occ notify_push:self-test"
+            ' || EXIT=1
             exit $EXIT
 
   summary:
