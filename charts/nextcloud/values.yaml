@@ -740,6 +740,12 @@ persistence:
   accessMode: ReadWriteOnce
   size: 8Gi
 
+  # Set this to false if you want to provide your own data directory via
+  # extraVolumes and extraVolumeMounts. Make sure to mount the folder at at the
+  # nextcloud.datadir path.
+  # Ignored if nextcloudData.enabled: true
+  dataVolumeMount: true
+
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:

@@ -406,6 +406,7 @@ Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 | `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil`           |
 | `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce` |
 | `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`           |
+| `persistence.dataVolumeMount`             | Toggle automatic mount of data volume                | `true`          |
 | `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`         |
 | `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`            |
 | `persistence.nextcloudData.labels`       | see `persistence.labels`                             | `{}`            |
