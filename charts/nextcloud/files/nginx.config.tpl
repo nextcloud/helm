@@ -4,6 +4,11 @@ upstream php-handler {
     server 127.0.0.1:9000;
 }
 
+map $http_x_forwarded_proto $real_scheme {
+	default http;
+	https https;
+}
+
 # Set the `immutable` cache control options only for assets with a cache busting `v` argument
 map $arg_v $asset_immutable {
     "" "";
@@ -87,7 +92,7 @@ server {
     # Rule borrowed from `.htaccess` to handle Microsoft DAV clients
     location = / {
         if ( $http_user_agent ~ ^DavClnt ) {
-            return 302 /remote.php/webdav/$is_args$args;
+            return 302 $real_scheme://$host/remote.php/webdav/$is_args$args;
         }
     }
 
@@ -104,12 +109,12 @@ server {
     location ^~ /.well-known {
         # The following 6 rules are borrowed from `.htaccess`
 
-        location = /.well-known/carddav     { return 301 /remote.php/dav/; }
-        location = /.well-known/caldav      { return 301 /remote.php/dav/; }
+        location = /.well-known/carddav     { return 301 $real_scheme://$host/remote.php/dav/; }
+        location = /.well-known/caldav      { return 301 $real_scheme://$host/remote.php/dav/; }
 
         # Let Nextcloud's API for `/.well-known` URIs handle all other
         # requests by passing them to the front-end controller.
-        return 301 /index.php$request_uri;
+        return 301 $real_scheme://$host/index.php$request_uri;
     }
 
     # Rules borrowed from `.htaccess` to hide certain paths from clients
@@ -122,7 +127,7 @@ server {
     # to the URI, resulting in a HTTP 500 error response.
     location ~ \.php(?:$|/) {
     # Required for legacy support
-        rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|ocs-provider\/.+|.+\/richdocumentscode(_arm64)?\/proxy) /index.php$request_uri;
+        rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|ocs-provider\/.+|.+\/richdocumentscode(_arm64)?\/proxy) $real_scheme://$host/index.php$request_uri;
 
         fastcgi_split_path_info ^(.+?\.php)(/.*)$;
         set $path_info $fastcgi_path_info;
@@ -158,10 +163,10 @@ server {
 
     # Rule borrowed from `.htaccess`
     location /remote {
-        return 301 /remote.php$request_uri;
+        return 301 $real_scheme://$host/remote.php$request_uri;
     }
 
     location / {
-        try_files $uri $uri/ /index.php$request_uri;
+        try_files $uri $uri/ $real_scheme://$host/index.php$request_uri;
     }
 }
