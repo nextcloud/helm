@@ -127,7 +127,7 @@ server {
     # to the URI, resulting in a HTTP 500 error response.
     location ~ \.php(?:$|/) {
     # Required for legacy support
-        rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|ocs-provider\/.+|.+\/richdocumentscode(_arm64)?\/proxy) $real_scheme://$host/index.php$request_uri;
+        rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|ocs-provider\/.+|.+\/richdocumentscode(_arm64)?\/proxy) /index.php$request_uri;
 
         fastcgi_split_path_info ^(.+?\.php)(/.*)$;
         set $path_info $fastcgi_path_info;
@@ -167,6 +167,6 @@ server {
     }
 
     location / {
-        try_files $uri $uri/ $real_scheme://$host/index.php$request_uri;
+        try_files $uri $uri/ /index.php$request_uri;
     }
 }
