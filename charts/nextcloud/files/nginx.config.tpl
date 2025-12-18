@@ -5,8 +5,13 @@ upstream php-handler {
 }
 
 map $http_x_forwarded_proto $real_scheme {
-	default http;
+	default $scheme;
 	https https;
+}
+
+map $http_x_forwarded_port $real_port {
+	default $server_port;
+	443     443;
 }
 
 # Set the `immutable` cache control options only for assets with a cache busting `v` argument
@@ -92,7 +97,7 @@ server {
     # Rule borrowed from `.htaccess` to handle Microsoft DAV clients
     location = / {
         if ( $http_user_agent ~ ^DavClnt ) {
-            return 302 $real_scheme://$host/remote.php/webdav/$is_args$args;
+            return 302 $real_scheme://$host:$real_port/remote.php/webdav/$is_args$args;
         }
     }
 
@@ -109,12 +114,12 @@ server {
     location ^~ /.well-known {
         # The following 6 rules are borrowed from `.htaccess`
 
-        location = /.well-known/carddav     { return 301 $real_scheme://$host/remote.php/dav/; }
-        location = /.well-known/caldav      { return 301 $real_scheme://$host/remote.php/dav/; }
+        location = /.well-known/carddav     { return 301 $real_scheme://$host:$real_port/remote.php/dav/; }
+        location = /.well-known/caldav      { return 301 $real_scheme://$host:$real_port/remote.php/dav/; }
 
         # Let Nextcloud's API for `/.well-known` URIs handle all other
         # requests by passing them to the front-end controller.
-        return 301 $real_scheme://$host/index.php$request_uri;
+        return 301 $real_scheme://$host:$real_port/index.php$request_uri;
     }
 
     # Rules borrowed from `.htaccess` to hide certain paths from clients
@@ -163,7 +168,7 @@ server {
 
     # Rule borrowed from `.htaccess`
     location /remote {
-        return 301 $real_scheme://$host/remote.php$request_uri;
+        return 301 $real_scheme://$host:$real_port/remote.php$request_uri;
     }
 
     location / {
