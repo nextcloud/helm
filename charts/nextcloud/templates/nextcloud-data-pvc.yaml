@@ -1,4 +1,35 @@
 {{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled (not .Values.persistence.nextcloudData.existingClaim) }}
+{{- if .Values.persistence.nextcloudData.hostPath }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-nextcloud-data
+spec:
+  capacity:
+    storage: {{ .Values.persistence.nextcloudData.size | quote }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  {{- with .Values.persistence.nextcloudData.storageClass }}
+  storageClassName: {{ ternary "" . (eq "-" .) }}
+  {{- end }}
+  claimRef:
+    name: {{ template "nextcloud.fullname" . }}-nextcloud-data
+  hostPath:
+    path: {{ .Values.persistence.nextcloudData.hostPath }}
+    type: Directory
+  {{- with .Values.persistence.nextcloudData.hostName }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - {{ . }}
+  {{- end }}
+{{- end }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -21,10 +52,9 @@ spec:
     requests:
       storage: {{ .Values.persistence.nextcloudData.size | quote }}
   {{- with .Values.persistence.nextcloudData.storageClass }}
-  {{- if (eq "-" .) }}
-  storageClassName: ""
-  {{- else }}
-  storageClassName: "{{ . }}"
+  storageClassName: {{ ternary "" . (eq "-" .) }}
   {{- end }}
+  {{- if .Values.persistence.nextcloudData.hostPath }}
+  volumeName: {{ template "nextcloud.fullname" . }}-nextcloud-data
   {{- end }}
 {{- end }}

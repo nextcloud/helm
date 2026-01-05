@@ -397,22 +397,24 @@ The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud 
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
 Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
-| Parameter                                 | Description                                          | Default         |
-| ----------------------------------------- | ---------------------------------------------------- | --------------- |
-| `persistence.enabled`                     | Enable persistence using PVC                         | `false`         |
-| `persistence.annotations`                 | PVC annotations                                      | `{}`            |
-| `persistence.labels`                    | PVC labels                                      | `{}`            |
-| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil`           |
-| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil`           |
-| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce` |
-| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`           |
-| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`         |
-| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`            |
-| `persistence.nextcloudData.labels`       | see `persistence.labels`                             | `{}`            |
-| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil`           |
-| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil`           |
-| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce` |
-| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`           |
+| Parameter                                 | Description                                             | Default         |
+|-------------------------------------------|---------------------------------------------------------|-----------------|
+| `persistence.enabled`                     | Enable persistence using PVC                            | `false`         |
+| `persistence.annotations`                 | PVC annotations                                         | `{}`            |
+| `persistence.labels`                      | PVC labels                                              | `{}`            |
+| `persistence.storageClass`                | PVC Storage Class for nextcloud volume                  | `nil`           |
+| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume               | `nil`           |
+| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                    | `ReadWriteOnce` |
+| `persistence.size`                        | PVC Storage Request for nextcloud volume                | `8Gi`           |
+| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud    | `false`         |
+| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                           | `{}`            |
+| `persistence.nextcloudData.labels`        | see `persistence.labels`                                | `{}`            |
+| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                          | `nil`           |
+| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                         | `nil`           |
+| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                            | `ReadWriteOnce` |
+| `persistence.nextcloudData.size`          | see `persistence.size`                                  | `8Gi`           |
+| `persistence.nextcloudData.hostName`      | Name of host node to create a pv for local storageClass | `nil`           |
+| `persistence.nextcloudData.hostPath`      | Path on the host where nextcloud data is stored         | `nil`           |
 
 ### Metrics Configurations
 
