@@ -753,7 +753,6 @@ persistence:
     size: 8Gi
 
     ## If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
-    hostName:
     hostPath:
 
 resources: {}

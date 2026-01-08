@@ -413,7 +413,6 @@ Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 | `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                         | `nil`           |
 | `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                            | `ReadWriteOnce` |
 | `persistence.nextcloudData.size`          | see `persistence.size`                                  | `8Gi`           |
-| `persistence.nextcloudData.hostName`      | Name of host node to create a pv for local storageClass | `nil`           |
 | `persistence.nextcloudData.hostPath`      | Path on the host where nextcloud data is stored         | `nil`           |
 
 ### Metrics Configurations
