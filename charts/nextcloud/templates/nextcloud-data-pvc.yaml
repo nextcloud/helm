@@ -1,4 +1,4 @@
-{{- if not .Values.persistence.nextcloudData.hostPath }}
+{{- if not .Values.persistence.hostPath }}
 {{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled (not .Values.persistence.nextcloudData.existingClaim) }}
 ---
 kind: PersistentVolumeClaim
