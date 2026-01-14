@@ -350,7 +350,7 @@ spec:
       {{- end }}
       volumes:
         - name: nextcloud-main
-          {{- if and .Values.persistence.enabled }}
+          {{- if .Values.persistence.enabled }}
           {{- if .Values.persistence.hostPath }}
           hostPath:
             path: {{ .Values.persistence.hostPath }}

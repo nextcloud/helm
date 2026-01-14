@@ -1,5 +1,10 @@
 {{- if not .Values.persistence.hostPath }}
-{{- if and .Values.persistence.enabled .Values.persistence.nextcloudData.enabled (not .Values.persistence.nextcloudData.existingClaim) }}
+{{- if and
+  .Values.persistence.enabled
+  .Values.persistence.nextcloudData.enabled
+  (not .Values.persistence.hostPath)
+  (not .Values.persistence.nextcloudData.existingClaim)
+}}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -24,5 +29,4 @@ spec:
   {{- with .Values.persistence.nextcloudData.storageClass }}
   storageClassName: {{ ternary "" . (eq "-" .) }}
   {{- end }}
-{{- end }}
 {{- end }}
