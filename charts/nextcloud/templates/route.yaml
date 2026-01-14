@@ -27,9 +27,9 @@ spec:
   rules:
     {{- range .Values.httpRoute.rules }}
     - backendRefs:
-          - name: {{ $fullName }}
-            port: {{ $svcPort }}
-            weight: 1
+        - name: {{ $fullName }}
+          port: {{ $svcPort }}
+          weight: 1
       {{- with .matches }}
       matches:
         {{- toYaml . | nindent 8 }}
