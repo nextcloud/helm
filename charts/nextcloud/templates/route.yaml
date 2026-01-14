@@ -34,7 +34,7 @@ spec:
       filters:
       {{- toYaml . | nindent 8 }}
     {{- end }}
-    - backendRefs:
+      backendRefs:
         - name: {{ $fullName }}
           port: {{ $svcPort }}
           weight: 1
