@@ -351,15 +351,27 @@ spec:
       volumes:
         - name: nextcloud-main
           {{- if .Values.persistence.enabled }}
+          {{- with .Values.persistence.hostPath }}
+          hostPath:
+            path: {{ . }}
+            type: Directory
+          {{- else }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.existingClaim }}{{ .Values.persistence.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+            claimName: {{ with .Values.persistence.existingClaim }}{{ . }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud{{- end }}
+          {{- end }}
           {{- else }}
           emptyDir: {}
           {{- end }}
         {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
         - name: nextcloud-data
+          {{- with .Values.persistence.nextcloudData.hostPath }}
+          hostPath:
+            path: {{ . }}
+            type: Directory
+          {{- else }}
           persistentVolumeClaim:
-            claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+            claimName: {{ with .Values.persistence.nextcloudData.existingClaim }}{{ . }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
+          {{- end }}
         {{- end }}
         {{- if .Values.nextcloud.configs }}
         - name: nextcloud-config

@@ -778,10 +778,15 @@ persistence:
   accessMode: ReadWriteOnce
   size: 8Gi
 
+  # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+  hostPath:
+
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
     enabled: false
+    # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+    hostPath:
     subPath:
     labels: {}
     annotations: {}
