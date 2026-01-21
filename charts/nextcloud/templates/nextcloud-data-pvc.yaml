@@ -1,8 +1,7 @@
-{{- if not .Values.persistence.hostPath }}
 {{- if and
   .Values.persistence.enabled
   .Values.persistence.nextcloudData.enabled
-  (not .Values.persistence.hostPath)
+  (not .Values.persistence.nextcloudData.hostPath)
   (not .Values.persistence.nextcloudData.existingClaim)
 }}
 ---
