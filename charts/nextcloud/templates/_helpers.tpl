@@ -81,12 +81,12 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
   value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
@@ -100,12 +100,12 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
 {{- else }}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
@@ -130,12 +130,12 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
 - name: POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
   {{- else }}
 - name: MYSQL_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
@@ -159,24 +159,24 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.usernameKey }}
+      key: {{ .Values.externalDatabase.existingSecret.usernameKey | default "db-username" }}
 - name: MYSQL_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
-      key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+      key: {{ .Values.externalDatabase.existingSecret.passwordKey | default "db-password" }}
   {{- end }}
 {{- end }}
 - name: NEXTCLOUD_ADMIN_USER
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.usernameKey }}
+      key: {{ .Values.nextcloud.existingSecret.usernameKey | default "nextcloud-username" }}
 - name: NEXTCLOUD_ADMIN_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.passwordKey }}
+      key: {{ .Values.nextcloud.existingSecret.passwordKey | default "nextcloud-password" }}
 - name: NEXTCLOUD_TRUSTED_DOMAINS
   {{- if .Values.nextcloud.trustedDomains }}
   value: {{ join " " .Values.nextcloud.trustedDomains | quote }}
@@ -209,12 +209,12 @@ Create environment variables used to configure the nextcloud container as well a
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey }}
+      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey | default "smtp-username" }}
 - name: SMTP_PASSWORD
   valueFrom:
     secretKeyRef:
       name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
+      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey | default "smtp-password" }}
 {{- end }}
 {{/*
 Redis env vars
