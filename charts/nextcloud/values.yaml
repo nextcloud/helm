@@ -459,11 +459,14 @@ externalDatabase:
   ## Use a existing secret
   existingSecret:
     enabled: false
-    # secretName: nameofsecret
+    # -- e.g. nameofsecret
+    secretName:
     usernameKey: db-username
     passwordKey: db-password
-    # hostKey: db-hostname-or-ip
-    # databaseKey: db-name
+    # -- e.g. db-hostname-or-ip
+    hostKey:
+    # -- e.g. db-name
+    databaseKey:
 
 ##
 ## MariaDB chart configuration
@@ -857,12 +860,89 @@ topologySpreadConstraints: []
 
 affinity: {}
 
-dnsConfig: {}
-# Custom dns config for Nextcloud containers.
-# You can for example configure ndots. This may be needed in some clusters with alpine images.
-# options:
-#   - name: ndots
-#     value: "1"
+dnsConfig:
+  # -- Custom dns config for Nextcloud containers.
+  # You can for example configure ndots. This may be needed in some clusters with alpine images.
+  # options:
+  #   - name: ndots
+  #     value: "1"
+  options: []
+
+
+# Notify Push (Clientpush)
+notifyPush:
+  # -- Enable another deployment to handle notify_push (sometimes called ClientPush)
+  # @section -- Notify Push (Clientpush)
+  enabled: false
+  # -- Setup notify_push on nextcloud per docker-entrypoint-hooks before start
+  # @section -- Notify Push (Clientpush)
+  autoSetup: false
+
+  # -- Number of notify-push pod replicas to deploy
+  # @section -- Notify Push (Clientpush)
+  replicaCount: 1
+
+  image:
+    # -- notify-push image registry
+    # @section -- Notify Push (Clientpush)
+    registry: docker.io
+    # -- notify-push image name (there is no official image yet: https://github.com/nextcloud/notify_push/issues/106)
+    # @section -- Notify Push (Clientpush)
+    repository: miles170/notify_push
+    # -- notify-push image tag
+    # @section -- Notify Push (Clientpush)
+    tag: v1.0.0
+    # -- notify-push image pull policy
+    # @section -- Notify Push (Clientpush)
+    pullPolicy: IfNotPresent
+    # -- notify-push image pull secrets
+    # e.g.
+    #   - myRegistrKeySecretName
+    # @section -- Notify Push (Clientpush)
+    pullSecrets: []
+
+  # -- option additional env (if a external redis is used, you need to set REDIS_URL)
+  # @section -- Notify Push (Clientpush)
+  extraEnv: []
+
+  # -- Additional annotations for notify-push pods
+  # @section -- Notify Push (Clientpush)
+  podAnnotations: {}
+  # -- Additional labels for notify-push pods
+  # @section -- Notify Push (Clientpush)
+  podLabels: {}
+  # -- Optional security context for the notify-push pod
+  # @section -- Notify Push (Clientpush)
+  podSecurityContext: {}
+
+  # -- Optional security context for the notify-push container
+  # @section -- Notify Push (Clientpush)
+  securityContext: {}
+  # -- notify-push resources
+  # @section -- Notify Push (Clientpush)
+  resources: {}
+
+  service:
+    # -- notify-push: Kubernetes Service type
+    # @section -- Notify Push (Clientpush)
+    type: ClusterIP
+    # -- Use serviceLoadBalancerIP to request a specific static IP, otherwise leave blank
+    # @section -- Notify Push (Clientpush)
+    loadBalancerIP:
+    # -- Additional annotations for service notify-push
+    # @section -- Notify Push (Clientpush)
+    annotations: {}
+    # -- Additional labels for service notify-push
+    # @section -- Notify Push (Clientpush)
+    labels: {}
+
+  ingress:
+    # -- Add path in default ingress to notify_push service
+    # @section -- Notify Push (Clientpush)
+    path: /push
+    # -- PathType for additional path in default ingress for notify-push path
+    # @section -- Notify Push (Clientpush)
+    pathType: Prefix
 
 imaginary:
   # -- Start Imgaginary
@@ -1017,8 +1097,9 @@ metrics:
   # seccompProfile:
   #   type: RuntimeDefault
 
+prometheus:
   ## Prometheus Operator ServiceMonitor configuration
-  ##
+  ## collects data from nextcloud metrics and notify_push if enabled
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
