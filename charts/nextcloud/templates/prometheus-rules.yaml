@@ -1,4 +1,4 @@
-{{- if .Values.metrics.rules.enabled }}
+{{- if .Values.prometheus.rules.enabled }}
 {{- $fullname := include "nextcloud.fullname" . }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
@@ -6,12 +6,12 @@ metadata:
   name: {{ $fullname }}
   labels:
     {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
-    {{- with .Values.metrics.rules.labels }}
+    {{- with .Values.prometheus.rules.labels }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
   groups:
-    {{- with .Values.metrics.rules.defaults }}
+    {{- with .Values.prometheus.rules.defaults }}
     {{- if .enabled }}
     {{- $filter := .filter | default (printf `namespace="%s",job=~"^%s.*"` $.Release.Namespace $fullname) }}
     - name: {{ $fullname }}-Defaults
@@ -52,7 +52,7 @@ spec:
             `}}
     {{- end }}
     {{- end }}{{/* end-with prometheus.rules.default */}}
-    {{- with .Values.metrics.rules.additionalRules }}
+    {{- with .Values.prometheus.rules.additionalRules }}
     - name: {{ $fullname }}-Additional
       rules:
         {{- toYaml . | nindent 8 }}
