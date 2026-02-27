@@ -225,6 +225,11 @@ nextcloud:
       container: ""
       # autocreate container
       autoCreate: false
+  openmetrics:
+    allowedClients:
+      - "127.0.0.1"
+      - "10.42.0.0/16"
+      - "10.43.0.0/16"
 
   ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
@@ -256,6 +261,8 @@ nextcloud:
     swift.config.php: true
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
+    # -- adjust openmetrics
+    helm-metrics.php: true
     # -- imaginary support config
     imaginary.config.php: false
 
@@ -1017,8 +1024,9 @@ metrics:
   # seccompProfile:
   #   type: RuntimeDefault
 
+prometheus:
   ## Prometheus Operator ServiceMonitor configuration
-  ##
+  ## collects data from nextcloud openmetrics and nextcloud-exporter if enabled
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##

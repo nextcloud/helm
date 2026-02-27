@@ -1,0 +1,37 @@
+{{- with .Values.prometheus.serviceMonitor }}
+{{- if .enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "nextcloud.fullname" $ }}
+  namespace: {{ .namespace | default $.Release.Namespace | quote }}
+  labels:
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+    {{- with .labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  jobLabel: {{ .jobLabel | quote }}
+  selector:
+    matchLabels:
+      {{- include "nextcloud.selectorLabels"  ( dict "rootContext" $ ) | nindent 6 }}
+      app.kubernetes.io/monitor: enabled
+  namespaceSelector:
+    {{- with .namespaceSelector }}
+    {{- toYaml . | nindent 4 }}
+    {{- else }}
+    matchNames:
+      - {{ $.Release.Namespace | quote }}
+    {{- end }}
+  endpoints:
+    - port: http
+      path: "/metrics"
+      {{- with .interval }}
+      interval: {{ . }}
+      {{- end }}
+      {{- with .scrapeTimeout }}
+      scrapeTimeout: {{ . }}
+      {{- end }}
+{{- end }}
+{{- end }}

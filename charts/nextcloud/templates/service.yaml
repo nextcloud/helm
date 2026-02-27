@@ -9,6 +9,7 @@ metadata:
   {{- end }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
+    app.kubernetes.io/monitor: enabled
 spec:
   type: {{ .Values.service.type }}
   {{- if (eq .Values.service.type "LoadBalancer") }}
@@ -31,14 +32,12 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
+    - name: http
+      port: {{ .Values.service.port }}
       targetPort: {{ .Values.nextcloud.containerPort }}
       protocol: TCP
-      name: http
       {{- with .Values.service.nodePort }}
       nodePort: {{ . }}
       {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "nextcloud.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/component: app
+    {{- include "nextcloud.selectorLabels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
