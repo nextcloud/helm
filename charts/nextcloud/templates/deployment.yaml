@@ -271,6 +271,11 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+            {{- if .Values.redis.enabled }}
+            - name: php-confd
+              mountPath: "/usr/local/etc/php/conf.d/redis-session.ini" # fix permission denied error
+              subPath: redis-session.ini
+            {{- end }}
             {{- include "nextcloud.volumeMounts" $ | trim | nindent 12 }}
         {{- end }}
         {{- end }}{{/* end-if cronjob.enabled */}}
@@ -284,7 +289,7 @@ spec:
       {{- with $.Values.nextcloud.priorityClassName | default $.Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled }}
+      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled .Values.redis.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
         {{- toYaml . | nindent 8 }}
@@ -335,6 +340,25 @@ spec:
             - "-c"
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
         {{- end }}{{/* end-if any database-initContainer */}}
+        {{- if .Values.redis.enabled }}
+        # create empty redis file for nextcloud entrypoint to override it
+        - name: init-redis-session-ini
+          # Using the same image as nextcloud to get the same UID to write the configuration.
+          image: {{ include "nextcloud.image" . }}
+          command: ['touch', '/usr/local/etc/php/conf.d/redis-session.ini']
+          {{- with .Values.nextcloud.redisInitContainer }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          {{- end }}
+          # Reuse the SCC from nextcloud, no need to provide a dedicated SCC for Redis init container.
+          {{- with .Values.nextcloud.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: php-confd
+              mountPath: "/usr/local/etc/php/conf.d"
+        {{- end }}{{/* end-if redis init */}}
       {{- end }}{{/* end-if any initContainer */}}
       {{- with .Values.affinity }}
       affinity:
@@ -393,6 +417,10 @@ spec:
           configMap:
             name: {{ template "nextcloud.fullname" . }}-hooks
             defaultMode: 0o755
+        {{- end }}
+        {{- if .Values.redis.enabled }}
+        - name: php-confd
+          emptyDir: {}
         {{- end }}
         {{- with .Values.nextcloud.extraVolumes }}
         {{- toYaml . | nindent 8 }}
