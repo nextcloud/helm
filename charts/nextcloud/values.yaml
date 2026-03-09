@@ -262,7 +262,7 @@ nextcloud:
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
     # -- adjust openmetrics
-    helm-metrics.php: true
+    helm-metrics.config.php: true
     # -- imaginary support config
     imaginary.config.php: false
 
