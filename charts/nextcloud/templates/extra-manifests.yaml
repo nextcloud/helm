@@ -1,0 +1,14 @@
+{{- /*
+  Renders extra manifests provided by the user in values.yaml under extraManifests.
+  extraManifests can be a map (keyed by manifest name) or a list of manifests.
+  If a map, each key is the name of the manifest.
+  If an array, each item is a manifest, which can be a string (YAML block) or a YAML object.
+*/ -}}
+{{- range $manifest := .Values.extraManifests }}
+---
+{{- if kindIs "string" $manifest }}
+{{ tpl $manifest $ }}
+{{- else }}
+{{ tpl (toYaml $manifest) $ }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,24 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: nextcloud
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
+
+extraManifests:
+  - |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: custom-config
+      labels:
+        {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
+    data:
+      customKey: customValue
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: '{{ template "nextcloud.fullname" . }}-custom-secret'
+    data:
+      secretKey: c2VjcmV0VmFsdWU=

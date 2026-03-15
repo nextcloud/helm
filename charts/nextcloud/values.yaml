@@ -29,6 +29,44 @@ deploymentLabels: {}
 # Number of replicas to be deployed
 replicaCount: 1
 
+httpRoute:
+  # -- Enable an HTTPRoute resource for nextcloud .
+  enabled: false
+  # -- Set the route apiVersion
+  apiVersion: gateway.networking.k8s.io/v1
+  # -- Set the route kind
+  kind: HTTPRoute
+
+  # -- Route annotations
+  annotations: {}
+  # -- Route labels
+  labels: {}
+  # -- Route hostnames
+  hostnames: []
+  # -- Reference to parent gateways
+  parentRefs: []
+  # -- List of rules and filters applied.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "/"
+  #   filters:
+  #   - type: RequestHeaderModifier
+  #     requestHeaderModifier:
+  #       set:
+  #       - name: My-Overwrite-Header
+  #         value: this-is-the-only-value
+  #       remove:
+  #       - User-Agent
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /echo
+  #     headers:
+  #     - name: version
+  #       value: v2
+
 ## Allowing use of ingress controllers
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ##
@@ -187,6 +225,11 @@ nextcloud:
       container: ""
       # autocreate container
       autoCreate: false
+  openmetrics:
+    allowedClients:
+      - "127.0.0.1"
+      - "10.42.0.0/16"
+      - "10.43.0.0/16"
 
   ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
@@ -218,6 +261,8 @@ nextcloud:
     swift.config.php: true
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
+    # -- adjust openmetrics
+    helm-metrics.config.php: true
     # -- imaginary support config
     imaginary.config.php: false
 
@@ -650,6 +695,7 @@ cronjob:
     schedule: "*/5 * * * *"
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 5
+    activeDeadlineSeconds:
     # -- Additional labels for cronjob
     labels: {}
     # -- Additional labels for cronjob pod
@@ -739,10 +785,15 @@ persistence:
   accessMode: ReadWriteOnce
   size: 8Gi
 
+  # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+  hostPath:
+
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
     enabled: false
+    # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+    hostPath:
     subPath:
     labels: {}
     annotations: {}
@@ -973,8 +1024,9 @@ metrics:
   # seccompProfile:
   #   type: RuntimeDefault
 
+prometheus:
   ## Prometheus Operator ServiceMonitor configuration
-  ##
+  ## collects data from nextcloud openmetrics and nextcloud-exporter if enabled
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
@@ -1035,3 +1087,41 @@ rbac:
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
+
+# -- Allows users to inject additional Kubernetes manifests (YAML) to be rendered with the release.
+# Could either be a list or a map
+# If a map, each key is the name of the manifest.
+# If an array, each item is a manifest, which can be a string (YAML block) or a YAML object.
+# Each item should be a string containing valid YAML. Example:
+# extraManifests:
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: Middleware
+#     metadata:
+#       name: my-middleware
+#     spec:
+#       ...
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: IngressRoute
+#     metadata:
+#       name: my-ingressroute
+#     spec:
+#       ...
+# Or as a map:
+# extraManifests:
+#   my-middleware:
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: Middleware
+#     metadata:
+#       name: my-middleware
+#     spec:
+#       ...
+#   my-ingressroute:
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: IngressRoute
+#     metadata:
+#       name: my-ingressroute
+#     spec:
+#       ...
+extraManifests: []
