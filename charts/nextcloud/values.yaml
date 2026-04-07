@@ -141,6 +141,10 @@ nextcloud:
   datadir: /var/www/html/data
   persistence:
     subPath:
+    # Set to true when using an image with code baked in (no VOLUME /var/www/html).
+    # Skips the /var/www/ and /var/www/html mounts so the image code is not masked
+    # by the PVC. Only granular mounts (config, custom_apps, themes, tmp) are kept.
+    useImageCode: false
   # if set, we'll template this list to the NEXTCLOUD_TRUSTED_DOMAINS env var
   trustedDomains: []
   ## SMTP configuration

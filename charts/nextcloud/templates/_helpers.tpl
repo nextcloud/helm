@@ -368,12 +368,14 @@ Swift as primary object store env vars
 Create volume mounts for the nextcloud container as well as the cron sidecar container.
 */}}
 {{- define "nextcloud.volumeMounts" -}}
+{{- if not .Values.nextcloud.persistence.useImageCode }}
 - name: nextcloud-main
   mountPath: /var/www/
   subPath: {{ ternary "root" (printf "%s/root" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
 - name: nextcloud-main
   mountPath: /var/www/html
   subPath: {{ ternary "html" (printf "%s/html" .Values.nextcloud.persistence.subPath) (empty .Values.nextcloud.persistence.subPath) }}
+{{- end }}
 {{- if and .Values.persistence.nextcloudData.enabled .Values.persistence.enabled }}
 - name: nextcloud-data
   mountPath: {{ .Values.nextcloud.datadir }}
