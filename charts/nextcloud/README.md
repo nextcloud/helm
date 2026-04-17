@@ -809,6 +809,15 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
 ```
 
+### Changing Parameters After Deployment
+Some parameters in `values.yaml`, such as `nextcloud.trustedDomains`, are only templated into the container environment during the initial installation.  
+Changes after deployment must be made by redeploying the Helm chart or manually inside the pod using the `occ` command. Example of a manual change:
+
+```bash
+# Add a new trusted domain after deployment
+kubectl exec -it <your-nextcloud-pod> -- /bin/sh -c "php occ config:system:set trusted_domains 2 --value=nextcloud.mydomain2.com"
+```
+
 ## Injecting Additional Manifests (`extraManifests`)
 
 You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
@@ -854,15 +863,6 @@ extraManifests:
       name: my-ingressroute
     spec:
       ...
-```
-
-### Changing Parameters After Deployment
-Some parameters in `values.yaml`, such as `nextcloud.trustedDomains`, are only templated into the container environment during the initial installation.  
-Changes after deployment must be made by redeploying the Helm chart or manually inside the pod using the `occ` command. Example of a manual change:
-
-```bash
-# Add a new trusted domain after deployment
-kubectl exec -it <your-nextcloud-pod> -- /bin/sh -c "php occ config:system:set trusted_domains 2 --value=nextcloud.mydomain2.com"
 ```
 
 # Backups
