@@ -150,13 +150,13 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              containerPort: {{ .Values.nextcloud.containerPort }}
+              containerPort: {{ .Values.nginx.containerPort }}
           {{- with .Values.livenessProbe }}
           {{- if .enabled }}
           livenessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port:  {{ $.Values.nginx.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}
@@ -172,7 +172,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port:  {{ $.Values.nginx.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}
@@ -188,7 +188,7 @@ spec:
           startupProbe:
             httpGet:
               path: /status.php
-              port:  {{ $.Values.nextcloud.containerPort }}
+              port:  {{ $.Values.nginx.containerPort }}
               httpHeaders:
                 - name: Host
                   value: {{ $.Values.nextcloud.host | quote }}

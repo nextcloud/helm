@@ -34,7 +34,11 @@ spec:
   ports:
     - name: http
       port: {{ .Values.service.port }}
+      {{- if .Values.nginx.enabled }}
+      targetPort: {{ .Values.nginx.containerPort }}
+      {{- else }}
       targetPort: {{ .Values.nextcloud.containerPort }}
+      {{- end }}
       protocol: TCP
       {{- with .Values.service.nodePort }}
       nodePort: {{ . }}
