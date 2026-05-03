@@ -59,6 +59,8 @@ httpRoute:
   #         value: this-is-the-only-value
   #       remove:
   #       - User-Agent
+  #   timeouts:
+  #     request: 300s
   # - matches:
   #   - path:
   #       type: PathPrefix
