@@ -976,7 +976,7 @@ metrics:
   image:
     registry: docker.io
     repository: xperimental/nextcloud-exporter
-    tag: 0.8.0
+    tag: 0.9.1
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName
