@@ -1,0 +1,14 @@
+suite: test my defaults
+templates:
+  - deployment.yaml
+  - secrets.yaml
+  - service.yaml
+chart:
+  version: 1.0.0
+  appVersion: 1.2.3
+tests:
+  - it: defaults
+    set:
+      metrics.token: "abcd"
+    asserts:
+      - matchSnapshot: { }
