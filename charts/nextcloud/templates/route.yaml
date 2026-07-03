@@ -27,7 +27,9 @@ spec:
   rules:
     {{- range .Values.httpRoute.rules }}
     - backendRefs:
-        - name: {{ $fullName }}
+        - group: ""
+          kind: Service
+          name: {{ $fullName }}
           port: {{ $svcPort }}
           weight: 1
       {{- with .matches }}
