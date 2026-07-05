@@ -1,0 +1,8 @@
+name: Sync Gitea mirror
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  mirror-sync:
+    uses: thecrimsontint/.github/.github/workflows/gitea-mirror-sync.yml@main
+    secrets: inherit
