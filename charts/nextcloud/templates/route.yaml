@@ -25,13 +25,37 @@ spec:
     {{- tpl (toYaml .) $ | nindent 4 }}
   {{- end }}
   rules:
+    {{- if .Values.httpRoute.wellKnown.enabled }}
+    {{- range $path := list "/.well-known/carddav" "/.well-known/caldav" }}
+    - matches:
+        - path:
+            type: Exact
+            value: {{ $path }}
+      filters:
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /remote.php/dav
+            statusCode: 301
+    {{- end }}
+    {{- end }}
     {{- range .Values.httpRoute.rules }}
-    - backendRefs:
+    {{- $isRedirect := false }}
+    {{- range .filters }}
+    {{- if eq (.type | default "") "RequestRedirect" }}
+    {{- $isRedirect = true }}
+    {{- end }}
+    {{- end }}
+    -
+      {{- if not $isRedirect }}
+      backendRefs:
         - group: ""
           kind: Service
           name: {{ $fullName }}
           port: {{ $svcPort }}
           weight: 1
+      {{- end }}
       {{- with .matches }}
       matches:
         {{- toYaml . | nindent 8 }}

@@ -45,6 +45,12 @@ httpRoute:
   hostnames: []
   # -- Reference to parent gateways
   parentRefs: []
+  # -- Add the standard Nextcloud service discovery redirects
+  # (`/.well-known/carddav` and `/.well-known/caldav` -> `/remote.php/dav`) as
+  # Gateway API `RequestRedirect` rules. Unlike the ingress-nginx server snippet
+  # this needs no implementation-specific config. Set to false to opt out.
+  wellKnown:
+    enabled: true
   # -- List of rules and filters applied.
   rules:
     - matches:
