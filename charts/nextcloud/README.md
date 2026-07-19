@@ -420,33 +420,39 @@ Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
 We include an optional experimental Nextcloud Metrics exporter from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-exporter).
 
-| Parameter                              | Description                                                                         | Default                                                      |
-| -------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `metrics.enabled`                      | Start Prometheus metrics exporter                                                   | `false`                                                      |
-| `metrics.replicaCount`                 | Number of nextcloud-metrics pod replicas to deploy                                  | `1`                                                          |
-| `metrics.server`                       | Nextcloud Server URL to get metrics from. If not provided, defaults to service name | `""`                                                         |
-| `metrics.https`                        | Defines if https is used to connect to nextcloud                                    | `false` (uses http)                                          |
-| `metrics.token`                        | Uses token for auth instead of username/password                                    | `""`                                                         |
-| `metrics.timeout`                      | When the scrape times out                                                           | `5s`                                                         |
-| `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
-| `metrics.info.apps`                    | Enable gathering of apps-related metrics.                                           | `false`                                                      |
-| `metrics.image.repository`             | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
-| `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                                | `0.6.2`                                                      |
-| `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
-| `metrics.image.pullSecrets`            | Nextcloud metrics exporter image pull secrets                                       | `nil`                                                        |
-| `metrics.podAnnotations`               | Additional annotations for metrics exporter                                         | not set                                                      |
-| `metrics.podLabels`                    | Additional labels for metrics exporter                                              | not set                                                      |
-| `metrics.service.type`                 | Metrics: Kubernetes Service type                                                    | `ClusterIP`                                                  |
-| `metrics.service.loadBalancerIP`       | Metrics: LoadBalancerIp for service type LoadBalancer                               | `nil`                                                        |
-| `metrics.service.nodePort`             | Metrics: NodePort for service type NodePort                                         | `nil`                                                        |
-| `metrics.service.annotations`          | Additional annotations for service metrics exporter                                 | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
-| `metrics.service.labels`               | Additional labels for service metrics exporter                                      | `{}`                                                         |
-| `metrics.serviceMonitor.enabled`       | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator        | `false`                                                      |
-| `metrics.serviceMonitor.namespace`     | Namespace in which Prometheus is running                                            | ``                                                           |
-| `metrics.serviceMonitor.jobLabel`      | Name of the label on the target service to use as the job name in prometheus        | ``                                                           |
-| `metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped                                         | `30s`                                                        |
-| `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                                 | ``                                                           |
-| `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                                 | `{}                                                          |
+| Parameter                                 | Description                                                                         | Default                                                      |
+| ----------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `metrics.enabled`                         | Start Prometheus metrics exporter                                                   | `false`                                                      |
+| `metrics.replicaCount`                    | Number of nextcloud-metrics pod replicas to deploy                                  | `1`                                                          |
+| `metrics.server`                          | Nextcloud Server URL to get metrics from. If not provided, defaults to service name | `""`                                                         |
+| `metrics.https`                           | Defines if https is used to connect to nextcloud                                    | `false` (uses http)                                          |
+| `metrics.token`                           | Uses token for auth instead of username/password                                    | `""`                                                         |
+| `metrics.timeout`                         | When the scrape times out                                                           | `5s`                                                         |
+| `metrics.tlsSkipVerify`                   | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
+| `metrics.info.apps`                       | Enable gathering of apps-related metrics.                                           | `false`                                                      |
+| `metrics.image.repository`                | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
+| `metrics.image.tag`                       | Nextcloud metrics exporter image tag                                                | `0.6.2`                                                      |
+| `metrics.image.pullPolicy`                | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
+| `metrics.image.pullSecrets`               | Nextcloud metrics exporter image pull secrets                                       | `nil`                                                        |
+| `metrics.podAnnotations`                  | Additional annotations for metrics exporter                                         | not set                                                      |
+| `metrics.podLabels`                       | Additional labels for metrics exporter                                              | not set                                                      |
+| `metrics.service.type`                    | Metrics: Kubernetes Service type                                                    | `ClusterIP`                                                  |
+| `metrics.service.loadBalancerIP`          | Metrics: LoadBalancerIp for service type LoadBalancer                               | `nil`                                                        |
+| `metrics.service.nodePort`                | Metrics: NodePort for service type NodePort                                         | `nil`                                                        |
+| `metrics.service.annotations`             | Additional annotations for service metrics exporter                                 | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
+| `metrics.service.labels`                  | Additional labels for service metrics exporter                                      | `{}`                                                         |
+| `prometheus.serviceMonitor.enabled`       | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator        | `false`                                                      |
+| `prometheus.serviceMonitor.namespace`     | Namespace in which Prometheus is running                                            | ``                                                           |
+| `prometheus.serviceMonitor.jobLabel`      | Name of the label on the target service to use as the job name in prometheus        | ``                                                           |
+| `prometheus.serviceMonitor.interval`      | Interval at which metrics should be scraped                                         | `30s`                                                        |
+| `prometheus.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                                 | ``                                                           |
+| `prometheus.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                                 | `{}`                                                         |
+| `prometheus.rules.enabled`                | Deploy Prometheus Rules (Alerts) for the exporter                                   | `false`                                                      |
+| `prometheus.rules.labels`                 | Label on Prometheus Rules CRD Manifest                                              | `{}`                                                         |
+| `prometheus.rules.defaults.enabled`       | Add Default Rules                                                                   | `true`                                                       |
+| `prometheus.rules.defaults.labels`        | Label on the rules (the severity is already set)                                    | `{}`                                                         |
+| `prometheus.rules.defaults.filter`        | Filter on metrics on alerts (default just for this helm-chart)                      | `""`                                                         |
+| `prometheus.rules.additionalRules`        | Add own Rules to Prometheus Rules                                                   | `[]`                                                         |
 
 
 
