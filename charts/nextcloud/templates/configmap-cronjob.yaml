@@ -1,0 +1,18 @@
+{{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "sidecar") }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-cronjob
+  labels:
+    {{- include "nextcloud.labels"  ( dict "rootContext" $ ) | nindent 4 }}
+data:
+  {{ with .Values.cronjob.sidecar }}
+  cronstable.yaml: |
+    jobs:
+      - name: cronjob
+        command: {{ .command | join " " | quote }}
+        schedule: {{ .schedule | quote }}
+        captureStdout: true
+  {{- end }}
+{{- end }}
