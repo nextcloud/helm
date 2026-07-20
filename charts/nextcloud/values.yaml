@@ -680,6 +680,16 @@ cronjob:
     ##
     resources: {}
 
+    image:
+      # -- cronstable image registry # can be docker.io and ghcr.io. docker.io has a rate-limit.
+      registry: ghcr.io
+      # -- cronstable image name
+      repository: ptweezy/cronstable
+      # -- cronstable image tag
+      tag: 1.2.24-alpine
+      # -- cronstable image pull policy
+      pullPolicy: IfNotPresent
+
     # Allow configuration of lifecycle hooks
     # ref: https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/
     lifecycle: {}
@@ -693,9 +703,15 @@ cronjob:
     #   runAsNonRoot: true
     #   readOnlyRootFilesystem: true
 
-    # The command the cronjob container executes.
+    schedule: "*/5 * * * *"
+    # The command to run in the cronjob container
+    # Example to increase memory limit: php -d memory_limit=2G ...
     command:
-      - /cron.sh
+      - php
+      - -f
+      - /var/www/html/cron.php
+      - --
+      - --verbose
 
   # Uses a Kubernetes CronJob to execute the Nextcloud cron tasks
   # Note: can run as non-root user. Should run as same user as the Nextcloud pod.
@@ -751,7 +767,7 @@ cronjob:
     #   readOnlyRootFilesystem: true
 
     # The command to run in the cronjob container
-    # Example to incerase memory limit: php -d memory_limit=2G ...
+    # Example to increase memory limit: php -d memory_limit=2G ...
     command:
       - php
       - -f

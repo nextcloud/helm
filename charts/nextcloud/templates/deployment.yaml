@@ -243,8 +243,8 @@ spec:
         {{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "sidecar") }}
         {{- with .Values.cronjob.sidecar }}
         - name: {{ $.Chart.Name }}-cron
-          image: {{ include "nextcloud.image" $ }}
-          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          image: "{{ coalesce $.Values.global.image.registry .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
           command:
             {{- toYaml .command | nindent 12 }}
           {{- with .lifecycle }}
@@ -272,6 +272,10 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "nextcloud.volumeMounts" $ | trim | nindent 12 }}
+            - name: nextcloud-cronjob
+              mountPath: /etc/cronstable.d/cronstable.yaml
+              subPath: cronstable.yaml
+              readOnly: true
         {{- end }}
         {{- end }}{{/* end-if cronjob.enabled */}}
         {{- with .Values.nextcloud.extraSidecarContainers }}
@@ -378,6 +382,11 @@ spec:
           configMap:
             name: {{ template "nextcloud.fullname" . }}-hooks
             defaultMode: 0o755
+        {{- end }}
+        {{- if and .Values.cronjob.enabled (eq .Values.cronjob.type "sidecar") }}
+        - name: nextcloud-cronjob
+          configMap:
+            name: {{ template "nextcloud.fullname" . }}-cronjob
         {{- end }}
         {{- with .Values.nextcloud.extraVolumes }}
         {{- toYaml . | nindent 8 }}
