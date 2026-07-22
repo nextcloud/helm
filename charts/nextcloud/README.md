@@ -707,6 +707,9 @@ ingress:
         deny all;
       }
 ```
+
+When exposing Nextcloud through the Gateway API (`httpRoute.enabled: true`), the CalDAV and CardDAV redirects are added automatically as `RequestRedirect` rules (`httpRoute.wellKnown.enabled`, on by default), so no implementation-specific configuration is required. Set `httpRoute.wellKnown.enabled: false` to opt out.
+
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
