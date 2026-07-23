@@ -271,7 +271,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- if .Values.redis.enabled }}
+            {{- if $.Values.redis.enabled }}
             - name: php-confd
               mountPath: "/usr/local/etc/php/conf.d/redis-session.ini" # fix permission denied error
               subPath: redis-session.ini
