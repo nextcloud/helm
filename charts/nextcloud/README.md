@@ -140,7 +140,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.tokenKey`                         | Name of the key that contains the nextcloud metrics token                                           | `''`                                                         |
 | `nextcloud.update`                                          | Trigger update if custom command is used                                                            | `0`                                                          |
 | `nextcloud.containerPort`                                   | Customize container port when not running as root                                                   | `80`                                                         |
-| `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains                                                    | `[]`                                                         |
+| `nextcloud.trustedDomains`                                  | Optional space-separated list of trusted domains (see [Running occ commands](#running-occ-commands) for post-deployment changes)                                                    | `[]`                                                         |
 | `nextcloud.datadir`                                         | nextcloud data dir location                                                                         | `/var/www/html/data`                                         |
 | `nextcloud.mail.enabled`                                    | Whether to enable/disable email settings                                                            | `false`                                                      |
 | `nextcloud.mail.fromAddress`                                | nextcloud mail send from field                                                                      | `nil`                                                        |
@@ -810,6 +810,15 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
+```
+
+### Changing Parameters After Deployment
+Some parameters in `values.yaml`, such as `nextcloud.trustedDomains`, are only templated into the container environment during the initial installation.  
+Changes after deployment must be made by redeploying the Helm chart or manually inside the pod using the `occ` command. Example of a manual change:
+
+```bash
+# Add a new trusted domain after deployment
+kubectl exec -it <your-nextcloud-pod> -- /bin/sh -c "php occ config:system:set trusted_domains 2 --value=nextcloud.mydomain2.com"
 ```
 
 ## Injecting Additional Manifests (`extraManifests`)
