@@ -709,6 +709,8 @@ cronjob:
     # crond does not work when not running as root user
     # Note: requires `persistence.enabled=true`
     schedule: "*/5 * * * *"
+    # Suspend the cron job without removing it
+    suspend: false
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 5
     activeDeadlineSeconds:
