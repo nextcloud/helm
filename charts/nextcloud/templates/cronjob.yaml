@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 spec:
   schedule: {{ .schedule | quote }}
-  suspend: {{ .suspend | default false }}
+  suspend: {{ .suspend }}
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .failedJobsHistoryLimit }}
