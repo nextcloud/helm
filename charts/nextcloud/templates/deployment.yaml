@@ -85,6 +85,11 @@ spec:
               readOnly: true
             {{- end }}
             {{- end }}
+            {{- if $.Values.redis.enabled }}
+            - name: php-confd
+              mountPath: "/usr/local/etc/php/conf.d/redis-session.ini" # fix permission denied error
+              subPath: redis-session.ini
+            {{- end }}
           {{- if not .Values.nginx.enabled }}
           ports:
             - name: http
@@ -271,11 +276,6 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            {{- if $.Values.redis.enabled }}
-            - name: php-confd
-              mountPath: "/usr/local/etc/php/conf.d/redis-session.ini" # fix permission denied error
-              subPath: redis-session.ini
-            {{- end }}
             {{- include "nextcloud.volumeMounts" $ | trim | nindent 12 }}
         {{- end }}
         {{- end }}{{/* end-if cronjob.enabled */}}
