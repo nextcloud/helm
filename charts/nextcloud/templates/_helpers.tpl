@@ -393,6 +393,19 @@ Swift as primary object store env vars
 
 
 {{/*
+Whether the config ConfigMap is rendered and mounted: true when nextcloud.configs
+holds any file or any nextcloud.defaultConfigs entry is enabled.
+Returns the string "true" or "false"; compare with (eq ... "true").
+*/}}
+{{- define "nextcloud.configs.enabled" -}}
+{{- $enabled := not (empty .Values.nextcloud.configs) -}}
+{{- range $_, $on := .Values.nextcloud.defaultConfigs -}}
+{{- if $on }}{{ $enabled = true }}{{ end -}}
+{{- end -}}
+{{- $enabled -}}
+{{- end -}}
+
+{{/*
 Create volume mounts for the nextcloud container as well as the cron sidecar container.
 */}}
 {{- define "nextcloud.volumeMounts" -}}
@@ -428,13 +441,11 @@ Create volume mounts for the nextcloud container as well as the cron sidecar con
   mountPath: /var/www/html/config/{{ $key }}
   subPath: {{ $key }}
 {{- end }}
-{{- if .Values.nextcloud.configs }}
 {{- range $key, $value := .Values.nextcloud.defaultConfigs }}
 {{- if $value }}
 - name: nextcloud-config
   mountPath: /var/www/html/config/{{ $key }}
   subPath: {{ $key }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{- if .Values.nextcloud.extraVolumeMounts }}
