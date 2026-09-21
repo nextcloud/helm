@@ -1,4 +1,4 @@
-{{- if .Values.nextcloud.configs -}}
+{{- if eq (include "nextcloud.configs.enabled" .) "true" -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,4 +16,4 @@ data:
     {{- tpl ($.Files.Get (printf "files/defaultConfigs/%s.tpl" $filename)) $ | nindent 4 }}
   {{- end }}
   {{- end }}
-{{- end }}{{/* end-if configs */}}
+{{- end }}{{/* end-if configs.enabled */}}

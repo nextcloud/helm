@@ -96,7 +96,7 @@ spec:
               persistentVolumeClaim:
                 claimName: {{ if .Values.persistence.nextcloudData.existingClaim }}{{ .Values.persistence.nextcloudData.existingClaim }}{{- else }}{{ template "nextcloud.fullname" . }}-nextcloud-data{{- end }}
             {{- end }}
-            {{- if .Values.nextcloud.configs }}
+            {{- if eq (include "nextcloud.configs.enabled" .) "true" }}
             - name: nextcloud-config
               configMap:
                 name: {{ template "nextcloud.fullname" . }}-config

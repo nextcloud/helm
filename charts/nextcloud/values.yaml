@@ -244,8 +244,9 @@ nextcloud:
   phpConfigs: {}
   ## Default config files that utilize environment variables:
   # see: https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables
-  # IMPORTANT: Will be used only if you put extra configs, otherwise default will come from nextcloud itself
-  # Default confgurations can be found here: https://github.com/nextcloud/docker/tree/master/.config
+  # Every enabled file is mounted into /var/www/html/config. Most mirror the files shipped in the
+  # nextcloud image; helm-metrics.config.php and imaginary.config.php exist only in this chart.
+  # Default configurations of the image can be found here: https://github.com/nextcloud/docker/tree/master/.config
   defaultConfigs:
     # To protect /var/www/html/config
     .htaccess: true
