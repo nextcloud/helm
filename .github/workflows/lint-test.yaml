@@ -145,7 +145,7 @@ jobs:
              --create-namespace \
              --wait \
              --wait-for-jobs \
-             --timeout 2m0s \
+             --timeout 5m0s \
              --values .github/tests/minio_test_values.yaml \
              minio/minio
 
