@@ -134,20 +134,24 @@ jobs:
         uses: helm/kind-action@v1.15.0
         if: steps.list-changed.outputs.changed == 'true'
 
-      - name: Install MinIO for testing S3 as Primary Storage
+      - name: Checkout Silo chart
         if: matrix.test_cases.name == 'S3 Enabled as Primary Storage'
-        # installs minio community helm chart here:
-        # https://github.com/minio/minio/tree/master/helm/minio
+        uses: actions/checkout@v7
+        with:
+          repository: pgsty/silo
+          path: silo
+
+      - name: Install Silo for testing S3 as Primary Storage
+        if: matrix.test_cases.name == 'S3 Enabled as Primary Storage'
         run: |
-          helm repo add minio https://charts.min.io/ && \
           helm install minio \
              --namespace nextcloud \
              --create-namespace \
              --wait \
              --wait-for-jobs \
-             --timeout 2m0s \
-             --values .github/tests/minio_test_values.yaml \
-             minio/minio
+             --timeout 5m0s \
+             --values .github/tests/silo_test_values.yaml \
+             ./silo/helm/silo
 
       - name: Run chart-testing (install ${{ matrix.test_cases.name }})
         id: install
