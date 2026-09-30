@@ -4,6 +4,7 @@ apiVersion: {{ include "nextcloud.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ template "nextcloud.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
     {{- with .Values.ingress.labels }}
