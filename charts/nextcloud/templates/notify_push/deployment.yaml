@@ -1,0 +1,65 @@
+{{- if .Values.notifyPush.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nextcloud.fullname" . }}-notify-push
+  labels:
+    {{- include "nextcloud.labels"  ( dict "component" "notify-push"  "rootContext" $ ) | nindent 4 }}
+spec:
+  replicas: {{ .Values.notifyPush.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nextcloud.selectorLabels"  ( dict "component" "notify-push"  "rootContext" $ ) | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.notifyPush.podAnnotations | nindent 8 }}
+      labels:
+        {{- include "nextcloud.selectorLabels"  ( dict "component" "notify-push"  "rootContext" $ ) | nindent 8 }}
+        {{- if .Values.redis.enabled }}
+        {{ template "nextcloud.redis.fullname" . }}-client: "true"
+        {{- end }}
+        {{- with .Values.notifyPush.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.notifyPush.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end}}
+      {{- end }}
+      containers:
+        - name: notify-push
+          {{- with .Values.notifyPush.image }}
+          image: "{{ .registry }}/{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          env:
+            - name: PORT
+              value: "7867"
+            - name: METRICS_PORT
+              value: "9867"
+            {{- include "nextcloud.env.database" . | nindent 12 }}
+            {{- if .Values.redis.enabled }}
+            {{- include "nextcloud.env.redis" . | nindent 12 }}
+            {{- end }}
+            - name: NEXTCLOUD_URL # deployment.namespace.svc.cluster.local
+              value: "http{{ if .Values.notifyPush.https }}s{{ end }}://{{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+            {{- with .Values.notifyPush.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 7867
+            - name: metrics
+              containerPort: 9867
+          {{- with .Values.notifyPush.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
+{{- end }}
