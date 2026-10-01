@@ -85,7 +85,7 @@ spec:
               readOnly: true
             {{- end }}
             {{- end }}
-            {{- if $.Values.redis.enabled }}
+            {{- if or $.Values.redis.enabled $.Values.externalRedis.enabled }}
             - name: php-confd
               mountPath: "/usr/local/etc/php/conf.d/redis-session.ini" # fix permission denied error
               subPath: redis-session.ini
@@ -289,7 +289,7 @@ spec:
       {{- with $.Values.nextcloud.priorityClassName | default $.Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled .Values.redis.enabled }}
+      {{- if or .Values.nextcloud.extraInitContainers .Values.mariadb.enabled .Values.postgresql.enabled .Values.redis.enabled .Values.externalRedis.enabled }}
       initContainers:
         {{- with .Values.nextcloud.extraInitContainers }}
         {{- toYaml . | nindent 8 }}
@@ -325,7 +325,7 @@ spec:
             - "-c"
             - "until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER} ; do sleep 2 ; done"
         {{- end }}{{/* end-if any database-initContainer */}}
-        {{- if .Values.redis.enabled }}
+        {{- if or $.Values.redis.enabled $.Values.externalRedis.enabled }}
         # create empty redis file for nextcloud entrypoint to override it
         - name: init-redis-session-ini
           # Using the same image as nextcloud to get the same UID to write the configuration.
@@ -403,7 +403,7 @@ spec:
             name: {{ template "nextcloud.fullname" . }}-hooks
             defaultMode: 0o755
         {{- end }}
-        {{- if .Values.redis.enabled }}
+        {{- if or $.Values.redis.enabled $.Values.externalRedis.enabled }}
         - name: php-confd
           emptyDir: {}
         {{- end }}
