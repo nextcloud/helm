@@ -131,7 +131,7 @@ jobs:
           fi
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.15.0
+        uses: helm/kind-action@v1.15.1
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Checkout Silo chart
