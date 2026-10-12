@@ -4,6 +4,11 @@ This Helm-Chart increase there major version on every breaking change (or major 
 
 Here we list all major versions and their breaking changes for migration.
 
+## v9
+- upgrade to v33 major version
+- move `metrics.serviceMonitor` to `prometheus.serviceMonitor`: It us used for metrics like openmetric and nextcloud-exporter
+- move `metrics.rules` to `prometheus.rules`: It us used for all collected metrics
+
 ## v8
 - `cronjob.command` was renamed to `cronjob.sidecar.command` to avoid confusion with the cronjob command. Please update your `values.yaml` accordingly.
 

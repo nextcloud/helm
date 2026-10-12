@@ -64,11 +64,7 @@ Create image name that is used in the deployment
 {{/*
 Create environment variables used to configure the nextcloud container as well as the cron sidecar container.
 */}}
-{{- define "nextcloud.env" -}}
-{{- if .Values.phpClientHttpsFix.enabled }}
-- name: OVERWRITEPROTOCOL
-  value: {{ .Values.phpClientHttpsFix.protocol | quote }}
-{{- end }}
+{{- define "nextcloud.env.database" -}}
 {{- if .Values.internalDatabase.enabled }}
 - name: SQLITE_DATABASE
   value: {{ .Values.internalDatabase.name | quote }}
@@ -87,6 +83,8 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
+- name: DATABASE_URL
+  value: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST)/$(MYSQL_DATABASE)"
 {{- else if .Values.postgresql.enabled }}
 - name: POSTGRES_HOST
   value: {{ template "postgresql.v1.primary.fullname" .Subcharts.postgresql }}
@@ -106,7 +104,9 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-{{- else }}
+- name: DATABASE_URL
+  value: "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DB)"
+{{- else }}{{/* mariadb.enable or postgresql.enabled -> now external */}}
   {{- if eq .Values.externalDatabase.type "postgresql" }}
 - name: POSTGRES_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
@@ -136,7 +136,9 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-  {{- else }}
+- name: DATABASE_URL
+  value: "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DB)"
+  {{- else }}{{/* external.type = postgresql  */}}
 - name: MYSQL_HOST
   {{- if .Values.externalDatabase.existingSecret.hostKey }}
   valueFrom:
@@ -165,60 +167,16 @@ Create environment variables used to configure the nextcloud container as well a
     secretKeyRef:
       name: {{ .Values.externalDatabase.existingSecret.secretName | default (printf "%s-db" .Release.Name) }}
       key: {{ .Values.externalDatabase.existingSecret.passwordKey }}
-  {{- end }}
+- name: DATABASE_URL
+  value: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_HOST)/$(MYSQL_DATABASE)"
+  {{- end }}{{/* external.type = postgresql */}}
+{{- end }}{{/* not mariadb.enable or postgresql.enabled -> just external*/}}
 {{- end }}
-- name: NEXTCLOUD_ADMIN_USER
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.usernameKey }}
-- name: NEXTCLOUD_ADMIN_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.passwordKey }}
-- name: NEXTCLOUD_TRUSTED_DOMAINS
-  {{- if .Values.nextcloud.trustedDomains }}
-  value: {{ join " " .Values.nextcloud.trustedDomains | quote }}
-  {{- else }}
-  value: {{ .Values.nextcloud.host }}{{ if .Values.metrics.enabled }} {{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ end }}
-  {{- end }}
-{{- if ne (int .Values.nextcloud.update) 0 }}
-- name: NEXTCLOUD_UPDATE
-  value: {{ .Values.nextcloud.update | quote }}
-{{- end }}
-- name: NEXTCLOUD_DATA_DIR
-  value: {{ .Values.nextcloud.datadir | quote }}
-{{- if .Values.nextcloud.mail.enabled }}
-- name: MAIL_FROM_ADDRESS
-  value: {{ .Values.nextcloud.mail.fromAddress | quote }}
-- name: MAIL_DOMAIN
-  value: {{ .Values.nextcloud.mail.domain | quote }}
-- name: SMTP_SECURE
-  value: {{ .Values.nextcloud.mail.smtp.secure | quote }}
-- name: SMTP_PORT
-  value: {{ .Values.nextcloud.mail.smtp.port | quote }}
-- name: SMTP_AUTHTYPE
-  value: {{ .Values.nextcloud.mail.smtp.authtype | quote }}
-- name: SMTP_HOST
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpHostKey }}
-- name: SMTP_NAME
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey }}
-- name: SMTP_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
-      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
-{{- end }}
+
 {{/*
 Redis env vars
 */}}
+{{- define "nextcloud.env.redis" -}}
 {{- if .Values.redis.enabled }}
 - name: REDIS_HOST
   value: {{ template "nextcloud.redis.fullname" . }}-master
@@ -253,7 +211,81 @@ Redis env vars
 - name: REDIS_HOST_PASSWORD
   value: {{ .Values.externalRedis.password | quote }}
 {{- end }}
-{{- end }}{{/* end if redis.enabled */}}
+{{- end }}{{/* end-of redis-enabled*/}}
+{{- if or
+  (and .Values.redis.auth.enabled .Values.redis.auth.password)
+  (and .Values.redis.auth.enabled .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey)
+  (and .Values.externalRedis.enabled .Values.externalRedis.existingSecret.secretName .Values.externalRedis.existingSecret.passwordKey)
+  (and .Values.externalRedis.enabled .Values.externalRedis.password)
+}}
+- name: REDIS_URL
+  value: "redis://:$(REDIS_HOST_PASSWORD)@$(REDIS_HOST):$(REDIS_HOST_PORT)"
+{{- else }}
+- name: REDIS_URL
+  value: "redis://$(REDIS_HOST):$(REDIS_HOST_PORT)"
+{{- end }}{{/* end-of redis-url*/}}
+{{- end }}{{/* end-of env.redis definition */}}
+
+{{- define "nextcloud.env" -}}
+{{- if .Values.phpClientHttpsFix.enabled }}
+- name: OVERWRITEPROTOCOL
+  value: {{ .Values.phpClientHttpsFix.protocol | quote }}
+{{- end }}
+{{- template "nextcloud.env.database" . }}
+{{- template "nextcloud.env.redis" . }}
+- name: NEXTCLOUD_ADMIN_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.usernameKey }}
+- name: NEXTCLOUD_ADMIN_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.passwordKey }}
+- name: NEXTCLOUD_TRUSTED_DOMAINS
+  {{- if .Values.nextcloud.trustedDomains }}
+  value: {{ join " " .Values.nextcloud.trustedDomains | quote }}
+  {{- else }}
+  value: {{ .Values.nextcloud.host }}{{ if .Values.metrics.enabled }} {{ template "nextcloud.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ end }}
+  {{- end }}
+{{- with .Values.nextcloud.openmetrics.allowedClients }}
+- name: OPENMETRICS_ALLOWED_CLIENTS
+  value: {{ join "," . | quote }}
+{{- end }}
+{{- if ne (int .Values.nextcloud.update) 0 }}
+- name: NEXTCLOUD_UPDATE
+  value: {{ .Values.nextcloud.update | quote }}
+{{- end }}
+- name: NEXTCLOUD_DATA_DIR
+  value: {{ .Values.nextcloud.datadir | quote }}
+{{- if .Values.nextcloud.mail.enabled }}
+- name: MAIL_FROM_ADDRESS
+  value: {{ .Values.nextcloud.mail.fromAddress | quote }}
+- name: MAIL_DOMAIN
+  value: {{ .Values.nextcloud.mail.domain | quote }}
+- name: SMTP_SECURE
+  value: {{ .Values.nextcloud.mail.smtp.secure | quote }}
+- name: SMTP_PORT
+  value: {{ .Values.nextcloud.mail.smtp.port | quote }}
+- name: SMTP_AUTHTYPE
+  value: {{ .Values.nextcloud.mail.smtp.authtype | quote }}
+- name: SMTP_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpHostKey }}
+- name: SMTP_NAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpUsernameKey }}
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.nextcloud.existingSecret.secretName | default (include "nextcloud.fullname" .) }}
+      key: {{ .Values.nextcloud.existingSecret.smtpPasswordKey }}
+{{- end }}
 {{/*
 S3 as primary object store env vars
 */}}

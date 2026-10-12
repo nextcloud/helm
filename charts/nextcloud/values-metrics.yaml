@@ -1,9 +1,0 @@
-metrics:
-  enabled: true
-  rules:
-    enabled: true
-    labels:
-      prometheus: default
-    defaults:
-      labels:
-        test: demo

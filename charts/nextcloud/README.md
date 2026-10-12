@@ -11,47 +11,51 @@ helm install my-release nextcloud/nextcloud
 
 ## Quick Links
 
-* [Introduction](#introduction)
-* [Prerequisites](#prerequisites)
-* [Installing the Chart](#installing-the-chart)
-* [Uninstalling the Chart](#uninstalling-the-chart)
-* [Upgrade / Breaking Changes](#upgrade--breaking-changes)
-* [Configuration](#configuration)
-    * [Ingress](#ingress)
-        * [Ingress Sticky-Sessions](#ingress-sticky-sessions)
-            * [NGINX Ingress-Controller](#nginx-ingress-controller)
-            * [Traefik Ingress-Controller](#traefik-ingress-controller)
-            * [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
-    * [Database Configurations](#database-configurations)
-    * [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
-    * [Persistence Configurations](#persistence-configurations)
-    * [Metrics Configurations](#metrics-configurations)
-    * [Headers set on NGINX](#headers-set-on-nginx)
-    * [Probes Configurations](#probes-configurations)
-    * [Collabora Configuration](#collabora-configuration)
-    * [Imaginary](#imaginary)
-* [Cron jobs](#cron-jobs)
-* [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
-* [Multiple config.php file](#multiple-configphp-file)
-* [Using nginx](#using-nginx)
-    * [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
-* [Preserving Source IP](#preserving-source-ip)
-* [Hugepages](#hugepages)
-* [HPA (Clustering)](#hpa-clustering)
-* [Adjusting PHP ini values](#adjusting-php-ini-values)
-* [Running `occ` commands](#running-occ-commands)
-    * [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
-    * [Downloading models for recognize](#downloading-models-for-recognize)
-* [Backups](#backups)
-* [Upgrades](#upgrades)
-* [Troubleshooting](#troubleshooting)
-    * [Logging](#logging)
-        * [Changing the logging behavior](#changing-the-logging-behavior)
-        * [Viewing the logs](#viewing-the-logs)
-            * [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
-            * [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
-            * [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
-        * [Sharing the logs](#sharing-the-logs)
+- [Nextcloud Helm Chart](#nextcloud-helm-chart)
+  - [TL;DR;](#tldr)
+  - [Quick Links](#quick-links)
+  - [Introduction](#introduction)
+  - [Prerequisites](#prerequisites)
+  - [Installing the Chart](#installing-the-chart)
+  - [Uninstalling the Chart](#uninstalling-the-chart)
+  - [Upgrade / Breaking Changes](#upgrade--breaking-changes)
+  - [Configuration](#configuration)
+    - [Ingress](#ingress)
+      - [Ingress Sticky-Sessions](#ingress-sticky-sessions)
+        - [NGINX Ingress-Controller](#nginx-ingress-controller)
+        - [Traefik Ingress-Controller](#traefik-ingress-controller)
+        - [HAProxy Ingress-Controller (Community-Version)](#haproxy-ingress-controller-community-version)
+    - [Database Configurations](#database-configurations)
+    - [Object Storage as Primary Storage Configuration](#object-storage-as-primary-storage-configuration)
+    - [Persistence Configurations](#persistence-configurations)
+    - [Metrics Configurations](#metrics-configurations)
+    - [Headers set on NGINX](#headers-set-on-nginx)
+    - [Probes Configurations](#probes-configurations)
+    - [Collabora Configuration](#collabora-configuration)
+    - [Imaginary](#imaginary)
+  - [Cron jobs](#cron-jobs)
+  - [Using the nextcloud docker image auto-configuration via env vars](#using-the-nextcloud-docker-image-auto-configuration-via-env-vars)
+  - [Multiple config.php file](#multiple-configphp-file)
+  - [Using nginx](#using-nginx)
+    - [Service discovery with nginx and ingress](#service-discovery-with-nginx-and-ingress)
+  - [Preserving Source IP](#preserving-source-ip)
+  - [Hugepages](#hugepages)
+  - [HPA (Clustering)](#hpa-clustering)
+  - [Adjusting PHP ini values](#adjusting-php-ini-values)
+  - [Running `occ` commands](#running-occ-commands)
+    - [Putting Nextcloud into maintanence mode](#putting-nextcloud-into-maintanence-mode)
+    - [Downloading models for recognize](#downloading-models-for-recognize)
+  - [Injecting Additional Manifests (`extraManifests`)](#injecting-additional-manifests-extramanifests)
+- [Backups](#backups)
+- [Upgrades](#upgrades)
+- [Troubleshooting](#troubleshooting)
+  - [Logging](#logging)
+    - [Changing the logging behavior](#changing-the-logging-behavior)
+    - [Viewing the logs](#viewing-the-logs)
+      - [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
+      - [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
+      - [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
+    - [Sharing the logs](#sharing-the-logs)
 
 ## Introduction
 
@@ -212,12 +216,14 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `cronjob.sidecar.resources`                                 | CPU/Memory resource requests/limits for the cron jobs sidecar                                       | `{}`                                                         |
 | `cronjob.sidecar.securityContext`                           | Optional security context for cron jobs sidecar                                                     | `nil`                                                        |
 | `cronjob.cronjob.schedule`                                  | Cron job schedule                                                                                   | `*/5 * * * *`                                                |
+| `cronjob.cronjob.suspend`                                   | Suspend the cron job without removing it                                                            | `false`                                                      |
 | `cronjob.cronjob.successfulJobsHistoryLimit`                | Number of successful jobs to keep in history                                                        | `3`                                                          |
 | `cronjob.cronjob.failedJobsHistoryLimit`                    | Number of failed jobs to keep in history                                                            | `5`                                                          |
 | `cronjob.cronjob.labels`                                    | An array of service labels                                                                          | `nil`                                                        |
 | `cronjob.cronjob.podLabels`                                 | An array of service labels                                                                          | `nil`                                                        |
 | `cronjob.cronjob.annotations`                               | An array of service annotations                                                                     | `nil`                                                        |
 | `cronjob.cronjob.backoffLimit`                              | The number of retries before marking a job as failed                                                | `1`                                                          |
+| `cronjob.cronjob.activeDeadlineSeconds`                     | The number of seconds before cancelling a job                                                       | `nil`                                                          |
 | `cronjob.cronjob.affinity`                                  | The affinity settings for the cron job                                                              | `{}`                                                         |
 | `cronjob.cronjob.resources`                                 | The resource requests/limits for the cron job                                                       | `{}`                                                         |
 | `cronjob.cronjob.priorityClassName`                         | Priority Class for cronjob. Defaults to .priorityClassName                                          | `nil`                                                        |
@@ -249,6 +255,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `podAnnotations`                                            | Annotations to be added at 'pod' level                                                              | not set                                                      |
 | `dnsConfig`                                                 | Custom dnsConfig for nextcloud containers                                                           | `{}`                                                         |
 | `topologySpreadConstraints`                                 | TopologySpreadConstraints for nextcloud pod and cronjob pod                                         | `{}`                                                         |
+| `extraManifests`                                            | Map or List of additional Kubernetes manifests to render with the release. If a List is provided, each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
 
 ### Ingress
 #### Ingress Sticky-Sessions
@@ -391,54 +398,70 @@ The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud 
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
 Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
 
-| Parameter                                 | Description                                          | Default         |
-| ----------------------------------------- | ---------------------------------------------------- | --------------- |
-| `persistence.enabled`                     | Enable persistence using PVC                         | `false`         |
-| `persistence.annotations`                 | PVC annotations                                      | `{}`            |
-| `persistence.labels`                    | PVC labels                                      | `{}`            |
-| `persistence.storageClass`                | PVC Storage Class for nextcloud volume               | `nil`           |
-| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume            | `nil`           |
-| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                 | `ReadWriteOnce` |
-| `persistence.size`                        | PVC Storage Request for nextcloud volume             | `8Gi`           |
-| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud | `false`         |
-| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                        | `{}`            |
-| `persistence.nextcloudData.labels`       | see `persistence.labels`                             | `{}`            |
-| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                       | `nil`           |
-| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                      | `nil`           |
-| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                         | `ReadWriteOnce` |
-| `persistence.nextcloudData.size`          | see `persistence.size`                               | `8Gi`           |
+| Parameter                                 | Description                                             | Default         |
+|-------------------------------------------|---------------------------------------------------------|-----------------|
+| `persistence.enabled`                     | Enable persistence using PVC                            | `false`         |
+| `persistence.hostPath`                    | Path on the host where nextcloud data is stored         | `nil`           |
+| `persistence.annotations`                 | PVC annotations                                         | `{}`            |
+| `persistence.labels`                      | PVC labels                                              | `{}`            |
+| `persistence.storageClass`                | PVC Storage Class for nextcloud volume                  | `nil`           |
+| `persistence.existingClaim`               | An Existing PVC name for nextcloud volume               | `nil`           |
+| `persistence.accessMode`                  | PVC Access Mode for nextcloud volume                    | `ReadWriteOnce` |
+| `persistence.size`                        | PVC Storage Request for nextcloud volume                | `8Gi`           |
+| `persistence.nextcloudData.enabled`       | Create a second PVC for the data folder in nextcloud    | `false`         |
+| `persistence.nextcloudData.hostPath`      | Path on the host where nextcloud data is stored         | `nil`           |
+| `persistence.nextcloudData.annotations`   | see `persistence.annotations`                           | `{}`            |
+| `persistence.nextcloudData.labels`        | see `persistence.labels`                                | `{}`            |
+| `persistence.nextcloudData.storageClass`  | see `persistence.storageClass`                          | `nil`           |
+| `persistence.nextcloudData.existingClaim` | see `persistence.existingClaim`                         | `nil`           |
+| `persistence.nextcloudData.accessMode`    | see `persistence.accessMode`                            | `ReadWriteOnce` |
+| `persistence.nextcloudData.size`          | see `persistence.size`                                  | `8Gi`           |
 
 ### Metrics Configurations
 
 We include an optional experimental Nextcloud Metrics exporter from [xperimental/nextcloud-exporter](https://github.com/xperimental/nextcloud-exporter).
 
-| Parameter                              | Description                                                                         | Default                                                      |
-| -------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `metrics.enabled`                      | Start Prometheus metrics exporter                                                   | `false`                                                      |
-| `metrics.replicaCount`                 | Number of nextcloud-metrics pod replicas to deploy                                  | `1`                                                          |
-| `metrics.server`                       | Nextcloud Server URL to get metrics from. If not provided, defaults to service name | `""`                                                         |
-| `metrics.https`                        | Defines if https is used to connect to nextcloud                                    | `false` (uses http)                                          |
-| `metrics.token`                        | Uses token for auth instead of username/password                                    | `""`                                                         |
-| `metrics.timeout`                      | When the scrape times out                                                           | `5s`                                                         |
-| `metrics.tlsSkipVerify`                | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
-| `metrics.info.apps`                    | Enable gathering of apps-related metrics.                                           | `false`                                                      |
-| `metrics.image.repository`             | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
-| `metrics.image.tag`                    | Nextcloud metrics exporter image tag                                                | `0.6.2`                                                      |
-| `metrics.image.pullPolicy`             | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
-| `metrics.image.pullSecrets`            | Nextcloud metrics exporter image pull secrets                                       | `nil`                                                        |
-| `metrics.podAnnotations`               | Additional annotations for metrics exporter                                         | not set                                                      |
-| `metrics.podLabels`                    | Additional labels for metrics exporter                                              | not set                                                      |
-| `metrics.service.type`                 | Metrics: Kubernetes Service type                                                    | `ClusterIP`                                                  |
-| `metrics.service.loadBalancerIP`       | Metrics: LoadBalancerIp for service type LoadBalancer                               | `nil`                                                        |
-| `metrics.service.nodePort`             | Metrics: NodePort for service type NodePort                                         | `nil`                                                        |
-| `metrics.service.annotations`          | Additional annotations for service metrics exporter                                 | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
-| `metrics.service.labels`               | Additional labels for service metrics exporter                                      | `{}`                                                         |
-| `metrics.serviceMonitor.enabled`       | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator        | `false`                                                      |
-| `metrics.serviceMonitor.namespace`     | Namespace in which Prometheus is running                                            | ``                                                           |
-| `metrics.serviceMonitor.jobLabel`      | Name of the label on the target service to use as the job name in prometheus        | ``                                                           |
-| `metrics.serviceMonitor.interval`      | Interval at which metrics should be scraped                                         | `30s`                                                        |
-| `metrics.serviceMonitor.scrapeTimeout` | Specify the timeout after which the scrape is ended                                 | ``                                                           |
-| `metrics.serviceMonitor.labels`        | Extra labels for the ServiceMonitor                                                 | `{}                                                          |
+| Parameter                                     | Description                                                                         | Default                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `metrics.enabled`                             | Start Prometheus metrics exporter                                                   | `false`                                                      |
+| `metrics.replicaCount`                        | Number of nextcloud-metrics pod replicas to deploy                                  | `1`                                                          |
+| `metrics.server`                              | Nextcloud Server URL to get metrics from. If not provided, defaults to service name | `""`                                                         |
+| `metrics.https`                               | Defines if https is used to connect to nextcloud                                    | `false` (uses http)                                          |
+| `metrics.token`                               | Uses token for auth instead of username/password                                    | `""`                                                         |
+| `metrics.timeout`                             | When the scrape times out                                                           | `5s`                                                         |
+| `metrics.tlsSkipVerify`                       | Skips certificate verification of Nextcloud server                                  | `false`                                                      |
+| `metrics.info.apps`                           | Enable gathering of apps-related metrics.                                           | `false`                                                      |
+| `metrics.info.update`                         | Becomes NEXTCLOUD_INFO_UPDATE env var in the nextcloud-exporter container.          | `false`                                                      |
+| `metrics.image.registry`                      | Nextcloud metrics exporter registry                                                 | `docker.io`                                                  |
+| `metrics.image.repository`                    | Nextcloud metrics exporter image name                                               | `xperimental/nextcloud-exporter`                             |
+| `metrics.image.tag`                           | Nextcloud metrics exporter image tag                                                | `0.9.1`                                                      |
+| `metrics.image.pullPolicy`                    | Nextcloud metrics exporter image pull policy                                        | `IfNotPresent`                                               |
+| `metrics.image.pullSecrets`                   | Nextcloud metrics exporter image pull secrets                                       | `nil`                                                        |
+| `metrics.resources`                           | Metrics exporter resource requests and limits                                       | `{}`                                                         |
+| `metrics.podAnnotations`                      | Additional annotations for metrics exporter                                         | `{}`                                                         |
+| `metrics.podLabels`                           | Additional labels for metrics exporter                                              | `{}`                                                         |
+| `metrics.nodeSelector`                        | Metrics exporter pod nodeSelector                                                   | `{}`                                                         |
+| `metrics.tolerations`                         | Metrics exporter pod tolerations                                                    | `[]`                                                         |
+| `metrics.affinity`                            | Metrics exporter pod affinity                                                       | `{}`                                                         |
+| `metrics.service.type`                        | Metrics: Kubernetes Service type                                                    | `ClusterIP`                                                  |
+| `metrics.service.loadBalancerIP`              | Metrics: LoadBalancerIp for service type LoadBalancer                               | `nil`                                                        |
+| `metrics.service.annotations`                 | Additional annotations for service metrics exporter                                 | `{prometheus.io/scrape: "true", prometheus.io/port: "9205"}` |
+| `metrics.service.labels`                      | Additional labels for service metrics exporter                                      | `{}`                                                         |
+| `metrics.securityContext`                     | Security context for the metrics CONTAINER in the pod                               | `{runAsUser: "1000", runAsNonRoot: "true"}`                  |
+| `metrics.podSecurityContext`                  | Security context for the metrics POD                                                | `{}`                                                         |
+| `prometheus.serviceMonitor.enabled`           | Create ServiceMonitor Resource for scraping metrics using PrometheusOperator        | `false`                                                      |
+| `prometheus.serviceMonitor.namespace`         | Namespace in which Prometheus is running                                            | `""`                                                         |
+| `prometheus.serviceMonitor.namespaceSelector` | Namespace in which Prometheus is running                                            | ``                                                           |
+| `prometheus.serviceMonitor.jobLabel`          | Name of the label on the target service to use as the job name in prometheus        | `""`                                                         |
+| `prometheus.serviceMonitor.interval`          | Interval at which metrics should be scraped                                         | `30s`                                                        |
+| `prometheus.serviceMonitor.scrapeTimeout`     | Specify the timeout after which the scrape is ended                                 | `""`                                                         |
+| `prometheus.serviceMonitor.labels`            | Extra labels for the ServiceMonitor                                                 | `{}`                                                         |
+| `prometheus.rules.enabled`                    | Deploy Prometheus Rules (Alerts) for the exporter                                   | `false`                                                      |
+| `prometheus.rules.labels`                     | Label on Prometheus Rules CRD Manifest                                              | `{}`                                                         |
+| `prometheus.rules.defaults.enabled`           | Add Default Rules                                                                   | `true`                                                       |
+| `prometheus.rules.defaults.labels`            | Label on the rules (the severity is already set)                                    | `{}`                                                         |
+| `prometheus.rules.defaults.filter`            | Filter on metrics on alerts (default just for this helm-chart)                      | `""`                                                         |
+| `prometheus.rules.additionalRules`            | Add own Rules to Prometheus Rules                                                   | `[]`                                                         |
 
 
 
@@ -699,6 +722,9 @@ ingress:
         deny all;
       }
 ```
+
+When exposing Nextcloud through the Gateway API (`httpRoute.enabled: true`), the CalDAV and CardDAV redirects are added automatically as `RequestRedirect` rules (`httpRoute.wellKnown.enabled`, on by default), so no implementation-specific configuration is required. Set `httpRoute.wellKnown.enabled: false` to opt out.
+
 ## Preserving Source IP
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
@@ -799,6 +825,53 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```bash
 # $NEXTCLOUD_POD should be the name of *your* nextcloud pod :)
 kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:download-models"
+```
+
+## Injecting Additional Manifests (`extraManifests`)
+
+You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
+
+`extraManifests` is either:
+- a map of manifest names to their YAML definitions
+- a list of YAML definitions, where each itemin the list can be either:
+  - a string containing valid YAML (multi-line block, e.g. with `|`), or
+  - a YAML object (inline YAML structure).
+
+These manifests will be rendered as part of the Helm release.
+
+**Example usage in `values.yaml`:**
+
+```yaml
+extraManifests:
+  - |
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: my-middleware
+    spec:
+      ...
+  - apiVersion: traefik.containo.us/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: my-ingressroute
+    spec:
+      ...
+# Or as a map:
+extraManifests:
+  my-middleware:
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: Middleware
+    metadata:
+      name: my-middleware
+    spec:
+      ...
+  my-ingressroute:
+    apiVersion: traefik.containo.us/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: my-ingressroute
+    spec:
+      ...
 ```
 
 # Backups

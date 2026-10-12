@@ -29,6 +29,52 @@ deploymentLabels: {}
 # Number of replicas to be deployed
 replicaCount: 1
 
+httpRoute:
+  # -- Enable an HTTPRoute resource for nextcloud .
+  enabled: false
+  # -- Set the route apiVersion
+  apiVersion: gateway.networking.k8s.io/v1
+  # -- Set the route kind
+  kind: HTTPRoute
+
+  # -- Route annotations
+  annotations: {}
+  # -- Route labels
+  labels: {}
+  # -- Route hostnames
+  hostnames: []
+  # -- Reference to parent gateways
+  parentRefs: []
+  # -- Add the standard Nextcloud service discovery redirects
+  # (`/.well-known/carddav` and `/.well-known/caldav` -> `/remote.php/dav`) as
+  # Gateway API `RequestRedirect` rules. Unlike the ingress-nginx server snippet
+  # this needs no implementation-specific config. Set to false to opt out.
+  wellKnown:
+    enabled: true
+  # -- List of rules and filters applied.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "/"
+  #   filters:
+  #   - type: RequestHeaderModifier
+  #     requestHeaderModifier:
+  #       set:
+  #       - name: My-Overwrite-Header
+  #         value: this-is-the-only-value
+  #       remove:
+  #       - User-Agent
+  #   timeouts:
+  #     request: 300s
+  # - matches:
+  #   - path:
+  #       type: PathPrefix
+  #       value: /echo
+  #     headers:
+  #     - name: version
+  #       value: v2
+
 ## Allowing use of ingress controllers
 ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ##
@@ -187,6 +233,11 @@ nextcloud:
       container: ""
       # autocreate container
       autoCreate: false
+  openmetrics:
+    allowedClients:
+      - "127.0.0.1"
+      - "10.42.0.0/16"
+      - "10.43.0.0/16"
 
   ## PHP Configuration files
   # Will be injected in /usr/local/etc/php/conf.d for apache image and in /usr/local/etc/php-fpm.d when nginx.enabled: true
@@ -218,6 +269,8 @@ nextcloud:
     swift.config.php: true
     # disables the web based updater as the default nextcloud docker image does not support it
     upgrade-disable-web.config.php: true
+    # -- adjust openmetrics
+    helm-metrics.config.php: true
     # -- imaginary support config
     imaginary.config.php: false
 
@@ -310,6 +363,7 @@ nextcloud:
 
   # Set securityContext parameters for the entire pod. For example, you may need to define runAsNonRoot directive
   podSecurityContext: {}
+  #   fsGroup: 33
   #   runAsUser: 33
   #   runAsGroup: 33
   #   runAsNonRoot: true
@@ -326,6 +380,10 @@ nextcloud:
     resources: {}
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
+
+    # Settings for the Redis init container that creates a configuration file to address permission issue in some cluster
+    redisInitContainer:
+      resources: {}
 
   # -- priority class for nextcloud.
   # Overrides .Values.priorityClassName
@@ -369,7 +427,7 @@ nginx:
     # Added in server block of default config.
     serverBlockCustom: |
       # set max upload size
-      client_max_body_size 10G;
+      client_max_body_size 512M;
       client_body_timeout 300s;
       fastcgi_buffers 64 4K;
       fastcgi_read_timeout 3600s;
@@ -421,11 +479,14 @@ externalDatabase:
   ## Use a existing secret
   existingSecret:
     enabled: false
-    # secretName: nameofsecret
+    # -- e.g. nameofsecret
+    secretName:
     usernameKey: db-username
     passwordKey: db-password
-    # hostKey: db-hostname-or-ip
-    # databaseKey: db-name
+    # -- e.g. db-hostname-or-ip
+    hostKey:
+    # -- e.g. db-name
+    databaseKey:
 
 ##
 ## MariaDB chart configuration
@@ -648,8 +709,11 @@ cronjob:
     # crond does not work when not running as root user
     # Note: requires `persistence.enabled=true`
     schedule: "*/5 * * * *"
+    # Suspend the cron job without removing it
+    suspend: false
     successfulJobsHistoryLimit: 3
     failedJobsHistoryLimit: 5
+    activeDeadlineSeconds:
     # -- Additional labels for cronjob
     labels: {}
     # -- Additional labels for cronjob pod
@@ -739,10 +803,15 @@ persistence:
   accessMode: ReadWriteOnce
   size: 8Gi
 
+  # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+  hostPath:
+
   ## Use an additional pvc for the data directory rather than a subpath of the default PVC
   ## Useful to store data on a different storageClass (e.g. on slower disks)
   nextcloudData:
     enabled: false
+    # -- If defined, use a hostPath volume for nextcloud data rather than a dynamically defined PVC.
+    hostPath:
     subPath:
     labels: {}
     annotations: {}
@@ -813,12 +882,13 @@ topologySpreadConstraints: []
 
 affinity: {}
 
-dnsConfig: {}
-# Custom dns config for Nextcloud containers.
-# You can for example configure ndots. This may be needed in some clusters with alpine images.
-# options:
-#   - name: ndots
-#     value: "1"
+dnsConfig:
+  # -- Custom dns config for Nextcloud containers.
+  # You can for example configure ndots. This may be needed in some clusters with alpine images.
+  # options:
+  #   - name: ndots
+  #     value: "1"
+  options: []
 
 imaginary:
   # -- Start Imgaginary
@@ -923,7 +993,7 @@ metrics:
   image:
     registry: docker.io
     repository: xperimental/nextcloud-exporter
-    tag: 0.8.0
+    tag: 0.9.1
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - myRegistrKeySecretName
@@ -973,8 +1043,9 @@ metrics:
   # seccompProfile:
   #   type: RuntimeDefault
 
+prometheus:
   ## Prometheus Operator ServiceMonitor configuration
-  ##
+  ## collects data from nextcloud openmetrics and nextcloud-exporter if enabled
   serviceMonitor:
     ## @param metrics.serviceMonitor.enabled Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
     ##
@@ -1035,3 +1106,41 @@ rbac:
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
 securityContext: {}
+
+# -- Allows users to inject additional Kubernetes manifests (YAML) to be rendered with the release.
+# Could either be a list or a map
+# If a map, each key is the name of the manifest.
+# If an array, each item is a manifest, which can be a string (YAML block) or a YAML object.
+# Each item should be a string containing valid YAML. Example:
+# extraManifests:
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: Middleware
+#     metadata:
+#       name: my-middleware
+#     spec:
+#       ...
+#   - |
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: IngressRoute
+#     metadata:
+#       name: my-ingressroute
+#     spec:
+#       ...
+# Or as a map:
+# extraManifests:
+#   my-middleware:
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: Middleware
+#     metadata:
+#       name: my-middleware
+#     spec:
+#       ...
+#   my-ingressroute:
+#     apiVersion: traefik.containo.us/v1alpha1
+#     kind: IngressRoute
+#     metadata:
+#       name: my-ingressroute
+#     spec:
+#       ...
+extraManifests: []
