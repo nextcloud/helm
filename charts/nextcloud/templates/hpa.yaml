@@ -4,6 +4,7 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ template "nextcloud.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
 spec:
