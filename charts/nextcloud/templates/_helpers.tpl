@@ -481,3 +481,22 @@ app.kubernetes.io/managed-by: {{ .rootContext.Release.Service }}
 app.kubernetes.io/version: {{ quote . }}
 {{- end }}
 {{- end -}}
+
+{{/*
+The service account the Nextcloud pods run as: rbac.serviceaccount.name when
+set; else nextcloud-serviceaccount when rbac.enabled is set, the previous
+default, so installs that enabled rbac keep their account; else the release's
+full name when the chart creates the account; else the namespace's default
+account.
+*/}}
+{{- define "nextcloud.serviceAccountName" -}}
+{{- if .Values.rbac.serviceaccount.name -}}
+{{- .Values.rbac.serviceaccount.name -}}
+{{- else if .Values.rbac.enabled -}}
+nextcloud-serviceaccount
+{{- else if .Values.rbac.serviceaccount.create -}}
+{{- include "nextcloud.fullname" . -}}
+{{- else -}}
+default
+{{- end -}}
+{{- end -}}

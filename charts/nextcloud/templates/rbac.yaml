@@ -26,6 +26,6 @@ roleRef:
   name: {{ template "nextcloud.fullname" . }}-privileged
 subjects:
   - kind: ServiceAccount
-    name: {{ .Values.rbac.serviceaccount.name }}
+    name: {{ include "nextcloud.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

@@ -135,9 +135,7 @@ spec:
             fsGroup: 33
             {{- end }}
             {{- end }}{{/* end-with podSecurityContext */}}
-          {{- if .Values.rbac.enabled }}
-          serviceAccountName: {{ .Values.rbac.serviceaccount.name }}
-          {{- end }}
+          serviceAccountName: {{ include "nextcloud.serviceAccountName" $ }}
           {{- with .Values.dnsConfig }}
           dnsConfig:
             {{- toYaml . | nindent 12 }}

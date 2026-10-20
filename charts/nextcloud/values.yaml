@@ -1098,10 +1098,18 @@ prometheus:
     additionalRules: []
 
 rbac:
+  # Role and RoleBinding for the privileged PodSecurityPolicy (removed in Kubernetes 1.25)
   enabled: false
+  # The service account the Nextcloud pods run as, created by the chart by
+  # default so they don't share the namespace's default account
   serviceaccount:
+    # Create the service account; when false, the pods run as `name`, or as
+    # the namespace's default account if it is empty
     create: true
-    name: nextcloud-serviceaccount
+    # Defaults to the release's full name. Installs with rbac.enabled keep the
+    # previous default, nextcloud-serviceaccount, so their account does not
+    # change on upgrade
+    name: ""
     annotations: {}
 
 ## @param securityContext for nextcloud pod @deprecated Use `nextcloud.podSecurityContext` instead
