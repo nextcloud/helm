@@ -42,7 +42,7 @@ jobs:
           helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@v2.9.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -120,7 +120,7 @@ jobs:
           helm repo add collabora-online https://collaboraonline.github.io/online
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.8.0
+        uses: helm/chart-testing-action@v2.9.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -131,7 +131,7 @@ jobs:
           fi
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.15.0
+        uses: helm/kind-action@v1.15.1
         if: steps.list-changed.outputs.changed == 'true'
 
       - name: Checkout Silo chart
