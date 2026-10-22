@@ -212,6 +212,10 @@ Redis env vars
   value: {{ .Values.externalRedis.password | quote }}
 {{- end }}
 {{- end }}{{/* end-of redis-enabled*/}}
+{{- if .Values.redis.auth.user }}
+- name: REDIS_USER
+  value: {{ .Values.redis.auth.user }}
+{{- end }}
 {{- if or
   (and .Values.redis.auth.enabled .Values.redis.auth.password)
   (and .Values.redis.auth.enabled .Values.redis.auth.existingSecret .Values.redis.auth.existingSecretPasswordKey)
@@ -219,7 +223,7 @@ Redis env vars
   (and .Values.externalRedis.enabled .Values.externalRedis.password)
 }}
 - name: REDIS_URL
-  value: "redis://:$(REDIS_HOST_PASSWORD)@$(REDIS_HOST):$(REDIS_HOST_PORT)"
+  value: "redis://$(REDIS_USER):$(REDIS_HOST_PASSWORD)@$(REDIS_HOST):$(REDIS_HOST_PORT)"
 {{- else }}
 - name: REDIS_URL
   value: "redis://$(REDIS_HOST):$(REDIS_HOST_PORT)"
