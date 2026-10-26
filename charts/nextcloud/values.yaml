@@ -844,6 +844,7 @@ priorityClassName: ""
 ##
 livenessProbe:
   enabled: true
+  path: /status.php
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 5
@@ -851,6 +852,7 @@ livenessProbe:
   successThreshold: 1
 readinessProbe:
   enabled: true
+  path: /status.php
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 5
@@ -858,6 +860,7 @@ readinessProbe:
   successThreshold: 1
 startupProbe:
   enabled: false
+  path: /status.php
   initialDelaySeconds: 30
   periodSeconds: 10
   timeoutSeconds: 5
