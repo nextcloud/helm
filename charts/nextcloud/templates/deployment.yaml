@@ -94,7 +94,7 @@ spec:
           {{- if .enabled }}
           livenessProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
               - name: Host
@@ -110,7 +110,7 @@ spec:
           {{- if .enabled }}
           readinessProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
               - name: Host
@@ -126,7 +126,7 @@ spec:
           {{- if .enabled }}
           startupProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
               - name: Host
@@ -155,7 +155,7 @@ spec:
           {{- if .enabled }}
           livenessProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
@@ -171,7 +171,7 @@ spec:
           {{- if .enabled }}
           readinessProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
@@ -187,7 +187,7 @@ spec:
           {{- if .enabled }}
           startupProbe:
             httpGet:
-              path: /status.php
+              path: {{ .path | default "/status.php" }}
               port:  {{ $.Values.nextcloud.containerPort }}
               httpHeaders:
                 - name: Host
