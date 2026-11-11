@@ -381,9 +381,9 @@ nextcloud:
     # Set postgresql initContainer securityContext parameters. For example, you may need to define runAsNonRoot directive
     securityContext: {}
 
-    # Settings for the Redis init container that creates a configuration file to address permission issue in some cluster
-    redisInitContainer:
-      resources: {}
+  # Settings for the Redis init container that creates a configuration file to address permission issue in some cluster
+  redisInitContainer:
+    resources: {}
 
   # -- priority class for nextcloud.
   # Overrides .Values.priorityClassName
