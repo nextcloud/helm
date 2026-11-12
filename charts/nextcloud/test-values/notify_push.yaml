@@ -1,0 +1,19 @@
+fullnameOverride: nextcloud
+
+nextcloud:
+  host: "nextcloud.nextcloud.svc.cluster.local"
+  trustedDomains:
+    - 'nextcloud.nextcloud.svc.cluster.local'
+    - 'nextcloud'
+
+redis:
+  enabled: true
+
+internalDatabase:
+  enabled: false
+mariadb:
+  enabled: true
+
+notifyPush:
+  enabled: true
+  autoSetup: true
