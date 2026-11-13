@@ -7,6 +7,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ template "nextcloud.fullname" . }}-nextcloud
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "nextcloud.labels"  ( dict "component" "app"  "rootContext" $ ) | nindent 4 }}
   {{- with .Values.persistence.labels }}
