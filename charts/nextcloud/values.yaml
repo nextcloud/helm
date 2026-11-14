@@ -595,6 +595,8 @@ redis:
     repository: bitnamilegacy/redis
   auth:
     enabled: true
+    # Username for redis authentication
+    user:
     password: "changeme"
     # name of an existing secret with Redis® credentials (instead of auth.password), must be created ahead of time
     existingSecret: ""

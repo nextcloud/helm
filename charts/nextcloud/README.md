@@ -2,7 +2,7 @@
 
 [Nextcloud](https://nextcloud.com/) is a file sharing server that puts the control and security of your own data back into your hands.
 
-## TL;DR;
+## TL;DR
 
 ```console
 helm repo add nextcloud https://nextcloud.github.io/helm/
@@ -149,7 +149,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.mail.smtp.secure`                                | SMTP connection `ssl` or empty                                                                      | `ssl`                                                        |
 | `nextcloud.mail.smtp.port`                                  | Optional SMTP port                                                                                  | `465`                                                        |
 | `nextcloud.mail.smtp.authtype`                              | SMTP authentication method                                                                          | `LOGIN`                                                      |
-| `nextcloud.mail.smtp.name`                                  | SMTP username, ONLY the part before the domain name. i.e. 'postmaster' NOT 'postmaster@example.com' | `user`                                                       |
+| `nextcloud.mail.smtp.name`                                  | SMTP username, ONLY the part before the domain name. i.e. 'postmaster' NOT '<postmaster@example.com>' | `user`                                                       |
 | `nextcloud.mail.smtp.password`                              | SMTP password                                                                                       | `pass`                                                       |
 | `nextcloud.configs`                                         | Config files created in `/var/www/html/config`                                                      | `{}`                                                         |
 | `nextcloud.persistence.subPath`                             | Set the subPath for nextcloud to use in volume                                                      | `nil`                                                        |
@@ -194,6 +194,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `lifecycle.preStopCommand`                                  | Specify deployment lifecycle hook preStopCommand                                                    | `nil`                                                        |
 | `redis.enabled`                                             | Whether to install/use redis for locking                                                            | `false`                                                      |
 | `redis.auth.enabled`                                        | Whether to enable password authentication with redis                                                | `true`                                                       |
+| `redis.auth.user`                                         | The user redis uses                                                                                 | `''`                                                         |
 | `redis.auth.password`                                       | The password redis uses                                                                             | `changeme`                                                   |
 | `redis.auth.existingSecret`                                 | The name of an existing secret with Redis® credentials                                              | `''`                                                         |
 | `redis.auth.existingSecretPasswordKey`                      | Password key to be retrieved from existing secret                                                   | `''`                                                         |
@@ -257,13 +258,16 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `extraManifests`                                            | Map or List of additional Kubernetes manifests to render with the release. If a List is provided, each item can be either a YAML string (multi-line block) or a YAML object. Useful for custom resources like Traefik IngressRoutes, Middlewares, etc. | `[]`                       |
 
 ### Ingress
+
 #### Ingress Sticky-Sessions
 
 For loadbalance over multiple Pods, it is useful to configure sticky session.
 
 ##### NGINX Ingress-Controller
+
 To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
 For more information take a look in the [ingress-controller documentation](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#session-affinity)
+
 ```yaml
 ingress:
   annotations:
@@ -271,8 +275,10 @@ ingress:
 ```
 
 ##### Traefik Ingress-Controller
+
 To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
 For more information take a look in the [ingress-controller documentation](https://doc.traefik.io/traefik/routing/providers/kubernetes-ingress/#on-service)
+
 ```yaml
 service:
   annotations:
@@ -280,8 +286,10 @@ service:
 ```
 
 ##### HAProxy Ingress-Controller (Community-Version)
+
 To enable sticky sessions on that ingress controller you could set the following values in this helm-chart.
 For more infromation take a look in the  [ingress-controller documentation](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity)
+
 ```yaml
 ingress:
   annotations:
@@ -289,14 +297,15 @@ ingress:
 ```
 
 ### Database Configurations
+
 By default, nextcloud will use a SQLite database. This is not recommended for production, but is enabled by default for testing purposes. When you are done testing, please set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
 
 For convenience, we packages the following Bitnami charts for databases (feel free to choose _one_ below):
+
 - [Bitnami MariaDB chart](https://github.com/bitnami/charts/tree/main/bitnami/mariadb)
 - [Bitnami PostgreSQL chart](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
 
 If you choose to use one of the prepackaged Bitnami helm charts, you must configure both the `externalDatabase` parameters, and the parameters for the chart you choose. For instance, if you choose to use the Bitnami PostgreSQL chart that we've prepackaged, you need to also configure all the parameters for `postgresql`. You do not need to use the Bitnami helm charts. If you want to use an already configured database that you have externally, just set `internalDatabase.enabled` to `false`, and configure the `externalDatabase` parameters below.
-
 
 | Parameter                                                             | Description                                                                       | Default                |
 | --------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
@@ -343,7 +352,6 @@ If you choose to use one of the prepackaged Bitnami helm charts, you must config
 
 Is there a missing parameter for one of the Bitnami helm charts listed above? Please feel free to submit a PR to add that parameter in our values.yaml, but be sure to also update this README file :)
 
-
 ### Object Storage as Primary Storage Configuration
 
 Nextcloud allows to configure object storages like OpenStack Swift or Amazon Simple Storage Service (S3) or any compatible S3-implementation (e.g. Minio or Ceph Object Gateway) as primary storage replacing the default storage of files.
@@ -353,7 +361,6 @@ By default, files are stored in nextcloud/data or another directory configured i
 Read more in the official [docs](https://docs.nextcloud.com/server/latest/admin_manual/configuration_files/primary_storage.html#configuring-object-storage-as-primary-storage).
 
 Here are all the values you can currently configure in this helm chart to configure an Object Store as your Primary Storage.
-
 
 | Parameter                                       | Description                                                           | Default     |
 | ----------------------------------------------- | --------------------------------------------------------------------- | ----------- |
@@ -389,13 +396,11 @@ Here are all the values you can currently configure in this helm chart to config
 | `nextcloud.objectStore.swift.container`         | Swift container to store the data in                                  | `''`        |
 | `nextcloud.objectStore.swift.autoCreate`        | Autocreate the Swift container                                        | `false`     |
 
-
-
 ### Persistence Configurations
 
 The [Nextcloud](https://hub.docker.com/_/nextcloud/) image stores the nextcloud data and configurations at the `/var/www/html` paths of the container.
 Persistent Volume Claims are used to keep the data across deployments. This is known to work with GKE, EKS, K3s, and minikube.
-Nextcloud will *not* delete the PVCs when uninstalling the helm chart.
+Nextcloud will _not_ delete the PVCs when uninstalling the helm chart.
 
 | Parameter                                 | Description                                             | Default         |
 |-------------------------------------------|---------------------------------------------------------|-----------------|
@@ -462,8 +467,6 @@ We include an optional experimental Nextcloud Metrics exporter from [xperimental
 | `prometheus.rules.defaults.filter`            | Filter on metrics on alerts (default just for this helm-chart)                      | `""`                                                         |
 | `prometheus.rules.additionalRules`            | Add own Rules to Prometheus Rules                                                   | `[]`                                                         |
 
-
-
 > **Note**:
 >
 > For nextcloud to function correctly, you should specify the `nextcloud.host` parameter to specify the FQDN (recommended) or the public IP address of the nextcloud service.
@@ -496,7 +499,6 @@ helm install --name my-release -f values.yaml nextcloud/nextcloud
 
 > **Tip**: You can use the default [values.yaml](values.yaml)
 
-
 ### Headers set on NGINX
 
 It is possible to set any additional header
@@ -505,30 +507,30 @@ It is possible to set any additional header
 | ---------------------------- | ---------------------------------- | ------- |
 | `nginx.config.headers.<key>` | Headers which are added with nginx |         |
 
-
 Following keys are already set with this values:
-  - Referrer-Policy: `no-referrer`
-  - X-Content-Type-Options: `nosniff`
-  - X-Download-Options: `noopen`
-  - X-Frame-Options: `SAMEORIGIN`
-  - X-Permitted-Cross-Domain-Policies: `none`
-  - X-Robots-Tag: `noindex, nofollow`
-  - X-XSS-Protection: `1; mode=block`
+
+- Referrer-Policy: `no-referrer`
+- X-Content-Type-Options: `nosniff`
+- X-Download-Options: `noopen`
+- X-Frame-Options: `SAMEORIGIN`
+- X-Permitted-Cross-Domain-Policies: `none`
+- X-Robots-Tag: `noindex, nofollow`
+- X-XSS-Protection: `1; mode=block`
 
 Maybe you like to set:
-  - Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
+
+- Strict-Transport-Security: `max-age=15768000; includeSubDomains; preload;`
+
 > [!WARNING]
 > Only add the preload option once you read about
-> the consequences in https://hstspreload.org/. This option
+> the consequences in <https://hstspreload.org/>. This option
 > will add the domain to a hardcoded list that is shipped
 > in all major browsers and getting removed from this list
 > could take several months.
 
-
 ### Probes Configurations
 
 The nextcloud deployment includes a series of different probes you can use to determine if a pod is ready or not. You can learn more in the [Configure Liveness, Readiness and Startup Probes Kubernetes docs](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/).
-
 
 | Parameter                            | Description                                 | Default |
 | ------------------------------------ | ------------------------------------------- | ------- |
@@ -577,6 +579,7 @@ This section provides options to enable and configure the Collabora Online serve
 | `collabora.ingress.hosts`                        | List of hosts for the Collabora ingress                                                            | `[{"host": "chart-example.local", "paths": [{"path": "/", "pathType": "ImplementationSpecific"}]}]` |
 | `collabora.ingress.tls`                          | TLS configuration for the Collabora ingress                                                        | `[]`                                                                                                |
 | `collabora.resources`                            | Resource requests and limits for the Collabora Online pods                                         | `{}`                                                                                                |
+
 > **Note**:
 >
 > You may need to uncomment `collabora.collabora.aliasgroups` and `collabora.collabora.extra_params`, depending on your setup. You may also need to set `collabora.collabora.server_name`. If left empty, it's derived from the request, so please set it if it doesn't work.
@@ -613,9 +616,9 @@ We include an optional external preview provider from [h2non/imaginary](https://
 | `imaginary.service.annotations`       | Additional annotations for service imaginary                                           | `{}`              |
 | `imaginary.service.labels`            | Additional labels for service imaginary                                                | `{}`              |
 
-
 > [!Note]
 > You also need to setup nextcloud, to use imaginary
+
 ```yaml
 nextcloud:
   defaultConfigs:
@@ -629,22 +632,19 @@ imaginary:
 
 To execute [background tasks](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html) by using system cron instead of default Ajax cron, set `cronjob.enabled` parameter to `true`. Background jobs are important for tasks that do not necessarily need user intervention, but still need to be executed frequently (cleaning up, sending some notifications, pulling RSS feeds, etc.).
 
-Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to ***Cron***.
+Enabling this option will create a sidecar container in the Nextcloud pod, which will start a [`crond` daemon](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/background_jobs_configuration.html#cron) responsible for running the Nextcloud cron.php script. At first launch, the background jobs mode in your Nextcloud basic settings will automatically be set to _**Cron**_.
 
 You can also set cronjob.type to cronjob to instead use a Kubernetes native CronJob. One advantage of this is that it can run as non-root when compared to the crond sidecar.
-
 
 ## Using the nextcloud docker image auto-configuration via env vars
 
 The [nextcloud/docker](https://github.com/nextcloud/docker/tree/master) image provides an auto-configuration via environment variables. See [their docs](https://github.com/nextcloud/docker/tree/master#auto-configuration-via-environment-variables) for more info.
-
 
 ## Multiple config.php file
 
 Nextcloud supports loading configuration parameters from multiple files.
 You can add arbitrary files ending with `.config.php` in the `config/` directory.
 See [documentation](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/config_sample_php_parameters.html#multiple-config-php-file). For example, to enable image and document previews:
-
 
 ```yaml
 nextcloud:
@@ -670,6 +670,7 @@ nextcloud:
 ```
 
 ## Using nginx
+
 To use nginx instead of apache to serve nextcloud, Set the following parameters in your `values.yaml`:
 
 ```yaml
@@ -728,14 +729,17 @@ When exposing Nextcloud through the Gateway API (`httpRoute.enabled: true`), the
 
 - Make sure your loadbalancer preserves source IP, for bare metal, `metalb` does and `klipper-lb` doesn't.
 - Make sure your Ingress preserves source IP. If you use `ingress-nginx`, add the following annotations:
+
 ```yaml
 ingress:
   annotations:
    nginx.ingress.kubernetes.io/enable-cors: "true"
    nginx.ingress.kubernetes.io/cors-allow-headers: "X-Forwarded-For"
 ```
+
 - The next layer is nextcloud pod's nginx container. In in your `values.yaml`, if `nextcloud.tag` has `fpm` in it, or `image.flavor` is set to `fpm`, this can be left at default
 - Add some PHP config for nextcloud as mentioned above in multiple `config.php`s section:
+
 ```php
   configs:
     proxy.config.php: |-
@@ -776,9 +780,11 @@ resources:
 ```
 
 ## HPA (Clustering)
+
 If you want to have multiple Nextcloud containers, regardless of dynamic or static sizes, you need to use shared persistence between the containers.
 
 Minimum cluster compatible persistence settings:
+
 ```yaml
 persistence:
   enabled: true
@@ -799,8 +805,8 @@ nextcloud:
 > [!Note]
 > Be sure to prefix your file name with `zz` to ensure it is loaded at the end.
 
-
 ## Running `occ` commands
+
 Sometimes you need to run an [occ](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/occ_command.html) command on the Nextcloud container directly. You can do that by running commands as the user `www-data` via the `kubectl exec` command.
 
 ```bash
@@ -811,6 +817,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ myocccomand"
 Here are some examples below.
 
 ### Putting Nextcloud into maintenance mode
+
 Some admin actions require you to put your Nextcloud instance into [maintenance mode](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html#maintenance-mode) (e.g. backups):
 
 ```bash
@@ -819,6 +826,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ maintenance:mo
 ```
 
 ### Downloading models for recognize
+
 [Recognize](https://github.com/nextcloud/recognize) requires you to download models before using it:
 
 ```bash
@@ -831,6 +839,7 @@ kubectl exec $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ recognize:down
 You can inject additional Kubernetes manifests (such as Traefik IngressRoutes, Middlewares, or any custom resources) directly via `values.yaml` using the `extraManifests` value.
 
 `extraManifests` is either:
+
 - a map of manifest names to their YAML definitions
 - a list of YAML definitions, where each itemin the list can be either:
   - a string containing valid YAML (multi-line block, e.g. with `|`), or
@@ -874,12 +883,14 @@ extraManifests:
 ```
 
 # Backups
+
 Check out the [official Nextcloud backup docs](https://docs.nextcloud.com/server/latest/admin_manual/maintenance/backup.html). For your files, if you're using persistent volumes, and you'd like to back up to s3 backed storage (such as minio), consider using [k8up](https://github.com/k8up-io/k8up) or [velero](https://github.com/vmware-tanzu/velero).
 
 # Upgrades
+
 Since this chart utilizes the [nextcloud/docker](https://github.com/nextcloud/docker) image, provided you are using persistent volumes, [upgrades of your Nextcloud server are handled automatically](https://github.com/nextcloud/docker#update-to-a-newer-version) from one version to the next, however, you can only upgrade one major version at a time. For example, if you want to upgrade from version `25` to `27`, you will have to upgrade from version `25` to `26`, then from `26` to `27`. Since our docker tag is set via the [`appVersion` in `Chart.yaml`](https://github.com/nextcloud/helm/blob/main/charts/nextcloud/Chart.yaml#L4), you'll need to make sure you gradually upgrade the helm chart if you have missed serveral app versions.
 
-⚠️ *Before Upgrading Nextcloud or the attached database, always make sure you take [backups](#backups)!*
+⚠️ _Before Upgrading Nextcloud or the attached database, always make sure you take [backups](#backups)!_
 
 After an upgrade, you may have missing indices. To fix this, you can run:
 
@@ -891,14 +902,18 @@ kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-mis
 # Troubleshooting
 
 ## Logging
+
 The nextcloud instance deployed by this chart doesn't currently create a log file locally inside the container.
 Examples scenarios to change this behavior include:
- - Triaging mailserver issues
- - Any time you're confused by server behavior and need more context
- - Before submitting a GitHub Issue (you can include relevant log messages that way)
+
+- Triaging mailserver issues
+- Any time you're confused by server behavior and need more context
+- Before submitting a GitHub Issue (you can include relevant log messages that way)
 
 ### Changing the logging behavior
+
 To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
+
 ```yaml
 nextcloud:
   configs:
@@ -911,7 +926,9 @@ nextcloud:
         'logdateformat' => 'F d, Y H:i:s'
         );
 ```
+
 `loglevel` corresponds to the detail of the logs. Valid values are:
+
 ```
 0: DEBUG: All activity; the most detailed logging.
 
@@ -923,27 +940,32 @@ nextcloud:
 
 4: FATAL: The server stops.
 ```
+
 [More information about Nextcloud logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html)
 
 ### Viewing the logs
+
 To view logs after changing the logging behavior, you can exec into the Kubernetes pod, or copy them to your local machine.
 
-#### Exec into the kubernetes pod:
+#### Exec into the kubernetes pod
+
 ```bash
 kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/sh
 ```
 
-#### Then look for the `nextcloud.log` file with tail or cat:
+#### Then look for the `nextcloud.log` file with tail or cat
 
 ```bash
 cat nextcloud.log
 tail -f nextcloud.log
 ```
 
-#### Copy the log file to your local machine:
+#### Copy the log file to your local machine
+
 ```bash
 kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log
 ```
 
 ### Sharing the logs
+
 Remember to anonymize your logs and snippets from your pod before sharing them with the internet. Kubernetes secrets, even Sealed ones, live in plaintext `env` variables on your running containers, and log messages can include other information that should stay safely with you.
