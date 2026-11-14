@@ -212,9 +212,9 @@ Redis env vars
   value: {{ .Values.externalRedis.password | quote }}
 {{- end }}
 {{- end }}{{/* end-of redis-enabled*/}}
-{{- if .Values.redis.auth.user }}
+{{- with .Values.redis.auth.user }}
 - name: REDIS_USER
-  value: {{ .Values.redis.auth.user }}
+  value: {{ quote . }}
 {{- end }}
 {{- if or
   (and .Values.redis.auth.enabled .Values.redis.auth.password)
