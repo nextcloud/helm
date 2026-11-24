@@ -52,9 +52,6 @@ helm install my-release nextcloud/nextcloud
   - [Logging](#logging)
     - [Changing the logging behavior](#changing-the-logging-behavior)
     - [Viewing the logs](#viewing-the-logs)
-      - [Exec into the kubernetes pod:](#exec-into-the-kubernetes-pod)
-      - [Then look for the `nextcloud.log` file with tail or cat:](#then-look-for-the-nextcloudlog-file-with-tail-or-cat)
-      - [Copy the log file to your local machine:](#copy-the-log-file-to-your-local-machine)
     - [Sharing the logs](#sharing-the-logs)
 
 ## Introduction
@@ -891,14 +888,20 @@ kubectl exec -it $NEXTCLOUD_POD -- su -s /bin/sh www-data -c "php occ db:add-mis
 # Troubleshooting
 
 ## Logging
-The nextcloud instance deployed by this chart doesn't currently create a log file locally inside the container.
-Examples scenarios to change this behavior include:
- - Triaging mailserver issues
- - Any time you're confused by server behavior and need more context
- - Before submitting a GitHub Issue (you can include relevant log messages that way)
+
+By default, Nextcloud writes logs to `nextcloud.log` in its data directory.
+With the chart's default `nextcloud.datadir`, this path is `/var/www/html/data/nextcloud.log`.
+The file may not exist until Nextcloud writes its first log entry, and existing
+or custom configurations can change the logging backend or path.
+
+Logs are useful when troubleshooting mail server issues, investigating unexpected
+behavior, or preparing a GitHub issue.
 
 ### Changing the logging behavior
-To change the logging behavior, modify your `logging.config.php` in your `values.yaml` under the `nextcloud.configs` section like so:
+
+To customize logging settings, add a configuration file under `nextcloud.configs`
+in your `values.yaml`. For example:
+
 ```yaml
 nextcloud:
   configs:
@@ -906,44 +909,48 @@ nextcloud:
       <?php
       $CONFIG = array (
         'log_type' => 'file',
-        'logfile' => 'nextcloud.log',
+        'logfile' => '/var/www/html/data/nextcloud.log',
         'loglevel' => 0,
-        'logdateformat' => 'F d, Y H:i:s'
-        );
+      );
 ```
-`loglevel` corresponds to the detail of the logs. Valid values are:
-```
-0: DEBUG: All activity; the most detailed logging.
 
-1: INFO: Activity such as user logins and file activities, plus warnings, errors, and fatal errors.
+Apply the updated values with `helm upgrade`. This example uses the chart's
+default data directory; adjust the path if you changed `nextcloud.datadir`.
+The target directory must exist and be writable by the PHP process. Use a
+persistent volume if logs need to survive pod replacements.
 
-2: WARN: Operations succeed, but with warnings of potential problems, plus errors and fatal errors.
+- `log_type` selects the logging backend (`file` writes to a file).
+- `logfile` specifies the absolute path to the log file.
+- `loglevel` sets the minimum severity to log (`0` enables debug level logging).
 
-3: ERROR: An operation fails, but other services and operations continue, plus fatal errors.
+Debug logging can produce large volumes of sensitive data and affect
+performance. Use it temporarily, then restore your previous log level in
+`values.yaml` and run `helm upgrade`. Removing the setting from Nextcloud's
+runtime configuration will restore Nextcloud’s default of `2` (warning level)
+unless `loglevel` is overwritten somewhere else as well.
 
-4: FATAL: The server stops.
-```
-[More information about Nextcloud logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html)
+For additional logging usage examples and parameters, see the
+[Nextcloud Server Admin Manual - Logging](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/logging_configuration.html) chapter.
 
 ### Viewing the logs
-To view logs after changing the logging behavior, you can exec into the Kubernetes pod, or copy them to your local machine.
 
-#### Exec into the kubernetes pod:
-```bash
-kubectl exec --stdin --tty nextcloud-pod-name-random-chars -- /bin/sh
-```
-
-#### Then look for the `nextcloud.log` file with tail or cat:
+Using the example path above, inspect the log directly in the Nextcloud container:
 
 ```bash
-cat nextcloud.log
-tail -f nextcloud.log
+kubectl exec -n default -c nextcloud <nextcloud-pod-name> -- tail -n 200 /var/www/html/data/nextcloud.log
+kubectl exec -n default -c nextcloud <nextcloud-pod-name> -- tail -f /var/www/html/data/nextcloud.log
 ```
 
-#### Copy the log file to your local machine:
+Or copy the file to your local machine:
+
 ```bash
-kubectl cp default/nextcloud-pod-name-random-chars:nextcloud.log ./my-local-machine-nextcloud.log
+kubectl cp -c nextcloud default/<nextcloud-pod-name>:/var/www/html/data/nextcloud.log ./nextcloud.log
 ```
+
+Replace `default`, `<nextcloud-pod-name>`, and the log path with the values for your deployment.
 
 ### Sharing the logs
-Remember to anonymize your logs and snippets from your pod before sharing them with the internet. Kubernetes secrets, even Sealed ones, live in plaintext `env` variables on your running containers, and log messages can include other information that should stay safely with you.
+
+Anonymize logs and pod output before sharing them publicly. Kubernetes Secrets -- including
+those generated from Sealed Secrets -- may appear in container environment variables,
+and logs can contain credentials, tokens, or other sensitive information.
