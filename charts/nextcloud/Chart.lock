@@ -10,6 +10,6 @@ dependencies:
   version: 21.1.3
 - name: collabora-online
   repository: https://collaboraonline.github.io/online
-  version: 1.3.8
-digest: sha256:e3812402c0af37e731a046c62096f5b2e8e58432b32e42a6bb69429054fd2c26
-generated: "2026-11-14T14:53:12.29079191Z"
+  version: 1.3.9
+digest: sha256:4bbfad8e92721b3d7c93fcdbd2221f1553abc0be0126fe0bf6e5cfd8fd77945e
+generated: "2026-11-25T14:58:14.535842532Z"
